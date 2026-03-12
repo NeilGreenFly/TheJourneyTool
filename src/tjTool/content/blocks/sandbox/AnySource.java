@@ -10,9 +10,11 @@ import mindustry.entities.units.BuildPlan;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.Styles;
+import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.meta.BuildVisibility;
 
 import static mindustry.Vars.*;
+import static mindustry.graphics.Layer.overlayUI;
 
 /**
  * 邻接源现已并入任意源, 原邻接源已被移除, 但可能会因其他测试重新加入, 不过这只会是暂时的. 
@@ -71,6 +73,12 @@ public class AnySource extends BaseSource {
             Draw.rect(regions[status], x, y);
             Draw.reset();
             drawSelecting();
+            for (var other: proximity)
+                if (other instanceof BaseTurret.BaseTurretBuild) {
+                    Draw.z(overlayUI);
+                    drawPlaceText("! 请不要将任意源与炮台相邻放置 !", tile.x, tile.y, false);
+                    break;
+                }
         }
 
         @Override

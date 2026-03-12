@@ -55,13 +55,15 @@ public class AmmoSource extends BaseSource {
         public float heat;
 
         public UnlockableContent getAmmo() {
-            if (ammoTypes.any() && ammo > -1) return ammoTypes.get(ammo);
-            return null;
+            return (ammoTypes.any() && ammo > -1 && ammo < ammoTypes.size)
+                    ? ammoTypes.get(ammo)
+                    : null;
         }
 
         public Liquid getCool() {
-            if (coolant.any() && cool > -1) return coolant.get(cool);
-            return null;
+            return (coolant.any() && cool > -1 && cool < coolant.size)
+                    ? coolant.get(cool)
+                    : null;
         }
 
         @Override
