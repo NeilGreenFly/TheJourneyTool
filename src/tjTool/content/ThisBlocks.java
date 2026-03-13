@@ -1,8 +1,15 @@
 package tjTool.content;
 
+import arc.graphics.Color;
+import mindustry.content.*;
+import mindustry.gen.Building;
+import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.world.Block;
-import mindustry.world.blocks.defense.OverdriveProjector;
+import mindustry.world.blocks.defense.*;
+import mindustry.world.blocks.liquid.LiquidBlock;
+import mindustry.world.draw.*;
 import mindustry.world.meta.BuildVisibility;
 import tjTool.content.blocks.sandbox.*;
 
@@ -10,7 +17,7 @@ import static mindustry.type.ItemStack.*;
 
 public class ThisBlocks {
 
-    public static Block anySource, ammoSource, solarSource, overdriveSource;
+    public static Block anySource, ammoSource, solarSource, mendSource, overdriveSource, regenSource;
 
     public static void load() {
 
@@ -27,7 +34,22 @@ public class ThisBlocks {
             alwaysUnlocked = true;
         }};
 
+        mendSource = new MendProjector("mend-source") {{
+            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+            alwaysUnlocked = true;
+            placeableLiquid = true;
+            size = 2;
+            reload = 250f;
+            range = 85f;
+            healPercent = 11f;
+            phaseBoost = 15f;
+            scaledHealth = 80;
+        }};
+
         overdriveSource = new OverdriveProjector("overdrive-source") {{
+            requirements(Category.effect, BuildVisibility.sandboxOnly, with());
+            alwaysUnlocked = true;
+            placeableLiquid = true;
             hasPower = false;
             hasItems = false;
             hasBoost = false;
@@ -37,9 +59,41 @@ public class ThisBlocks {
             range = 200f;
             speedBoost = 2.5f;
             useTime = 300f;
-            placeableLiquid = true;
+        }};
+
+        regenSource = new RegenProjector("regen-source") {{
             requirements(Category.effect, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            placeableLiquid = true;
+            size = 3;
+            range = 28;
+            baseColor = Pal.regen;
+            healPercent = 4f / 60f;
+            Color col = Color.valueOf("8ca9e8");
+            drawer = new DrawMulti(
+                    new DrawRegion("-bottom"),
+                    new DrawLiquidTile(Liquids.hydrogen, 9f / 4f) {
+                        @Override
+                        public void draw(Building build) {
+                            LiquidBlock.drawTiledFrames(build.block.size, build.x, build.y, this.padLeft, this.padRight, this.padTop, this.padBottom, this.drawLiquid, this.alpha);
+                        }
+                    },
+                    new DrawDefault(),
+                    new DrawGlowRegion() {{
+                        color = Color.sky;
+                    }},
+                    new DrawPulseShape(false) {{
+                        layer = Layer.effect;
+                        color = col;
+                    }},
+                    new DrawShape() {{
+                        layer = Layer.effect;
+                        radius = 3.5f;
+                        useWarmupRadius = true;
+                        timeScl = 2f;
+                        color = col;
+                    }}
+            );
         }};
 
     }

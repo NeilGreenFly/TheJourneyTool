@@ -1,5 +1,6 @@
 package tjTool.content.blocks.sandbox;
 
+import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.ui.*;
@@ -10,6 +11,7 @@ import arc.util.io.*;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.*;
+import mindustry.graphics.Layer;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
@@ -69,6 +71,7 @@ public class AmmoSource extends BaseSource {
         @Override
         public void draw() {
             super.draw();
+            Draw.z(Layer.blockAdditive);
             TjDraw.overdrive(this, "#D2F0FF", "#CBA3FF", heat);
             if (checkBuild(turretBuild))
                 TjDraw.overdrive(turretBuild, "#ffd59e", heat);
@@ -176,13 +179,13 @@ public class AmmoSource extends BaseSource {
             if (turretBuild != null) {
                 table.clear();
                 table.background(Tex.pane).top();
-                TjConfigTable.rowTable(this, table, new Image(turretBuild.block.uiIcon), turretBuild.block.localizedName, ammoTypes, () -> ammo, false, 0);
-                if (coolant.any()) TjConfigTable.rowTable(this, table, new Image(Icon.star), "Boost", coolant, () -> cool, false, 1);
-                if (consumes.any()) TjConfigTable.rowTable(this, table, new Image(Icon.download), "Consumes", consumes, () -> -1, false, -1);
+                TjConfigTable.rowTable(this, table, new Image(turretBuild.block.uiIcon), turretBuild.block.localizedName, ammoTypes, -1, () -> ammo, false, 0);
+                if (coolant.any()) TjConfigTable.rowTable(this, table, new Image(Icon.star), "Boost", coolant, coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
+                if (consumes.any()) TjConfigTable.rowImageTable(table, new Image(Icon.download), "Consumes", consumes);
                 if (turretBuild.block.canOverdrive) TjConfigTable.rowTable(this, table, new Image(Icon.effect), "Overdrive",
                         new Seq<>(new TextureRegion[]{Blocks.overdriveProjector.fullIcon, Blocks.overdriveProjector.fullIcon, Blocks.overdriveDome.fullIcon}),
                         new Seq<>(new String[]{"150%", "225%", "250%"}),
-                        () -> overdrive, false, 2);
+                        2, () -> overdrive, false, 2);
             }
         }
 
