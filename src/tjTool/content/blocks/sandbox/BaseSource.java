@@ -40,6 +40,7 @@ public class BaseSource extends Block {
         solid = true;
         canOverdrive = false;
         group = BlockGroup.transportation;
+        schematicPriority = -9;
         configurable = false;
         saveConfig = false;
         clearOnDoubleTap = false;

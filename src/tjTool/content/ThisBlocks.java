@@ -38,6 +38,8 @@ public class ThisBlocks {
             requirements(Category.effect, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
             placeableLiquid = true;
+            hasPower = false;
+            hasItems = false;
             size = 2;
             reload = 250f;
             range = 85f;
@@ -65,6 +67,9 @@ public class ThisBlocks {
             requirements(Category.effect, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
             placeableLiquid = true;
+            hasPower = false;
+            hasItems = false;
+            hasLiquids = false;
             size = 3;
             range = 28;
             baseColor = Pal.regen;
