@@ -12,6 +12,7 @@ import mindustry.type.*;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.meta.BuildVisibility;
+import tjTool.core.*;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.overlayUI;
@@ -38,6 +39,18 @@ public class AnySource extends BaseSource {
         clearOnDoubleTap = true;
 
         config(Integer.class, (AnySourceBuild tile, Integer status) -> tile.status = status);
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+        stats.add(TjStat.config, table -> {
+            table.row();
+            for (int i = 0; i < 3; i++)
+                TjStat.newConfigStats(table, regions[i],
+                        TjBundle.get("block", name, "config-name-" + i),
+                        TjBundle.get("block", name, "config-description-" + i));
+        });
     }
 
     @Override

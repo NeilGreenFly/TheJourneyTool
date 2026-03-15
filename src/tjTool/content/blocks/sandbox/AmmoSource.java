@@ -180,9 +180,9 @@ public class AmmoSource extends BaseSource {
                 table.clear();
                 table.background(Tex.pane).top();
                 TjConfigTable.rowTable(this, table, new Image(turretBuild.block.uiIcon), turretBuild.block.localizedName, ammoTypes, -1, () -> ammo, false, 0);
-                if (coolant.any()) TjConfigTable.rowTable(this, table, new Image(Icon.star), "Boost", coolant, coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
-                if (consumes.any()) TjConfigTable.rowImageTable(table, new Image(Icon.download), "Consumes", consumes);
-                if (turretBuild.block.canOverdrive) TjConfigTable.rowTable(this, table, new Image(Icon.effect), "Overdrive",
+                if (coolant.any()) TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant, coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
+                if (consumes.any()) TjConfigTable.rowImageTable(table, new Image(Icon.download), TjBundle.getBlock(name, "config-consumes"), consumes);
+                if (turretBuild.block.canOverdrive) TjConfigTable.rowTable(this, table, new Image(Icon.effect), TjBundle.getBlock(name, "config-overdrive"),
                         new Seq<>(new TextureRegion[]{Blocks.overdriveProjector.fullIcon, Blocks.overdriveProjector.fullIcon, Blocks.overdriveDome.fullIcon}),
                         new Seq<>(new String[]{"150%", "225%", "250%"}),
                         2, () -> overdrive, false, 2);

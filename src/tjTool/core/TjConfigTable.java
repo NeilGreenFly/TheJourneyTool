@@ -25,9 +25,9 @@ public class TjConfigTable {
         table.add(icon).size(40f).tooltip(tip).center();
         if (regions.any()) {
             table.table(configTable(building, regions, tips, holder, closeSelect, groupIndex)).left();
-            table.add(imageButton(Icon.undo, () -> building.configure(new int[]{groupIndex, -1}))).size(40f).tooltip("Reset").center();
+            table.add(imageButton(Icon.undo, () -> building.configure(new int[]{groupIndex, -1}))).size(40f).tooltip(TjBundle.get("table", "reset")).center();
             if (favorite > -1 && favorite < regions.size)
-                table.add(imageButton(Icon.star, () -> building.configure(new int[]{groupIndex, favorite}))).size(40f).tooltip("Favorite").center();
+                table.add(imageButton(Icon.star, () -> building.configure(new int[]{groupIndex, favorite}))).size(40f).tooltip(TjBundle.get("table", "favorite")).center();
             table.row();
         } else table.image(Icon.cancel).size(40f).center().row();
     }

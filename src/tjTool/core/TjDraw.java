@@ -12,6 +12,10 @@ import static mindustry.Vars.tilesize;
 
 public class TjDraw {
 
+    public static String toString(Color color) {
+        return "[#" + color + "]";
+    }
+
     public static Color rainbow() {
         return rainbow(25f, 100f);
     }
