@@ -17,7 +17,9 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.BuildVisibility;
 import mindustry.world.meta.Env;
+import tjTool.core.TjBundle;
 import tjTool.core.TjDraw;
+import tjTool.core.TjStat;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.overlayUI;
@@ -54,6 +56,15 @@ public class BaseSource extends Block {
 
     public TextureRegion atlasFind(String suffix) {
         return Core.atlas.find(Vars.content.transformName(name + "-" + suffix));
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+        stats.add(TjStat.config, table -> {
+            table.row();
+            TjStat.acknowledgements(table, region);
+        });
     }
 
     @Override

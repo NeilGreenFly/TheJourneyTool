@@ -50,7 +50,7 @@ public class AmmoSource extends BaseSource {
         super.setStats();
         stats.add(TjStat.config, table -> {
             table.row();
-            TjStat.newConfigStats(table, region, TjBundle.getBlock(name, "name"), TjBundle.getBlock(name, "config-description"));
+            TjStat.newConfigStats(table, Icon.turret.getRegion(), TjBundle.getBlock(name, "config-ammo"), TjBundle.getBlock(name, "config-ammo-description"));
             TjStat.newConfigStats(table, Icon.star.getRegion(), TjBundle.getBlock(name, "config-boost"), TjBundle.getBlock(name, "config-boost-description"));
             TjStat.newConfigStats(table, Icon.download.getRegion(), TjBundle.getBlock(name, "config-consumes"), TjBundle.getBlock(name, "config-consumes-description"));
             TjStat.newConfigStats(table, Icon.effect.getRegion(), TjBundle.getBlock(name, "config-overdrive"), TjBundle.getBlock(name, "config-overdrive-description"));

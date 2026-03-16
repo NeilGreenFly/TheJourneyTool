@@ -1,6 +1,7 @@
 package tjTool.content.blocks.sandbox;
 
 import mindustry.world.blocks.power.SolarGenerator;
+import tjTool.core.*;
 
 import static mindustry.world.blocks.power.PowerNode.makeBatteryBalance;
 import static mindustry.world.blocks.power.PowerNode.makePowerBalance;
@@ -13,6 +14,15 @@ public class SolarSource extends SolarGenerator {
         canOverdrive = false;
         placeableLiquid = true;
         powerProduction = 1000000f / 60f;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+        stats.add(TjStat.config, table -> {
+            table.row();
+            TjStat.acknowledgements(table, region);
+        });
     }
 
     @Override

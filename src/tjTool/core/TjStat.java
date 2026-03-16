@@ -12,6 +12,10 @@ import mindustry.world.meta.StatCat;
 public class TjStat {
     public static final Stat config = new Stat("config", StatCat.function);
 
+    public static void acknowledgements(Table table, TextureRegion region) {
+        newConfigStats(table, region, TjBundle.getThis("acknowledgements"), TjBundle.getThis("saying"));
+    }
+
     public static void newConfigStats(Table table, TextureRegion region, String name, String description) {
         table.table(Styles.grayPanel, frame -> {
             frame.image(region).tooltip(name).size(40f).pad(12f).left().top();

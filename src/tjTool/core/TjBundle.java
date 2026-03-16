@@ -12,6 +12,10 @@ public class TjBundle {
         return Core.bundle.get(namespace + "." + path + "." + attribute);
     }
 
+    public static String getThis(String path) {
+        return get("tj-tool", path);
+    }
+
     public static String getBlock(String name, String attribute) {
         return get("block", name, attribute);
     }
