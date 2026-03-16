@@ -17,9 +17,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.BuildVisibility;
 import mindustry.world.meta.Env;
-import tjTool.core.TjBundle;
-import tjTool.core.TjDraw;
-import tjTool.core.TjStat;
+import tjTool.core.*;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.overlayUI;
