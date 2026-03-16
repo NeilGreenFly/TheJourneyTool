@@ -91,7 +91,7 @@ public class AnySource extends BaseSource {
             for (var other: proximity)
                 if (other instanceof BaseTurret.BaseTurretBuild) {
                     Draw.z(overlayUI);
-                    drawPlaceText("! 请不要将任意源与炮台相邻放置 !", tile.x, tile.y, false);
+                    drawPlaceText(TjBundle.getBlock(name, "warning"), tile.x, tile.y, false);
                     break;
                 }
         }
@@ -137,7 +137,6 @@ public class AnySource extends BaseSource {
 
         @Override
         public void buildConfiguration(Table table) {
-            String[] names = {"空", "任意", "邻接"};
             table.clear();
             table.background(Tex.pane).top();
             table.table(newTable -> {
@@ -151,7 +150,7 @@ public class AnySource extends BaseSource {
                             Styles.clearNoneTogglei,
                             36f,
                             () -> {}
-                    ).tooltip(names[i] + "源").group(group).get();
+                    ).tooltip(TjBundle.getBlock(name, "config-name-" + finalI)).group(group).get();
                     button.changed(() -> {
                         if (button.isChecked()) {
                             configure(finalI);
@@ -162,7 +161,7 @@ public class AnySource extends BaseSource {
                     button.update(() -> button.setChecked(status == finalI));
                 }
             }).row();
-            table.label(() -> names[status] + "源").size(120f, 40f);
+            table.label(() -> TjBundle.getBlock(name, "config-name-" + status)).size(120f, 40f);
         }
 
         @Override
