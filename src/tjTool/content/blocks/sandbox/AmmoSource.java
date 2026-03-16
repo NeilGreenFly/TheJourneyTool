@@ -45,6 +45,18 @@ public class AmmoSource extends BaseSource {
         });
     }
 
+    @Override
+    public void setStats() {
+        super.setStats();
+        stats.add(TjStat.config, table -> {
+            table.row();
+            TjStat.newConfigStats(table, region, TjBundle.getBlock(name, "name"), TjBundle.getBlock(name, "config-description"));
+            TjStat.newConfigStats(table, Icon.star.getRegion(), TjBundle.getBlock(name, "config-boost"), TjBundle.getBlock(name, "config-boost-description"));
+            TjStat.newConfigStats(table, Icon.download.getRegion(), TjBundle.getBlock(name, "config-consumes"), TjBundle.getBlock(name, "config-consumes-description"));
+            TjStat.newConfigStats(table, Icon.effect.getRegion(), TjBundle.getBlock(name, "config-overdrive"), TjBundle.getBlock(name, "config-overdrive-description"));
+        });
+    }
+
     public class AmmoSourceBuild extends BaseSourceBuild {
         public @Nullable BaseTurret.BaseTurretBuild turretBuild = null;
         public int ammo = -1;
@@ -180,7 +192,11 @@ public class AmmoSource extends BaseSource {
                 table.clear();
                 table.background(Tex.pane).top();
                 TjConfigTable.rowTable(this, table, new Image(turretBuild.block.uiIcon), turretBuild.block.localizedName, ammoTypes, -1, () -> ammo, false, 0);
-                if (coolant.any()) TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant, coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
+                if (coolant.any())
+                    if (turretBuild.block instanceof ReloadTurret turret)
+                        TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant.map(item -> item.fullIcon), coolant.map(liquid -> liquid.localizedName + "\n" + TjStat.boosters(turret, true, liquid)), coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
+                    else
+                        TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant, coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
                 if (consumes.any()) TjConfigTable.rowImageTable(table, new Image(Icon.download), TjBundle.getBlock(name, "config-consumes"), consumes);
                 if (turretBuild.block.canOverdrive) TjConfigTable.rowTable(this, table, new Image(Icon.effect), TjBundle.getBlock(name, "config-overdrive"),
                         new Seq<>(new TextureRegion[]{Blocks.overdriveProjector.fullIcon, Blocks.overdriveProjector.fullIcon, Blocks.overdriveDome.fullIcon}),
