@@ -22,12 +22,12 @@ public class TjConfigTable {
     }
 
     public static void rowTable(Building building, Table table, Image icon, String tip, Seq<TextureRegion> regions, Seq<String> tips, int favorite, Prov<Integer> holder, boolean closeSelect, int groupIndex) {
-        table.add(icon).size(40f).tooltip(tip).center();
+        table.add(icon).size(40f).tooltip(tip, true).center();
         if (regions.any()) {
             table.table(configTable(building, regions, tips, holder, closeSelect, groupIndex)).left();
-            table.add(imageButton(Icon.undo, () -> building.configure(new int[]{groupIndex, -1}))).size(40f).tooltip(TjBundle.get("table", "reset")).center();
+            table.add(imageButton(Icon.undo, () -> building.configure(new int[]{groupIndex, -1}))).size(40f).tooltip(TjBundle.get("table", "reset"), true).center();
             if (favorite > -1 && favorite < regions.size)
-                table.add(imageButton(Icon.star, () -> building.configure(new int[]{groupIndex, favorite}))).size(40f).tooltip(TjBundle.get("table", "favorite")).center();
+                table.add(imageButton(Icon.star, () -> building.configure(new int[]{groupIndex, favorite}))).size(40f).tooltip(TjBundle.get("table", "favorite"), true).center();
             table.row();
         } else table.image(Icon.cancel).size(40f).center().row();
     }
@@ -67,7 +67,7 @@ public class TjConfigTable {
     ) {
         ImageButton button = table.button(Tex.whiteui, Styles.clearNoneTogglei, 24f, () -> {
             if (closeSelect) Vars.control.input.config.hideConfig();
-        }).tooltip(tip).group(group).get();
+        }).tooltip(tip, true).group(group).get();
 
         if (groupIndex != -1) button.changed(() -> consumer.get(new int[]{groupIndex, button.isChecked() ? buttonIndex : -1}));
         button.getStyle().imageUp = new TextureRegionDrawable(region);
@@ -75,11 +75,11 @@ public class TjConfigTable {
     }
 
     public static <Type extends UnlockableContent> void rowImageTable(Table table, Image icon, String tip, Seq<Type> items) {
-        table.add(icon).size(40f).tooltip(tip).center();
+        table.add(icon).size(40f).tooltip(tip, true).center();
         if (items.any())
             table.table(rowImage -> {
                 for (var item : items)
-                    rowImage.table(frame -> frame.image(item.fullIcon).size(24f).center()).tooltip(item.localizedName).size(40f);
+                    rowImage.table(frame -> frame.image(item.fullIcon).size(24f).center()).tooltip(item.localizedName, true).size(40f);
             }).left().row();
         else table.image(Icon.cancel).size(40f).center().row();
     }

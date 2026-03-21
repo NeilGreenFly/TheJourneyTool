@@ -112,7 +112,7 @@ public class BaseSource extends Block {
         private float selectingDrawRadius = 0f;
 
         public boolean checkBuild(Building other) {
-            return other != null && other.interactable(team);
+            return other != null && other.team == team;
         }
 
         public void drawSelecting() {

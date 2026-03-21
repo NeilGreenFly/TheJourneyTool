@@ -32,7 +32,6 @@ public class ThisBlocks {
 
         solarSource = new SolarSource("solar-source") {{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
-            alwaysUnlocked = true;
         }};
 
         mendSource = new MendProjector("mend-source") {
