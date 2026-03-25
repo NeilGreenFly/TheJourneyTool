@@ -10,6 +10,7 @@ import arc.struct.Seq;
 import mindustry.Vars;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.*;
+import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
 
 /**
@@ -83,5 +84,100 @@ public class TjConfigTable {
             }).left().row();
         else table.image(Icon.cancel).size(40f).center().row();
     }
+
+    public static void titleTable(Table table, String title, String label) {
+        table.table(tag -> {
+            tag.add(title).left().color(Pal.gray);
+            tag.image().height(3).color(Pal.gray).growX().pad(5).row();
+            tag.add(label).colspan(2).color(Pal.lightishGray).growX().left().padTop(4).padLeft(20).padRight(20);
+        }).growX().pad(4, 8, 4, 8).row();
+    }
+
+    public static Cons<Table> updateLog = table -> {
+        table.add("更新日志").growX().left().color(Pal.accent).row();
+        table.image().height(3).color(Pal.accent).growX().pad(5).padLeft(0).padRight(0).row();
+        TjConfigTable.titleTable(table, "v1.1.1", """
+                            新增 >>
+                            - 为 StatusEffects.none 覆盖新的精灵(原为空)
+                            - 为 太阳能源 添加无缝瓦片精灵
+                            - 为 emanate(发散) 添加更多part
+                            - 新增更新日志
+                            """);
+        TjConfigTable.titleTable(table, "v1.1", """
+                            调整 >>
+                            - 完善语言包, 现已覆盖简体中文和英文
+                            - 完善建筑介绍
+                            修复 >>
+                            - 修复弹药源跨队伍供弹的BUG
+                            """);
+        TjConfigTable.titleTable(table, "v1.0.3", """
+                            调整 >>
+                            - 降低了 弹药源 的放置优先级
+                            """);
+        TjConfigTable.titleTable(table, "v1.0.2", """
+                            新增 >>
+                            - 新增 修理源 和 再生源
+                            - 弹药源 现在可以一键选择效率最高的液体和超速倍率
+                            调整 >>
+                            - 超速源 贴图重绘
+                            修复 >>
+                            - 弹药源 现在可以将超速图层绘制在合适的图层
+                            - 弹药源 现在消耗栏已不再可以被点击
+                            """);
+        TjConfigTable.titleTable(table, "v1.0.1", """
+                            新增 >>
+                            - 弹药源 添加超速配置
+                            修复 >>
+                            - 弹药源 现已兼容多人模式
+                            - 弹药源 现在复制可以保留配置
+                            - 紧急修复 弹药源 因索引越界导致的崩溃
+                            """);
+        TjConfigTable.titleTable(table, "v1.0", """
+                            新增 >>
+                            - 添加了4个便于沙盒测试的方块
+                            - 当 任意源 与炮台相邻时警告
+                            修复 >>
+                            - 修复 弹药源 因索引越界导致的崩溃
+                            """);
+        table.add("彩蛋").growX().left().color(Pal.accent).row();
+        table.image().height(3).color(Pal.accent).growX().pad(5).padLeft(0).padRight(0).row();
+        table.label(() -> TjDraw.rainbowStream("""
+                            其实这一页都是彩蛋喵
+                            以及这一页是硬编码的
+                            所以使用其他语言也只能看到中文
+                            关注 Neil 谢谢喵
+                            """)).growX().left().pad(8).row();
+//                    table.label(() -> TjDraw.rainbowStream("""
+//                            v1.1.1
+//                            - 为 StatusEffects.none 覆盖新的精灵(原为空)
+//
+//                            v1.1
+//                            - 完善语言包, 现已覆盖简体中文和英文
+//                            - 完善建筑介绍
+//                            - 修复弹药源跨队伍供弹的BUG
+//
+//                            v1.0.3
+//                            - 调整了弹药源的放置优先级
+//
+//                            v1.0.2
+//                            - 修复图层绘制错误的问题
+//                            - 现在消耗栏已不再可以被点击
+//                            - 新增修理源和再生源
+//                            - 超速源贴图重绘
+//                            - 新增快速选择
+//                              现在可以一键选择效率最高的液体和超速倍率
+//
+//                            v1.0.1
+//                            - 修复弹药源不能兼容多人模式的问题
+//                            - 弹药源添加超速选项
+//                            - 修复复制无法保留配置等BUG
+//                            - 紧急修复因索引越界导致的崩溃
+//
+//                            v1.0
+//                            - 添加了4个便于沙盒测试的方块
+//                            - 修复因索引越界导致的崩溃
+//                            - 新增当 任意源 与炮台相邻时警告
+//                            """)).growX().left().row();
+    };
 
 }

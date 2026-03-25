@@ -6,6 +6,7 @@ import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.*;
 import tjTool.content.ThisBlocks;
+import tjTool.content.ThisOverride;
 
 public class ThisMain extends Mod{
 
@@ -16,6 +17,7 @@ public class ThisMain extends Mod{
     @Override
     public void loadContent(){
         ThisBlocks.load();
+        ThisOverride.load();
     }
 
 }

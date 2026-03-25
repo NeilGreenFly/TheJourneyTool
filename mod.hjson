@@ -1,4 +1,5 @@
-displayName: "The Journey Tool  v1.0"
+displayName: "The Journey Tool  v1.1"
+subtitle: "旅途有你, 才叫旅途."
 description: "旅途有你,才叫旅途.\n添加了更多调试工具便于测试,如因模组冲突导致崩溃请自行禁用该模组或其他模组,我们不会考虑去兼容其他模组,至少目前如此."
 
 name: "tj-tool"

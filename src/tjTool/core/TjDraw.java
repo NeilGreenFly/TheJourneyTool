@@ -24,6 +24,13 @@ public class TjDraw {
         return Color.HSVtoRGB(Time.time % 360, s, v);
     }
 
+    public static String rainbowStream(String string) {
+        StringBuilder rainbowString = new StringBuilder();
+        for (int i = 0; i < string.length(); i += 1)
+            rainbowString.append(TjDraw.toString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f))).append(string.charAt(i));
+        return rainbowString.toString();
+    }
+
     public static void lightPoly(Building building) {
         lightPoly(building, 4, building.team.color);
     }
