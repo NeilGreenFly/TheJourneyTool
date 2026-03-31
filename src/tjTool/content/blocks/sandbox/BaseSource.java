@@ -59,10 +59,7 @@ public class BaseSource extends Block {
     @Override
     public void setStats() {
         super.setStats();
-        stats.add(TjStat.config, table -> {
-            table.row();
-            TjStat.acknowledgements(table, region);
-        });
+        stats.add(TjStat.config, TjStat.acknowledgements(region));
     }
 
     @Override
@@ -145,7 +142,7 @@ public class BaseSource extends Block {
         public void drawSelect() {
             selecting = true;
             if (drawProximity && !rotate)
-                for (var other: proximity)
+                for (var other : proximity)
                     if (checkBuild(other) && (other.block.hasItems || other.block.hasLiquids))
                         Drawf.selected(other.tile, team.color);
         }

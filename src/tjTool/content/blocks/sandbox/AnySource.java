@@ -88,7 +88,7 @@ public class AnySource extends BaseSource {
             Draw.rect(regions[status], x, y);
             Draw.reset();
             drawSelecting();
-            for (var other: proximity)
+            for (var other : proximity)
                 if (other instanceof BaseTurret.BaseTurretBuild) {
                     Draw.z(overlayUI);
                     drawPlaceText(TjBundle.getBlock(name, "warning"), tile.x, tile.y, false);
@@ -102,10 +102,10 @@ public class AnySource extends BaseSource {
             switch (status) {
 
                 case 1:
-                    for (Item item: content.items())
+                    for (Item item : content.items())
                         for (int i = 10; i --> 0;)
                             offload(item);
-                    for (Liquid liquid: content.liquids()) {
+                    for (Liquid liquid : content.liquids()) {
                         liquids.set(liquid, 10000f);
                         dumpLiquid(liquid);
                     }

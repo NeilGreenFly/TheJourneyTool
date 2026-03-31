@@ -52,10 +52,7 @@ public class ThisBlocks {
             @Override
             public void setStats() {
                 super.setStats();
-                stats.add(TjStat.config, table -> {
-                    table.row();
-                    TjStat.acknowledgements(table, region);
-                });
+                stats.add(TjStat.config, TjStat.acknowledgements(region));
             }
         };
 
@@ -78,10 +75,7 @@ public class ThisBlocks {
             @Override
             public void setStats() {
                 super.setStats();
-                stats.add(TjStat.config, table -> {
-                    table.row();
-                    TjStat.acknowledgements(table, region);
-                });
+                stats.add(TjStat.config, TjStat.acknowledgements(region));
             }
         };
 
@@ -127,10 +121,7 @@ public class ThisBlocks {
             @Override
             public void setStats() {
                 super.setStats();
-                stats.add(TjStat.config, table -> {
-                    table.row();
-                    TjStat.acknowledgements(table, region);
-                });
+                stats.add(TjStat.config, TjStat.acknowledgements(region));
             }
         };
 

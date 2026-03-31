@@ -9,22 +9,24 @@ import mindustry.type.Liquid;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.defense.turrets.ReloadTurret;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatCat;
+import mindustry.world.meta.*;
 
 public class TjStat {
     public static final Stat config = new Stat("config", StatCat.function);
 
-    public static void acknowledgements(Table table, TextureRegion region) {
-        newConfigStats(table, region, TjBundle.getThis("acknowledgements"), TjBundle.getThis("saying"), new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                BaseDialog dialog = new BaseDialog(TjBundle.getThis("saying"));
-                dialog.cont.table(TjConfigTable.updateLog);
-                dialog.addCloseButton();
-                dialog.show();
-            }
-        });
+    public static StatValue acknowledgements(TextureRegion region) {
+        return table -> {
+            table.row();
+            newConfigStats(table, region, TjBundle.getThis("acknowledgements"), TjBundle.getThis("saying"), new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    BaseDialog dialog = new BaseDialog(TjBundle.getThis("saying"));
+                    dialog.cont.table(TjConfigTable.updateLog);
+                    dialog.addCloseButton();
+                    dialog.show();
+                }
+            });
+        };
     }
 
     public static void newConfigStats(Table table, TextureRegion region, String name, String description) {

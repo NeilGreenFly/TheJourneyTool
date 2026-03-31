@@ -115,35 +115,35 @@ public class AmmoSource extends BaseSource {
                 if (getCool() != null && !turretBuild.block.consumesLiquid(getCool())) cool = -1;
 
                 if (turretBuild.block.hasItems)
-                    for (var item: content.items())
+                    for (var item : content.items())
                         if (turretBuild.block.consumesItem(item))
                             consumes.add(item);
                 if (turretBuild.block.hasLiquids)
-                    for (var liquid: content.liquids())
+                    for (var liquid : content.liquids())
                         if (turretBuild.block.consumesLiquid(liquid))
                             consumes.add(liquid);
                 if (turretBuild instanceof ItemTurret.ItemTurretBuild) {
-                    for (var v: consumes)
+                    for (var v : consumes)
                         if (v instanceof Item)
                             ammoTypes.add(v);
                 } else if (turretBuild instanceof LiquidTurret.LiquidTurretBuild) {
-                    for (var v: consumes)
+                    for (var v : consumes)
                         if (v instanceof Liquid)
                             ammoTypes.add(v);
                 } else if (turretBuild instanceof ContinuousLiquidTurret.ContinuousLiquidTurretBuild) {
-                    for (var v: consumes)
+                    for (var v : consumes)
                         if (v instanceof Liquid)
                             ammoTypes.add(v);
                 }
-                for (var v: ammoTypes)
+                for (var v : ammoTypes)
                     consumes.remove(v);
                 if (((BaseTurret) turretBuild.block).coolant != null)
-                    for (var liquid: content.liquids())
+                    for (var liquid : content.liquids())
                         if (((BaseTurret) turretBuild.block).coolant.consumes(liquid)) {
                             coolant.add(liquid);
                             consumes.remove(liquid);
                         }
-                for (var v: consumes)
+                for (var v : consumes)
                     if (v instanceof Item item && turretBuild.acceptItem(this, item))
                         turretBuild.handleItem(this, item);
                     else if (v instanceof Liquid liquid)
@@ -165,14 +165,14 @@ public class AmmoSource extends BaseSource {
                     if (getAmmo() instanceof Liquid liquid)
                         turretBuild.liquids.set(liquid, turretBuild.block.liquidCapacity);
                     else
-                        for (var v: ammoTypes)
+                        for (var v : ammoTypes)
                             if (v instanceof Liquid liquid)
                                 turretBuild.liquids.set(liquid, 0f);
                 }
                 if (getCool() != null)
                     turretBuild.liquids.set(getCool(), turretBuild.block.liquidCapacity);
                 else
-                    for (var liquid: coolant)
+                    for (var liquid : coolant)
                         turretBuild.liquids.set(liquid, 0f);
                 if (overdrive > -1)
                     turretBuild.applyBoost(overdrives[overdrive], 61.0f);
@@ -194,12 +194,12 @@ public class AmmoSource extends BaseSource {
                 TjConfigTable.rowTable(this, table, new Image(turretBuild.block.uiIcon), turretBuild.block.localizedName, ammoTypes, -1, () -> ammo, false, 0);
                 if (coolant.any())
                     if (turretBuild.block instanceof ReloadTurret turret)
-                        TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant.map(item -> item.fullIcon), coolant.map(liquid -> liquid.localizedName + "\n" + TjStat.boosters(turret, true, liquid)), coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
+                        TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant.map(item -> item.uiIcon), coolant.map(liquid -> liquid.localizedName + "\n" + TjStat.boosters(turret, true, liquid)), coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
                     else
                         TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant, coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
                 if (consumes.any()) TjConfigTable.rowImageTable(table, new Image(Icon.download), TjBundle.getBlock(name, "config-consumes"), consumes);
                 if (turretBuild.block.canOverdrive) TjConfigTable.rowTable(this, table, new Image(Icon.effect), TjBundle.getBlock(name, "config-overdrive"),
-                        new Seq<>(new TextureRegion[]{Blocks.overdriveProjector.fullIcon, Blocks.overdriveProjector.fullIcon, Blocks.overdriveDome.fullIcon}),
+                        new Seq<>(new TextureRegion[]{Blocks.overdriveProjector.uiIcon, Blocks.overdriveProjector.uiIcon, Blocks.overdriveDome.uiIcon}),
                         new Seq<>(new String[]{"150%", "225%", "250%"}),
                         2, () -> overdrive, false, 2);
             }
