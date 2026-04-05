@@ -1,7 +1,6 @@
 package tjTool.content.blocks.sandbox;
 
 import arc.Core;
-import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.*;
@@ -10,7 +9,6 @@ import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.type.*;
-import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.blocks.heat.HeatBlock;
 import mindustry.world.draw.*;
