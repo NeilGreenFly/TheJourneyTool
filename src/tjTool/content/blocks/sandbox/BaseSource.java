@@ -64,11 +64,7 @@ public class BaseSource extends Block {
 
     @Override
     public void setBars() {
-        addBar("health", entity -> new Bar(
-                () -> Core.bundle.get("stat.health", "stat.health"),
-                TjDraw::rainbow,
-                entity::healthf
-        ).blink(Color.white));
+        addBar("health", TjBar.makeHealthBalance());
     }
 
     @Override
