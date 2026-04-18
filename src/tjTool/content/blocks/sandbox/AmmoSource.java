@@ -1,7 +1,7 @@
 package tjTool.content.blocks.sandbox;
 
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
@@ -18,11 +18,13 @@ import mindustry.world.draw.*;
 import tjTool.core.*;
 
 import static mindustry.Vars.content;
+import static tjTool.core.TjConfigTable.*;
 
 public class AmmoSource extends BaseSource {
     public AmmoSource(String name) {
         super(name);
         rotate = true;
+        quickRotate = false;
         regionRotated1 = 1;
         configurable = true;
         saveConfig = true;
@@ -31,18 +33,7 @@ public class AmmoSource extends BaseSource {
                 new DrawDefault(),
                 new DrawHeatOutput()
         );
-        config(int[].class, (AmmoSourceBuild tile, int[] v) -> {
-            switch (v[0]) {
-                case -2:
-                    tile.ammo = v[1];
-                    tile.cool = v[2];
-                    tile.overdrive = v[3];
-                    break;
-                case 0: tile.ammo = v[1]; break;
-                case 1: tile.cool = v[1]; break;
-                case 2: tile.overdrive = v[1]; break;
-            }
-        });
+        config(int[].class, (AmmoSourceBuild tile, int[] v) -> tile.pack.receive(v));
     }
 
     @Override
@@ -59,9 +50,16 @@ public class AmmoSource extends BaseSource {
 
     public class AmmoSourceBuild extends BaseSourceBuild {
         public @Nullable BaseTurret.BaseTurretBuild turretBuild = null;
-        public int ammo = -1;
-        public int cool = -1;
-        public int overdrive = -1;
+        public ConfigPack pack = new ConfigPack(this).with(
+                new ConfigContent(),
+                new ConfigContent(new Image(Icon.star), TjBundle.getBlock(name, "config-boost")).setAlwaysBuild(false),
+                new ConfigContent(new Image(Icon.download), TjBundle.getBlock(name, "config-consumes")).setAlwaysBuild(false).setLock(true),
+                new ConfigContent(new Image(Icon.effect), TjBundle.getBlock(name, "config-overdrive"), Seq.with(
+                        new Option(Blocks.overdriveProjector.uiIcon, "150%"),
+                        new Option(Blocks.overdriveProjector.uiIcon, "225%"),
+                        new Option(Blocks.overdriveDome.uiIcon, "250%")
+                )).setFavorite(2).setAlwaysBuild(false).setStatic(true)
+        );
         public Seq<UnlockableContent> consumes = new Seq<>();
         public Seq<UnlockableContent> ammoTypes = new Seq<>();
         public Seq<Liquid> coolant = new Seq<>();
@@ -69,15 +67,26 @@ public class AmmoSource extends BaseSource {
         public float heat;
 
         public UnlockableContent getAmmo() {
-            return (ammoTypes.any() && ammo > -1 && ammo < ammoTypes.size)
-                    ? ammoTypes.get(ammo)
-                    : null;
+            return pack.from(ammoTypes, 0);
         }
 
         public Liquid getCool() {
-            return (coolant.any() && cool > -1 && cool < coolant.size)
-                    ? coolant.get(cool)
-                    : null;
+            return pack.from(coolant, 1);
+        }
+
+        public void drawItemSelections(Building building, Seq<UnlockableContent> selections) {
+            float dx = building.x - (building.block.size * 8) / 2f;
+            float dy = building.y + (building.block.size * 8) / 2f;
+            for (var selection : selections)
+                if (selection != null) {
+                    float s = 6f * selection.fullIcon.ratio();
+                    float h = 6f;
+                    Draw.mixcol(Color.darkGray, 1f);
+                    Draw.rect(selection.fullIcon, dx, dy - 1f, s, h);
+                    Draw.reset();
+                    Draw.rect(selection.fullIcon, dx, dy, s, h);
+                    dy -= 7f;
+                }
         }
 
         @Override
@@ -93,26 +102,28 @@ public class AmmoSource extends BaseSource {
         public void drawSelect() {
             super.drawSelect();
             if (turretBuild != null) {
-                drawItemSelection(getAmmo() != null ? getAmmo() : turretBuild.block);
                 TjDraw.lightPoly(turretBuild, TjDraw.rainbow());
+                drawItemSelection(turretBuild.block);
+                drawItemSelections(turretBuild, Seq.with(getAmmo(), getCool()));
             }
         }
 
         @Override
-        public void updateTile() {
-            heat = Mathf.lerpDelta(heat, overdrive > -1 ? 1f : 0f, 0.08f);
-            /*
-            这边本来是初始化的，但是暂时不了解放在什么地方比较好，以及没有放置条件和不满足的回调，故目前为止暂时维持现状，以后我会来优化的。
-             */
+        public void drawConfigure() {
+            super.drawConfigure();
+            drawSelect();
+            selecting = false;
+        }
+
+        @Override
+        public void onProximityUpdate() {
+            pack.clear();
             consumes.clear();
             ammoTypes.clear();
             coolant.clear();
             Building b = front();
             if (checkBuild(b) && b instanceof BaseTurret.BaseTurretBuild baseTurretBuild && (turretBuild == baseTurretBuild || turretBuild == null)) {
                 turretBuild = baseTurretBuild;
-                if (getAmmo() instanceof Item item && !turretBuild.block.consumesItem(item)) ammo = -1;
-                if (getAmmo() instanceof Liquid liquid && !turretBuild.block.consumesLiquid(liquid)) ammo = -1;
-                if (getCool() != null && !turretBuild.block.consumesLiquid(getCool())) cool = -1;
 
                 if (turretBuild.block.hasItems)
                     for (var item : content.items())
@@ -143,6 +154,23 @@ public class AmmoSource extends BaseSource {
                             coolant.add(liquid);
                             consumes.remove(liquid);
                         }
+                pack.get(0).setIcon(new Image(turretBuild.block.uiIcon)).setTip(turretBuild.block.localizedName).setOptions(ammoTypes.map(optionMapper));
+                pack.get(1).setOptions(coolant.map(
+                        turretBuild instanceof ReloadTurret.ReloadTurretBuild reloadTurretBuild
+                        ? liquid -> new Option(liquid.uiIcon, liquid.localizedName + "\n" + TjStat.boosters((ReloadTurret) reloadTurretBuild.block, true, liquid))
+                        : liquid -> new Option(liquid.uiIcon, liquid.localizedName)
+                )).setFavorite(coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)));
+                pack.get(2).setOptions(consumes.map(optionMapper));
+            } else {
+                turretBuild = null;
+                pack.reset();
+            }
+        }
+
+        @Override
+        public void updateTile() {
+            heat = Mathf.lerpDelta(heat, pack.get(3).getIndex() > -1 ? 1f : 0f, 0.08f);
+            if (turretBuild != null) {
                 for (var v : consumes)
                     if (v instanceof Item item && turretBuild.acceptItem(this, item))
                         turretBuild.handleItem(this, item);
@@ -174,13 +202,8 @@ public class AmmoSource extends BaseSource {
                 else
                     for (var liquid : coolant)
                         turretBuild.liquids.set(liquid, 0f);
-                if (overdrive > -1)
-                    turretBuild.applyBoost(overdrives[overdrive], 61.0f);
-            } else {
-                turretBuild = null;
-                ammo = -1;
-                cool = -1;
-                overdrive = -1;
+                if (pack.get(3).getIndex() > -1)
+                    turretBuild.applyBoost(overdrives[pack.get(3).getIndex()], 61.0f);
             }
 //            if (turretBuild instanceof ReloadTurret.ReloadTurretBuild reloadTurretBuild && sf && (!ammoTypes.any() || getAmmo() != null))
 //                reloadTurretBuild.reloadCounter = ((ReloadTurret) reloadTurretBuild.block).reload;
@@ -191,39 +214,30 @@ public class AmmoSource extends BaseSource {
             if (turretBuild != null) {
                 table.clear();
                 table.background(Tex.pane).top();
-                TjConfigTable.rowTable(this, table, new Image(turretBuild.block.uiIcon), turretBuild.block.localizedName, ammoTypes, -1, () -> ammo, false, 0);
-                if (coolant.any())
-                    if (turretBuild.block instanceof ReloadTurret turret)
-                        TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant.map(item -> item.uiIcon), coolant.map(liquid -> liquid.localizedName + "\n" + TjStat.boosters(turret, true, liquid)), coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
-                    else
-                        TjConfigTable.rowTable(this, table, new Image(Icon.star), TjBundle.getBlock(name, "config-boost"), coolant, coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)), () -> cool, false, 1);
-                if (consumes.any()) TjConfigTable.rowImageTable(table, new Image(Icon.download), TjBundle.getBlock(name, "config-consumes"), consumes);
-                if (turretBuild.block.canOverdrive) TjConfigTable.rowTable(this, table, new Image(Icon.effect), TjBundle.getBlock(name, "config-overdrive"),
-                        new Seq<>(new TextureRegion[]{Blocks.overdriveProjector.uiIcon, Blocks.overdriveProjector.uiIcon, Blocks.overdriveDome.uiIcon}),
-                        new Seq<>(new String[]{"150%", "225%", "250%"}),
-                        2, () -> overdrive, false, 2);
+                pack.build(table).row();
             }
         }
 
         @Override
         public int[] config() {
-            return new int[]{-2, ammo, cool, overdrive};
+            return pack.config();
+        }
+
+        @Override
+        public float heat() {
+            return turretBuild != null ? super.heat() : 0f;
         }
 
         @Override
         public void write(Writes write) {
             super.write(write);
-            write.i(ammo);
-            write.i(cool);
-            write.i(overdrive);
+            pack.write(write);
         }
 
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
-            ammo = read.i();
-            cool = read.i();
-            overdrive = read.i();
+            pack.read(read);
         }
     }
 }

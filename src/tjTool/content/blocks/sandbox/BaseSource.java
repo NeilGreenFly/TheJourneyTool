@@ -99,8 +99,8 @@ public class BaseSource extends Block {
     }
 
     public class BaseSourceBuild extends Building implements HeatBlock {
-        private boolean selecting = false;
-        private float selectingDrawRadius = 0f;
+        protected boolean selecting = false;
+        protected float selectingDrawRadius = 0f;
 
         public boolean checkBuild(Building other) {
             return other != null && other.team == team;

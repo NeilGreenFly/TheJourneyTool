@@ -5,8 +5,7 @@ import mindustry.content.StatusEffects;
 import mindustry.entities.part.DrawPart;
 import tjTool.core.*;
 
-import java.util.Objects;
-
+import static mindustry.content.Blocks.tileLogicDisplay;
 import static mindustry.content.UnitTypes.emanate;
 import static mindustry.entities.part.DrawPart.PartProgress.warmup;
 
@@ -14,14 +13,7 @@ public class ThisOverride {
 
     public static void load() {
 
-        // Anuken 把 logicDisplayTile 改成 tileLogicDisplay 了导致没办法直接用, 如果直接用会导致近几个版本不兼容.
-        // 所幸资源名称没改, 我真的会谢...
-        // 版本跨度: v154.3 - v156
-        for (var block : mindustry.Vars.content.blocks())
-            if (Objects.equals(block.name, "tile-logic-display")) {
-                block.allowRectanglePlacement = true;
-                break;
-            }
+        tileLogicDisplay.allowRectanglePlacement = true;
 
         StatusEffects.none.color = Color.green;
 

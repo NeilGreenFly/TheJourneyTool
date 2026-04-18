@@ -2,90 +2,246 @@ package tjTool.core;
 
 import arc.func.*;
 import arc.graphics.g2d.TextureRegion;
-import arc.scene.style.Drawable;
+import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Collapser;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import mindustry.Vars;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
 
-/**
- * "button": {"icon", "handle"}
- */
 public class TjConfigTable {
 
-    private static final float uiSize = 40f;
+    public static final float uiSize = 44f;
+    public static final float iconSize = 32f;
 
-    public static <Type extends UnlockableContent> void rowTable(Building building, Table table, Image icon, String tip, Seq<Type> items, int favorite, Prov<Integer> holder, boolean closeSelect, int groupIndex) {
-        rowTable(building, table, icon, tip, items.map(item -> item.uiIcon), items.map(item -> item.localizedName), favorite, holder, closeSelect, groupIndex);
+    public static Func<UnlockableContent, Option> optionMapper = item -> new Option(item.uiIcon, item.localizedName);
+
+    public static class ConfigPack {
+        public Building building;
+        public Seq<ConfigContent> contents;
+
+        public ConfigPack(Building building) {
+            this.building = building;
+            this.contents = new Seq<>();
+        }
+
+        public ConfigPack add(ConfigContent content) {
+            contents.add(content.setPack(this));
+            return this;
+        }
+
+        public ConfigPack with(ConfigContent... contents) {
+            for (var content : contents)
+                add(content);
+            return this;
+        }
+
+        public ConfigContent get(int index) {
+            return contents.get(index);
+        }
+
+        public int getIndex(int index) {
+            return get(index).getIndex();
+        }
+
+        public <Type> Type from(Seq<Type> content, int index) {
+            int idx = getIndex(index);
+            return idx != -1 && idx < content.size
+                    ? content.get(idx)
+                    : null;
+        }
+
+        public void reset() {
+            for (var content : contents)
+                content.reset();
+        }
+
+        public void clear() {
+            for (var content : contents)
+                if (!content.isStatic)
+                    content.clear();
+        }
+
+        public int[] config() {
+            int[] items = new int[contents.size];
+            for (int i = 0; i < contents.size; ++i)
+                items[i] = contents.get(i).index;
+            return items;
+        }
+
+        public void configure() {
+            building.configure(config());
+        }
+
+        public void receive(int[] v) {
+            for (int i = 0; i < contents.size; ++i)
+                contents.get(i).index = v[i];
+        }
+
+        public void write(Writes write) {
+            for (var content : contents)
+                write.i(content.index);
+        }
+
+        public void read(Reads read) {
+            for (var content : contents)
+                content.index = read.i();
+        }
+
+        public Table build(Table table) {
+            return table.table(t -> {
+                for (var content : contents)
+                    content.build(t);
+            }).get();
+        }
     }
 
-    public static void rowTable(Building building, Table table, Image icon, String tip, Seq<TextureRegion> regions, Seq<String> tips, int favorite, Prov<Integer> holder, boolean closeSelect, int groupIndex) {
-        table.add(icon).size(uiSize).tooltip(tip, true).center();
-        if (regions.any()) {
-            table.table(configTable(building, regions, tips, holder, closeSelect, groupIndex)).left();
-            table.add(imageButton(Icon.undo, () -> building.configure(new int[]{groupIndex, -1}))).size(uiSize).tooltip(TjBundle.get("table", "reset"), true).center();
-            if (favorite > -1 && favorite < regions.size)
-                table.add(imageButton(Icon.star, () -> building.configure(new int[]{groupIndex, favorite}))).size(uiSize).tooltip(TjBundle.get("table", "favorite"), true).center();
-            table.row();
-        } else table.image(Icon.cancel).size(uiSize).center().row();
-    }
+    public static class ConfigContent {
+        private ConfigPack pack;
+        public boolean lock;
+        public boolean alwaysBuild;
+        public boolean isStatic;
+        private Image icon;
+        private String tip;
 
-    public static <Type extends UnlockableContent> Cons<Table> configTable(Building building, Seq<Type> items, Prov<Integer> holder, boolean closeSelect, int groupIndex) {
-        return configTable(building, items.map(item -> item.uiIcon), items.map(item -> item.localizedName), holder, closeSelect, groupIndex);
-    }
+        public Seq<Option> options;
+        private int favorite;
+        private int index;
 
-    public static Cons<Table> configTable(Building building, Seq<TextureRegion> regions, Seq<String> tips, Prov<Integer> holder, boolean closeSelect, int groupIndex) {
-        return table -> {
-            table.clear();
-            table.background(Styles.black6).left().defaults().size(uiSize);
-            ButtonGroup<ImageButton> group = new ButtonGroup<>();
-            group.setMinCheckCount(0);
+        public ConfigContent() {
+            this(new Image(Icon.cancel), "=w=");
+        }
 
-            for (int i = 0; i < regions.size; i += 1) {
-                configButton(table, group, holder, building::configure, closeSelect, regions.get(i), tips.get(i), groupIndex, i);
+        public ConfigContent(Image icon, String tip) {
+            this(icon, tip, new Seq<>());
+        }
+
+        public ConfigContent(Image icon, String tip, Seq<Option> options) {
+            this.icon = icon;
+            this.tip = tip;
+            this.lock = false;
+            this.alwaysBuild = true;
+            this.isStatic = false;
+            this.options = options;
+            this.favorite = -1;
+            this.index = -1;
+        }
+
+        private ConfigContent setPack(ConfigPack pack) {
+            this.pack = pack;
+            return this;
+        }
+
+        public ConfigContent setLock(boolean lock) {
+            this.lock = lock;
+            return this;
+        }
+
+        public ConfigContent setAlwaysBuild(boolean alwaysBuild) {
+            this.alwaysBuild = alwaysBuild;
+            return this;
+        }
+
+        public ConfigContent setStatic(boolean aStatic) {
+            isStatic = aStatic;
+            return this;
+        }
+
+        public ConfigContent setIcon(Image icon) {
+            this.icon = icon;
+            return this;
+        }
+
+        public ConfigContent setTip(String tip) {
+            this.tip = tip;
+            return this;
+        }
+
+        public ConfigContent setOptions(Seq<Option> options) {
+            this.options = options;
+            return this;
+        }
+
+        public ConfigContent setFavorite(int favorite) {
+            this.favorite = favorite;
+            return this;
+        }
+
+        public void setIndex(int index) {
+            index = Mathf.clamp(index, -1, options.size - 1);
+            if (this.index != index) {
+                this.index = index;
+                pack.configure();
             }
-        };
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public void reset() {
+            index = -1;
+        }
+
+        public void clear() {
+            options = new Seq<>();
+        }
+
+        public void add(TextureRegion region, String tip) {
+            options.add(new Option(region, tip));
+        }
+
+        public Cons<Table> table() {
+            return !lock
+                    ? table -> {
+                ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                group.setMinCheckCount(0);
+                table.background(Styles.black6).defaults().size(uiSize);
+                for (int i = 0; i < options.size; ++i) {
+                    final int idx = i;
+                    Option option = options.get(idx);
+                    ImageButton button = table.button(new TextureRegionDrawable(option.region), Styles.clearNoneTogglei, iconSize, () -> {
+                    }).tooltip(option.tip).group(group).get();
+                    button.changed(() -> setIndex(button.isChecked() ? idx : -1));
+                    button.update(() -> button.setChecked(getIndex() == idx));
+                }
+            }
+                    : table -> {
+                table.background(Styles.black3).defaults().size(uiSize);
+                for (var option : options)
+                    table.table(t -> t.image(option.region).tooltip(option.tip).maxSize(iconSize).center());
+            };
+        }
+
+        public void build(Table table) {
+            if (alwaysBuild || options.any()) {
+                table.add(icon).size(uiSize).tooltip(tip, true).center();
+                if (options.any()) {
+                    table.table(table()).left();
+                    if (!lock)
+                        table.button(Icon.undo, Styles.clearNonei, iconSize, () -> setIndex(-1)).size(uiSize).tooltip(TjBundle.get("table", "reset")).center();
+                    if (favorite > -1 && favorite < options.size)
+                        table.button(Icon.star, Styles.clearNonei, iconSize, () -> setIndex(favorite)).size(uiSize).tooltip(TjBundle.get("table", "favorite")).center();
+                } else table.image(Icon.cancel).size(iconSize).center();
+                table.row();
+            }
+        }
     }
 
-    private static ImageButton imageButton(Drawable icon, Runnable r) {
-        return imageButton(icon, Styles.clearNonei, r);
-    }
+    public static class Option {
+        public TextureRegion region;
+        public String tip;
 
-    private static ImageButton imageButton(Drawable icon, ImageButton.ImageButtonStyle style, Runnable r) {
-        var button = new ImageButton(icon, style);
-        button.clicked(r);
-        return button;
-    }
-
-    private static void configButton(
-            Table table, ButtonGroup<ImageButton> group, Prov<Integer> holder,
-            Cons<int[]> consumer, boolean closeSelect,
-            TextureRegion region, String tip,
-            int groupIndex, final int buttonIndex
-    ) {
-        ImageButton button = table.button(Tex.whiteui, Styles.clearNoneTogglei, 24f, () -> {
-            if (closeSelect) Vars.control.input.config.hideConfig();
-        }).tooltip(tip, true).group(group).get();
-
-        if (groupIndex != -1) button.changed(() -> consumer.get(new int[]{groupIndex, button.isChecked() ? buttonIndex : -1}));
-        button.getStyle().imageUp = new TextureRegionDrawable(region);
-        button.update(() -> button.setChecked(holder.get() == buttonIndex));
-    }
-
-    public static <Type extends UnlockableContent> void rowImageTable(Table table, Image icon, String tip, Seq<Type> items) {
-        table.add(icon).size(uiSize).tooltip(tip, true).center();
-        if (items.any())
-            table.table(rowImage -> {
-                for (var item : items)
-                    rowImage.table(frame -> frame.image(item.uiIcon).center()).tooltip(item.localizedName, true).size(uiSize);
-            }).left().row();
-        else table.image(Icon.cancel).size(uiSize).center().row();
+        public Option(TextureRegion region, String tip) {
+            this.region = region;
+            this.tip = tip;
+        }
     }
 
     public static void titleTable(Table table, String title, String label) {
@@ -112,7 +268,11 @@ public class TjConfigTable {
         table.add("更新日志").growX().left().color(Pal.accent).row();
         table.image().height(4).color(Pal.accent).growX().pad(5).padLeft(0).padRight(0).row();
         titleTable(table, "v1.1.2", """
-                >>
+                调整 >>
+                - v157
+                - 太阳能源 精灵微调
+                - 弹药源 配置面板全面重构
+                - 弹药源 炮台和选项的角标分离绘制
                 """, false);
         titleTable(table, "v1.1.1", """
                 新增 >>
@@ -167,37 +327,6 @@ public class TjConfigTable {
                 所以使用其他语言也只能看到中文
                 关注 Neil 谢谢喵
                 """)).growX().left().pad(8).row();
-//        table.label(() -> TjDraw.rainbowStream("""
-//                v1.1.1
-//                - 为 StatusEffects.none 覆盖新的精灵(原为空)
-//
-//                v1.1
-//                - 完善语言包, 现已覆盖简体中文和英文
-//                - 完善建筑介绍
-//                - 修复弹药源跨队伍供弹的BUG
-//
-//                v1.0.3
-//                - 调整了弹药源的放置优先级
-//
-//                v1.0.2
-//                - 修复图层绘制错误的问题
-//                - 现在消耗栏已不再可以被点击
-//                - 新增修理源和再生源
-//                - 超速源贴图重绘
-//                - 新增快速选择
-//                  现在可以一键选择效率最高的液体和超速倍率
-//
-//                v1.0.1
-//                - 修复弹药源不能兼容多人模式的问题
-//                - 弹药源添加超速选项
-//                - 修复复制无法保留配置等BUG
-//                - 紧急修复因索引越界导致的崩溃
-//
-//                v1.0
-//                - 添加了4个便于沙盒测试的方块
-//                - 修复因索引越界导致的崩溃
-//                - 新增当 任意源 与炮台相邻时警告
-//                """)).growX().left().row();
     };
 
 }
