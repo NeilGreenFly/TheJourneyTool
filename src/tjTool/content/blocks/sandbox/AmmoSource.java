@@ -3,6 +3,7 @@ package tjTool.content.blocks.sandbox;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
@@ -13,6 +14,8 @@ import mindustry.ctype.UnlockableContent;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.type.*;
+import mindustry.ui.Styles;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
 import tjTool.core.*;
@@ -58,11 +61,25 @@ public class AmmoSource extends BaseSource {
                         new Option(Blocks.overdriveProjector.uiIcon, "150%"),
                         new Option(Blocks.overdriveProjector.uiIcon, "225%"),
                         new Option(Blocks.overdriveDome.uiIcon, "250%")
-                )).setFavorite(2).setAlwaysBuild(false).setStatic(true)
+                )).setFavorite(2).setAlwaysBuild(false).setStatic(true),
+                new ConfigContent(new Image(Icon.turret), TjBundle.getBlock(name, "turret")).setSave(false),
+                new ConfigContent() {
+                    @Override
+                    public void build(Table table) {
+                        table.table(t -> {
+                            t.button(new TextureRegionDrawable(Blocks.overdriveDome.uiIcon), Styles.clearNoneTogglei, iconSize, () -> {
+                                index = index != 1 ? 1 : 0;
+                                pack.configure();
+                            }).size(uiSize).checked(index == 1).color(Color.valueOf("#ff7f7f"));
+                            t.label(() -> TjDraw.rainbowStream("<- Saturation Overdrive")).padLeft(5f);
+                        }).colspan(3).left().row();
+                    }
+                }.setStatic(true).setSave(false)
         );
         public Seq<UnlockableContent> consumes = new Seq<>();
         public Seq<UnlockableContent> ammoTypes = new Seq<>();
         public Seq<Liquid> coolant = new Seq<>();
+        public Seq<Block> turrets = new Seq<>();
         public float[] overdrives = {1.5f, 2.25f, 2.5f};
         public float heat;
 
@@ -95,7 +112,7 @@ public class AmmoSource extends BaseSource {
             Draw.z(Layer.blockAdditive);
             TjDraw.overdrive(this, "#D2F0FF", "#CBA3FF", heat);
             if (checkBuild(turretBuild))
-                TjDraw.overdrive(turretBuild, "#ffd59e", heat);
+                TjDraw.overdrive(turretBuild, pack.get(5).getIndex() != 1 ? "#ffd59e" : "#ff9f7f", heat);
         }
 
         @Override
@@ -121,6 +138,7 @@ public class AmmoSource extends BaseSource {
             consumes.clear();
             ammoTypes.clear();
             coolant.clear();
+            turrets.clear();
             Building b = front();
             if (checkBuild(b) && b instanceof BaseTurret.BaseTurretBuild baseTurretBuild && (turretBuild == baseTurretBuild || turretBuild == null)) {
                 turretBuild = baseTurretBuild;
@@ -154,6 +172,7 @@ public class AmmoSource extends BaseSource {
                             coolant.add(liquid);
                             consumes.remove(liquid);
                         }
+                turrets = content.blocks().select(block -> block instanceof BaseTurret && block.size == turretBuild.block.size);
                 pack.get(0).setIcon(new Image(turretBuild.block.uiIcon)).setTip(turretBuild.block.localizedName).setOptions(ammoTypes.map(optionMapper));
                 pack.get(1).setOptions(coolant.map(
                         turretBuild instanceof ReloadTurret.ReloadTurretBuild reloadTurretBuild
@@ -161,6 +180,7 @@ public class AmmoSource extends BaseSource {
                         : liquid -> new Option(liquid.uiIcon, liquid.localizedName)
                 )).setFavorite(coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)));
                 pack.get(2).setOptions(consumes.map(optionMapper));
+                pack.get(4).setOptions(turrets.map(block -> new Option(block.uiIcon, block.localizedName))).setIndex(turrets.indexOf(turretBuild.block));
             } else {
                 turretBuild = null;
                 pack.reset();
@@ -169,7 +189,8 @@ public class AmmoSource extends BaseSource {
 
         @Override
         public void updateTile() {
-            heat = Mathf.lerpDelta(heat, pack.get(3).getIndex() > -1 ? 1f : 0f, 0.08f);
+            boolean sf = pack.get(5).getIndex() == 1;
+            heat = Mathf.lerpDelta(heat, pack.get(3).getIndex() > -1 || sf ? 1f : 0f, 0.08f);
             if (turretBuild != null) {
                 for (var v : consumes)
                     if (v instanceof Item item && turretBuild.acceptItem(this, item))
@@ -204,17 +225,30 @@ public class AmmoSource extends BaseSource {
                         turretBuild.liquids.set(liquid, 0f);
                 if (pack.get(3).getIndex() > -1)
                     turretBuild.applyBoost(overdrives[pack.get(3).getIndex()], 61.0f);
+                int idx = pack.get(4).getIndex();
+                if (idx != -1) {
+                    if (turrets.get(idx) != turretBuild.block) {
+                        float rotation = turretBuild.rotation;
+                        turretBuild.tile.setBlock(turrets.get(idx), team);
+                        turretBuild.rotation = rotation;
+                    }
+                } else pack.get(4).setIndex(turrets.indexOf(turretBuild.block));
+                // 饱和超速强势回归 2333
+                if (turretBuild instanceof ReloadTurret.ReloadTurretBuild reloadTurretBuild && sf && (!ammoTypes.any() || getAmmo() != null))
+                    reloadTurretBuild.reloadCounter = turretBuild instanceof LaserTurret.LaserTurretBuild ? 0 : ((ReloadTurret) reloadTurretBuild.block).reload;
+                pack.get(3).setLock(sf);
             }
-//            if (turretBuild instanceof ReloadTurret.ReloadTurretBuild reloadTurretBuild && sf && (!ammoTypes.any() || getAmmo() != null))
-//                reloadTurretBuild.reloadCounter = ((ReloadTurret) reloadTurretBuild.block).reload;
         }
 
         @Override
         public void buildConfiguration(Table table) {
             if (turretBuild != null) {
                 table.clear();
-                table.background(Tex.pane).top();
-                pack.build(table).row();
+                table.background(Tex.pane).left();
+                pack.build(table,
+                        new ConfigPage(Icon.star, new int[]{0, 1, 2, 3}),
+                        new ConfigPage(Icon.wrench, new int[]{4, 5})
+                ).row();
             }
         }
 

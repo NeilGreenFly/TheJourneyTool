@@ -3,7 +3,7 @@ package tjTool.core;
 import arc.func.*;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
-import arc.scene.style.TextureRegionDrawable;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Collapser;
 import arc.scene.ui.layout.Table;
@@ -14,6 +14,8 @@ import mindustry.ctype.UnlockableContent;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
+
+import java.util.Objects;
 
 public class TjConfigTable {
 
@@ -69,14 +71,20 @@ public class TjConfigTable {
         }
 
         public int[] config() {
+            return config(true);
+        }
+
+        public int[] config(boolean save) {
             int[] items = new int[contents.size];
             for (int i = 0; i < contents.size; ++i)
-                items[i] = contents.get(i).index;
+                items[i] = !save || contents.get(i).save
+                        ? contents.get(i).index
+                        : -1;
             return items;
         }
 
         public void configure() {
-            building.configure(config());
+            building.configure(config(false));
         }
 
         public void receive(int[] v) {
@@ -86,12 +94,14 @@ public class TjConfigTable {
 
         public void write(Writes write) {
             for (var content : contents)
-                write.i(content.index);
+                if (content.save)
+                    write.i(content.index);
         }
 
         public void read(Reads read) {
             for (var content : contents)
-                content.index = read.i();
+                if (content.save)
+                    content.index = read.i();
         }
 
         public Table build(Table table) {
@@ -100,19 +110,48 @@ public class TjConfigTable {
                     content.build(t);
             }).get();
         }
+
+        public Table build(Table table, ConfigPage... pages) {
+            ButtonGroup<ImageButton> group = new ButtonGroup<>();
+            Table panel = new Table();
+            table.table(list -> {
+                for (var page : pages)
+                    list.button(page.icon, Styles.clearNoneTogglei, iconSize, () -> {
+                        panel.clearChildren();
+                        for (var idx : page.contents)
+                            contents.get(idx).build(panel);
+                        table.pack();
+                    }).size(uiSize).group(group).row();
+                list.getChildren().get(0).fireClick();
+            }).top();
+            table.image().width(5).color(Pal.gray).growY().padRight(10);
+            table.add(panel).top();
+            return table;
+        }
+    }
+
+    public static class ConfigPage {
+        public Drawable icon;
+        public int[] contents;
+
+        public ConfigPage(Drawable icon, int[] contents) {
+            this.icon = icon;
+            this.contents = contents;
+        }
     }
 
     public static class ConfigContent {
-        private ConfigPack pack;
+        protected ConfigPack pack;
         public boolean lock;
         public boolean alwaysBuild;
         public boolean isStatic;
-        private Image icon;
-        private String tip;
+        public boolean save;
+        protected Image icon;
+        protected String tip;
 
         public Seq<Option> options;
-        private int favorite;
-        private int index;
+        protected int favorite;
+        protected int index;
 
         public ConfigContent() {
             this(new Image(Icon.cancel), "=w=");
@@ -128,6 +167,7 @@ public class TjConfigTable {
             this.lock = false;
             this.alwaysBuild = true;
             this.isStatic = false;
+            this.save = true;
             this.options = options;
             this.favorite = -1;
             this.index = -1;
@@ -150,6 +190,11 @@ public class TjConfigTable {
 
         public ConfigContent setStatic(boolean aStatic) {
             isStatic = aStatic;
+            return this;
+        }
+
+        public ConfigContent setSave(boolean save) {
+            this.save = save;
             return this;
         }
 
@@ -185,6 +230,13 @@ public class TjConfigTable {
             return index;
         }
 
+        public int indexOf(Option option) {
+            for (int i = 0; i < options.size; i++)
+                if (options.get(i).equals(option))
+                    return i;
+            return -1;
+        }
+
         public void reset() {
             index = -1;
         }
@@ -199,9 +251,9 @@ public class TjConfigTable {
 
         public Cons<Table> table() {
             return !lock
-                    ? table -> {
+            ? table -> {
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
-                group.setMinCheckCount(0);
+                if (save) group.setMinCheckCount(0);
                 table.background(Styles.black6).defaults().size(uiSize);
                 for (int i = 0; i < options.size; ++i) {
                     final int idx = i;
@@ -210,12 +262,16 @@ public class TjConfigTable {
                     }).tooltip(option.tip).group(group).get();
                     button.changed(() -> setIndex(button.isChecked() ? idx : -1));
                     button.update(() -> button.setChecked(getIndex() == idx));
+                    if (i % 8 == 7) table.row();
                 }
             }
-                    : table -> {
+            : table -> {
                 table.background(Styles.black3).defaults().size(uiSize);
-                for (var option : options)
+                int count = 0;
+                for (var option : options) {
                     table.table(t -> t.image(option.region).tooltip(option.tip).maxSize(iconSize).center());
+                    if (++count % 8 == 0) table.row();
+                }
             };
         }
 
@@ -224,12 +280,14 @@ public class TjConfigTable {
                 table.add(icon).size(uiSize).tooltip(tip, true).center();
                 if (options.any()) {
                     table.table(table()).left();
-                    if (!lock)
-                        table.button(Icon.undo, Styles.clearNonei, iconSize, () -> setIndex(-1)).size(uiSize).tooltip(TjBundle.get("table", "reset")).center();
-                    if (favorite > -1 && favorite < options.size)
-                        table.button(Icon.star, Styles.clearNonei, iconSize, () -> setIndex(favorite)).size(uiSize).tooltip(TjBundle.get("table", "favorite")).center();
+                    if (!lock) {
+                        if (save)
+                            table.button(Icon.undo, Styles.clearNonei, iconSize, () -> setIndex(-1)).size(uiSize).tooltip(TjBundle.get("table", "reset")).center();
+                        if (favorite > -1 && favorite < options.size)
+                            table.button(Icon.star, Styles.clearNonei, iconSize, () -> setIndex(favorite)).size(uiSize).tooltip(TjBundle.get("table", "favorite")).center();
+                    }
                 } else table.image(Icon.cancel).size(iconSize).center();
-                table.row();
+                table.left().row();
             }
         }
     }
@@ -241,6 +299,10 @@ public class TjConfigTable {
         public Option(TextureRegion region, String tip) {
             this.region = region;
             this.tip = tip;
+        }
+
+        public boolean equals(Option other) {
+            return other.region == region && Objects.equals(other.tip, tip);
         }
     }
 
@@ -267,12 +329,19 @@ public class TjConfigTable {
     public static Cons<Table> updateLog = table -> {
         table.add("更新日志").growX().left().color(Pal.accent).row();
         table.image().height(4).color(Pal.accent).growX().pad(5).padLeft(0).padRight(0).row();
+        titleTable(table, "v1.1.3", """
+                新增 >>
+                - 弹药源 现在可以切换同尺寸的炮台类型
+                """, false);
         titleTable(table, "v1.1.2", """
                 调整 >>
                 - v157
                 - 太阳能源 精灵微调
-                - 弹药源 配置面板全面重构
-                - 弹药源 炮台和选项的角标分离绘制
+                - 弹药源
+                    现在不可被快捷旋转
+                    更新逻辑优化
+                    配置面板全面重构
+                    炮台和选项的角标分离绘制
                 """, false);
         titleTable(table, "v1.1.1", """
                 新增 >>
