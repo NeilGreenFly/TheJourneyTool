@@ -1,17 +1,24 @@
 package tjTool.content.blocks.sandbox;
 
+import arc.graphics.Color;
 import arc.graphics.g2d.*;
+import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.util.Eachable;
+import arc.util.Log;
 import arc.util.io.*;
+import mindustry.content.Fx;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.*;
+import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.ui.Styles;
+import mindustry.world.blocks.defense.BuildTurret;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
-import mindustry.world.meta.BuildVisibility;
+import mindustry.world.blocks.payloads.BuildPayload;
+import mindustry.world.blocks.payloads.UnitPayload;
 import tjTool.core.*;
 
 import static mindustry.Vars.*;
@@ -69,27 +76,22 @@ public class AnySource extends BaseSource {
         regions = new TextureRegion[] {
                 atlasFind("void"),
                 atlasFind("any"),
-                atlasFind("adjacent")
+                atlasFind("adjacent"),
+                atlasFind("error")
         };
     }
 
     public class AnySourceBuild extends BaseSourceBuild {
-        public int status = 0;
-
-        @Override
-        public boolean checkBuild(Building other) {
-            return super.checkBuild(other)
-                    && other.block.buildVisibility != BuildVisibility.sandboxOnly
-                    && other.block.category != Category.distribution;
-        }
+        public int status = 1;
+        private boolean handle;
 
         @Override
         public void draw() {
-            Draw.rect(regions[status], x, y);
+            Draw.rect(status == 1 ? region : regions[status], x, y);
             Draw.reset();
             drawSelecting();
             for (var other : proximity)
-                if (other instanceof BaseTurret.BaseTurretBuild) {
+                if (other instanceof BaseTurret.BaseTurretBuild && !(other instanceof BuildTurret.BuildTurretBuild)) {
                     Draw.z(overlayUI);
                     drawPlaceText(TjBundle.getBlock(name, "warning"), tile.x, tile.y, false);
                     break;
@@ -98,40 +100,50 @@ public class AnySource extends BaseSource {
 
         @Override
         public void updateTile() {
+            if (status == 1) {
+                try {
 
-            switch (status) {
-
-                case 1:
-                    for (Item item : content.items())
-                        for (int i = 10; i --> 0;)
+                    for (var other : proximity) {
+                        if (checkBuild(other)) {
+                            if (other.block.hasItems)
+                                for (Item item : content.items())
+                                    other.handleStack(item, other.acceptStack(item, 1000000, this), this);
+                            if (other.block.hasLiquids)
+                                for (Liquid liquid : content.liquids())
+                                    if (other.acceptLiquid(this, liquid))
+                                        other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid)));
+                            if (other.block.acceptsPayload)
+                                for (var v : content.blocks()) {
+                                    var payload = new BuildPayload(v, team);
+                                    if (other.acceptPayload(this, payload))
+                                        other.handlePayload(this, payload);
+                                }
+                            if (other.block.acceptsUnitPayloads)
+                                for (var v : content.units()) {
+                                    var payload = new UnitPayload(v.create(team));
+                                    if (other.acceptPayload(this, payload))
+                                        other.handlePayload(this, payload);
+                                }
+                        }
+                    }
+                    for (Item item : content.items()) {
+                        handle = true;
+                        for (int i = 10; i-- > 0 && handle; )
                             offload(item);
+                    }
                     for (Liquid liquid : content.liquids()) {
                         liquids.set(liquid, 10000f);
                         dumpLiquid(liquid);
                     }
                     liquids.clear();
-                    // TODO UnitAssembler
-                    break;
 
-                case 2:
-                    for (var other : proximity) {
-                        if (checkBuild(other)) {
-                            if (other.block.category == Category.turret) {
-                                continue;
-                            }
-                            if (other.block.hasItems)
-                                for (Item item : content.items())
-                                    if (other.acceptItem(this, item))
-                                        other.items.set(item, Math.max(other.getMaximumAccepted(item), other.items.get(item)));
-                            if (other.block.hasLiquids)
-                                for (Liquid liquid : content.liquids())
-                                    if (other.acceptLiquid(this, liquid))
-                                        other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid)));
-                        }
-                    }
-                    break;
-
-                default: break;
+                } catch (NullPointerException e) {
+                    Log.err(e);
+                    deselect();
+                    status = 3;
+                }
+            } else if (status == 3 && Mathf.chanceDelta(0.03)) {
+                Fx.regenSuppressParticle.at(x + Mathf.range(block.size * tilesize/2f - 1f), y + Mathf.range(block.size * tilesize/2f - 1f), Pal.remove);
             }
         }
 
@@ -139,11 +151,24 @@ public class AnySource extends BaseSource {
         public void buildConfiguration(Table table) {
             table.clear();
             table.background(Tex.pane).top();
+            if (status == 3) {
+                table.label(() -> TjDraw.flashingStream("NullPointerException >>>", Pal.remove, Color.valueOf("#f59f9f"))).growX().left().row();
+//                table.label(() -> TjDraw.rainbowStream("NullPointerException >>>")).growX().left().row();
+                table.image().color(Pal.remove).height(4).growX().padTop(5).padBottom(5).row();
+                table.label(() -> """
+                        这里似乎出现了异常...
+                        您可以将 last_log.txt 发送给模组开发者,
+                        也可以附带当前游戏内截图, 他们或许知道该怎么做.
+                        
+                        但请不要仅将此界面截图发送!
+                        开发者需要的是日志而不是一段文本!""").color(Pal.remove).growX().left();
+                return;
+            }
             table.table(newTable -> {
                 newTable.clear();
                 newTable.background(Styles.black6).left().defaults().size(56f);
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
-                for (int i = 0; i < regions.length; i += 1) {
+                for (int i = 0; i < 2; i += 1) {
                     int finalI = i;
                     ImageButton button = newTable.button(
                             Tex.whiteui,
@@ -161,12 +186,17 @@ public class AnySource extends BaseSource {
                     button.update(() -> button.setChecked(status == finalI));
                 }
             }).row();
-            table.label(() -> TjBundle.getBlock(name, "config-name-" + status)).size(120f, 40f);
+            table.label(() -> TjBundle.getBlock(name, "config-name-" + status)).size(120f, 40f).growX().center();
+        }
+
+        @Override
+        public void handleItem(Building source, Item item) {
+            handle = false;
         }
 
         @Override
         public Integer config() {
-            return status;
+            return status % 3;
         }
 
         @Override

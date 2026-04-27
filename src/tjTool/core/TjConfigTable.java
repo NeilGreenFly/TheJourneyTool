@@ -66,8 +66,7 @@ public class TjConfigTable {
 
         public void clear() {
             for (var content : contents)
-                if (!content.isStatic)
-                    content.clear();
+                content.clear();
         }
 
         public int[] config() {
@@ -145,6 +144,7 @@ public class TjConfigTable {
         public boolean lock;
         public boolean alwaysBuild;
         public boolean isStatic;
+        public boolean unReset;
         public boolean save;
         protected Image icon;
         protected String tip;
@@ -167,6 +167,7 @@ public class TjConfigTable {
             this.lock = false;
             this.alwaysBuild = true;
             this.isStatic = false;
+            this.unReset = false;
             this.save = true;
             this.options = options;
             this.favorite = -1;
@@ -190,6 +191,11 @@ public class TjConfigTable {
 
         public ConfigContent setStatic(boolean aStatic) {
             isStatic = aStatic;
+            return this;
+        }
+
+        public ConfigContent setUnReset(boolean unReset) {
+            this.unReset = unReset;
             return this;
         }
 
@@ -238,11 +244,13 @@ public class TjConfigTable {
         }
 
         public void reset() {
-            index = -1;
+            if (!unReset)
+                index = -1;
         }
 
         public void clear() {
-            options = new Seq<>();
+            if (!isStatic)
+                options = new Seq<>();
         }
 
         public void add(TextureRegion region, String tip) {
@@ -329,6 +337,12 @@ public class TjConfigTable {
     public static Cons<Table> updateLog = table -> {
         table.add("更新日志").growX().left().color(Pal.accent).row();
         table.image().height(4).color(Pal.accent).growX().pad(5).padLeft(0).padRight(0).row();
+        titleTable(table, "v1.1.4", """
+                回退 >>
+                - 弹药源 因UI缺陷和严重崩溃等问题回退至上一版本
+                新增 >>
+                - 任意源 现在可以输出载荷
+                """, false);
         titleTable(table, "v1.1.3", """
                 新增 >>
                 - 弹药源 现在可以切换同尺寸的炮台类型

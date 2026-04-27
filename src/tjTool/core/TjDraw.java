@@ -12,7 +12,7 @@ import static mindustry.Vars.tilesize;
 
 public class TjDraw {
 
-    public static String toString(Color color) {
+    public static String colorToString(Color color) {
         return "[#" + color + "]";
     }
 
@@ -27,7 +27,14 @@ public class TjDraw {
     public static String rainbowStream(String string) {
         StringBuilder rainbowString = new StringBuilder();
         for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(TjDraw.toString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f))).append(string.charAt(i));
+            rainbowString.append(TjDraw.colorToString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f))).append(string.charAt(i));
+        return rainbowString.toString();
+    }
+
+    public static String flashingStream(String string, Color color, Color colorTo) {
+        StringBuilder rainbowString = new StringBuilder();
+        for (int i = 0; i < string.length(); i += 1)
+            rainbowString.append(TjDraw.colorToString(color.cpy().lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
         return rainbowString.toString();
     }
 
