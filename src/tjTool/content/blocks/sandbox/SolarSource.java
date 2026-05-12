@@ -2,14 +2,11 @@ package tjTool.content.blocks.sandbox;
 
 import arc.graphics.g2d.*;
 import mindustry.gen.Building;
-import mindustry.type.Category;
 import mindustry.world.blocks.power.SolarGenerator;
-import mindustry.world.meta.BuildVisibility;
 import tjTool.core.*;
 
 import static arc.math.geom.Geometry.d8;
 import static mindustry.Vars.world;
-import static mindustry.type.ItemStack.with;
 import static mindustry.world.blocks.power.PowerNode.makeBatteryBalance;
 import static mindustry.world.blocks.power.PowerNode.makePowerBalance;
 import static tjTool.core.TjAutoTile.*;
