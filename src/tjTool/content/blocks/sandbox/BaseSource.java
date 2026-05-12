@@ -13,13 +13,11 @@ import mindustry.world.Block;
 import mindustry.world.blocks.heat.HeatBlock;
 import mindustry.world.draw.*;
 import mindustry.world.meta.BlockGroup;
-import mindustry.world.meta.BuildVisibility;
 import mindustry.world.meta.Env;
 import tjTool.core.*;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.overlayUI;
-import static mindustry.type.ItemStack.with;
 
 public class BaseSource extends Block {
     public DrawBlock drawer = new DrawDefault();
@@ -76,10 +74,6 @@ public class BaseSource extends Block {
             Fill.square(x * tilesize, (y - 1) * tilesize, 2 * size);
             Fill.square(x * tilesize, (y + 1) * tilesize, 2 * size);
         }
-    }
-
-    public void requirements(Category cat) {
-        requirements(cat, BuildVisibility.sandboxOnly, with());
     }
 
     @Override

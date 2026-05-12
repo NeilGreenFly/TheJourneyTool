@@ -108,3 +108,9 @@ tasks.register('deploy', Jar){
         }
     }
 }
+
+tasks.register('modBuild', Copy) {
+    dependsOn build
+    from "build/libs/${project.name}Desktop.jar"
+    into System.getenv('APPDATA') + '/Mindustry/mods'
+}

@@ -2,10 +2,14 @@ package tjTool.content.blocks.sandbox;
 
 import arc.graphics.g2d.*;
 import mindustry.gen.Building;
+import mindustry.type.Category;
 import mindustry.world.blocks.power.SolarGenerator;
+import mindustry.world.meta.BuildVisibility;
 import tjTool.core.*;
 
+import static arc.math.geom.Geometry.d8;
 import static mindustry.Vars.world;
+import static mindustry.type.ItemStack.with;
 import static mindustry.world.blocks.power.PowerNode.makeBatteryBalance;
 import static mindustry.world.blocks.power.PowerNode.makePowerBalance;
 import static tjTool.core.TjAutoTile.*;
@@ -45,7 +49,7 @@ public class SolarSource extends SolarGenerator {
     }
 
     public class SolarSourceBuild extends GeneratorBuild {
-        int index = 0;
+        protected int index = 0;
 
         public boolean checkBuild(Building other) {
             return other instanceof SolarSourceBuild && other.team == team;
@@ -65,15 +69,15 @@ public class SolarSource extends SolarGenerator {
         public void updateProximity() {
             super.updateProximity();
             proximityTileUpdate();
-            for (var point : proximityPoint)
+            for (var point : d8)
                 if (world.build(tileX() + point.x, tileY() + point.y) instanceof SolarSourceBuild other && other.team == this.team)
                     other.proximityTileUpdate();
         }
 
         public void proximityTileUpdate() {
             index = 0;
-            for (int i = 0; i < proximityPoint.length; i += 1)
-                if (checkBuild(world.build(tileX() + proximityPoint[i].x, tileY() + proximityPoint[i].y)))
+            for (int i = 0; i < d8.length; i += 1)
+                if (checkBuild(world.build(tileX() + d8[i].x, tileY() + d8[i].y)))
                     index |= 1 << i;
         }
     }

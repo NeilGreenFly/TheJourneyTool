@@ -18,27 +18,25 @@ import static mindustry.type.ItemStack.*;
 
 public class ThisBlocks {
 
-    public static Block anySource, ammoSource, solarSource, mendSource, overdriveSource, regenSource;
+    public static Block anySource, ammoSource, solarSource, mendSource, overdriveSource, regenSource, shieldSource;
 
     public static void load() {
 
         anySource = new AnySource("any-source") {{
-            requirements(Category.distribution);
+            staticRequirements(this, Category.distribution);
         }};
 
         ammoSource = new AmmoSource("ammo-source") {{
-            requirements(Category.distribution);
+            staticRequirements(this, Category.distribution);
         }};
 
         solarSource = new SolarSource("solar-source") {{
-            requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            staticRequirements(this, Category.power);
         }};
 
         mendSource = new MendProjector("mend-source") {
             {
-                requirements(Category.effect, BuildVisibility.sandboxOnly, with());
-                alwaysUnlocked = true;
-                placeableLiquid = true;
+                staticRequirements(this, Category.effect);
                 hasPower = false;
                 hasItems = false;
                 size = 2;
@@ -58,9 +56,7 @@ public class ThisBlocks {
 
         overdriveSource = new OverdriveProjector("overdrive-source") {
             {
-                requirements(Category.effect, BuildVisibility.sandboxOnly, with());
-                alwaysUnlocked = true;
-                placeableLiquid = true;
+                staticRequirements(this, Category.effect);
                 hasPower = false;
                 hasItems = false;
                 hasBoost = false;
@@ -81,9 +77,7 @@ public class ThisBlocks {
 
         regenSource = new RegenProjector("regen-source") {
             {
-                requirements(Category.effect, BuildVisibility.sandboxOnly, with());
-                alwaysUnlocked = true;
-                placeableLiquid = true;
+                staticRequirements(this, Category.effect);
                 hasPower = false;
                 hasItems = false;
                 hasLiquids = false;
@@ -125,5 +119,16 @@ public class ThisBlocks {
             }
         };
 
+        shieldSource = new ShieldSource("shield-source") {{
+            staticRequirements(this, Category.effect);
+        }};
+
     }
+
+    public static void staticRequirements(Block block, Category cat) {
+        block.requirements(cat, BuildVisibility.sandboxOnly, with());
+        block.alwaysUnlocked = true;
+        block.placeableLiquid = true;
+    }
+
 }

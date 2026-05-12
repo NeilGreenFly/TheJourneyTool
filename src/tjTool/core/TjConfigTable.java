@@ -337,6 +337,10 @@ public class TjConfigTable {
     public static Cons<Table> updateLog = table -> {
         table.add("更新日志").growX().left().color(Pal.accent).row();
         table.image().height(4).color(Pal.accent).growX().pad(5).padLeft(0).padRight(0).row();
+        titleTable(table, "v1.1.5", """
+                新增 >>
+                - 护盾源
+                """, false);
         titleTable(table, "v1.1.4", """
                 回退 >>
                 - 弹药源 因UI缺陷和严重崩溃等问题回退至上一版本

@@ -7,6 +7,6 @@ author: "NeilGreenFly"
 
 main: "tjTool.ThisMain"
 
-version: 1.1.4
+version: 1.1.5
 minGameVersion: 157
 java: true
