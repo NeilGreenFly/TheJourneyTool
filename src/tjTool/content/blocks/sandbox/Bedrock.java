@@ -23,11 +23,11 @@ public class Bedrock extends Wall {
         update = true;
         placeEffect = new MultiEffect(placeEffect, Fx.drillSteam.startDelay(0f));
         breakEffect = new MultiEffect(breakEffect, Fx.mineImpact, new Effect(60,
-                        e -> randLenVectors(e.id, 1, e.finpow() * 5f,
-                        (x, y) -> {
-                            float r = size * tilesize * e.fout();
-                            Draw.rect(region, e.x + x, e.y + y, r, r);
-                        })));
+                e -> randLenVectors(e.id, 1, e.finpow() * 5f,
+                (x, y) -> {
+                    float r = size * tilesize * e.fout();
+                    Draw.rect(region, e.x + x, e.y + y, r, r);
+                })));
         allowRectanglePlacement = true;
         placeableLiquid = true;
         alwaysUnlocked = true;
