@@ -84,6 +84,16 @@ public class AnySource extends BaseSource {
     public class AnySourceBuild extends BaseSourceBuild {
         public int status = 1;
         private boolean handle;
+        private String exception = """
+                如果您重启过游戏, 在提交日志前请复现一次该异常,
+                否则开发者将不会知道这是由什么导致的...
+                因为在重启游戏后日志会被清空并重写, 如果您直接
+                发送这个毫无意义的日志, 没有谁能够帮得了您, 先生.
+                
+                如果您看到了这段文本, 那么您大概率需要按照上述做一遍.
+                但是不排除您可能只是重启了存档, 在日志未被清空的情况下
+                您当然可以继续提交. 这是被容许的.
+                """;
 
         @Override
         public void draw() {
@@ -137,7 +147,8 @@ public class AnySource extends BaseSource {
                     }
                     liquids.clear();
 
-                } catch (NullPointerException e) {
+                } catch (RuntimeException e) { // NullPointerException
+                    exception = e.getClass().getName();
                     Log.err(e);
                     deselect();
                     status = 3;
@@ -152,7 +163,7 @@ public class AnySource extends BaseSource {
             table.clear();
             table.background(Tex.pane).top();
             if (status == 3) {
-                table.label(() -> TjDraw.flashingStream("NullPointerException >>>", Pal.remove, Color.valueOf("#f59f9f"))).growX().left().row();
+                table.label(() -> TjDraw.flashingStream(exception + " >>>", Pal.remove, Color.valueOf("#f59f9f"))).growX().left().row();
 //                table.label(() -> TjDraw.rainbowStream("NullPointerException >>>")).growX().left().row();
                 table.image().color(Pal.remove).height(4).growX().padTop(5).padBottom(5).row();
                 table.label(() -> """

@@ -1,0 +1,68 @@
+package tjTool.content.blocks.sandbox;
+
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.util.Time;
+import mindustry.content.Fx;
+import mindustry.entities.Effect;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.gen.Building;
+import mindustry.graphics.Layer;
+import mindustry.world.blocks.defense.Wall;
+import tjTool.core.*;
+
+import static arc.math.Angles.randLenVectors;
+import static mindustry.Vars.tilesize;
+
+public class Bedrock extends Wall {
+    public Bedrock(String name) {
+        super(name);
+        size = 2;
+        health = Integer.MAX_VALUE;
+        update = true;
+        placeEffect = new MultiEffect(placeEffect, Fx.drillSteam.startDelay(0f));
+        breakEffect = new MultiEffect(breakEffect, Fx.mineImpact, new Effect(60,
+                        e -> randLenVectors(e.id, 1, e.finpow() * 5f,
+                        (x, y) -> {
+                            float r = size * tilesize * e.fout();
+                            Draw.rect(region, e.x + x, e.y + y, r, r);
+                        })));
+        allowRectanglePlacement = true;
+        placeableLiquid = true;
+        alwaysUnlocked = true;
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+        stats.add(TjStat.config, TjStat.acknowledgements(region));
+    }
+
+    @Override
+    public void setBars() {
+        addBar("health", TjBar.makeHealthBalance());
+    }
+
+    public class BedrockBuild extends Building {
+        @Override
+        public float handleDamage(float amount) {
+            return 0f;
+        }
+
+        @Override
+        public void updateTile() {
+            maxHealth = block.health;
+            heal();
+        }
+
+        @Override
+        public void draw() {
+            super.draw();
+            Draw.color(Color.HSVtoRGB((Time.time + x + y) % 360.0F, 25.0F, 100.0F));
+            Draw.z(Layer.shields);
+            Fill.rect(x, y, size * tilesize, size * tilesize);
+            Draw.reset();
+        }
+    }
+}

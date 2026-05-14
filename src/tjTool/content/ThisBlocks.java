@@ -18,7 +18,7 @@ import static mindustry.type.ItemStack.*;
 
 public class ThisBlocks {
 
-    public static Block anySource, ammoSource, solarSource, mendSource, overdriveSource, regenSource, shieldSource;
+    public static Block anySource, ammoSource, solarSource, bedrock, mendSource, overdriveSource, regenSource, shieldSource;
 
     public static void load() {
 
@@ -32,6 +32,10 @@ public class ThisBlocks {
 
         solarSource = new SolarSource("solar-source") {{
             staticRequirements(this, Category.power);
+        }};
+
+        bedrock = new Bedrock("bedrock") {{
+            staticRequirements(this, Category.defense);
         }};
 
         mendSource = new MendProjector("mend-source") {
