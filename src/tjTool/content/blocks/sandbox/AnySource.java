@@ -22,8 +22,6 @@ import mindustry.world.blocks.payloads.UnitPayload;
 import tjTool.core.*;
 
 import static mindustry.Vars.*;
-import static mindustry.ctype.ContentType.item;
-import static mindustry.ctype.ContentType.liquid;
 import static mindustry.graphics.Layer.overlayUI;
 
 /**

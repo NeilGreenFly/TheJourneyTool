@@ -17,6 +17,7 @@ import mindustry.ui.Styles;
 
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 public class TjConfigTable {
 
     public static final float uiSize = 44f;
