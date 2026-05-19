@@ -340,6 +340,7 @@ public class TjConfigTable {
         titleTable(table, "v1.1.5", """
                 新增 >>
                 - 护盾源
+                - 基岩
                 """, false);
         titleTable(table, "v1.1.4", """
                 回退 >>

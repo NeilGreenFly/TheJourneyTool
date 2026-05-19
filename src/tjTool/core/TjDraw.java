@@ -1,15 +1,19 @@
 package tjTool.core;
 
+import arc.func.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.math.geom.Geometry;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.gen.Building;
+import mindustry.graphics.Pal;
+import mindustry.world.Block;
 
+import static arc.math.geom.Geometry.*;
 import static mindustry.Vars.tilesize;
 
+@SuppressWarnings("unused")
 public class TjDraw {
 
     public static String colorToString(Color color) {
@@ -81,15 +85,77 @@ public class TjDraw {
         Lines.beginLine();
         for (int i = 0; i < 4; ++i) {
             Lines.linePoint(
-                    building.x + Geometry.d4(i).x * r + Geometry.d4(i).y * w,
-                    building.y + Geometry.d4(i).y * r - Geometry.d4(i).x * w);
+                    building.x + d4(i).x * r + d4(i).y * w,
+                    building.y + d4(i).y * r - d4(i).x * w);
             if(f < 0.5f) Lines.linePoint(
-                    building.x + Geometry.d4(i).x * r - Geometry.d4(i).y * w,
-                    building.y + Geometry.d4(i).y * r + Geometry.d4(i).x * w);
+                    building.x + d4(i).x * r - d4(i).y * w,
+                    building.y + d4(i).y * r + d4(i).x * w);
         }
         Lines.endLine(true);
 
         Draw.reset();
+    }
+
+    public static void drawPlace(Block block, int x, int y, boolean valid) {
+        float width = 2;
+        float[] r = new float[]{block.size * tilesize / 2f, 0, tilesize * 16};
+        float[] wr = new float[]{width / 2f, block.size * tilesize / 2f - width};
+        float cx = x * tilesize + block.offset;
+        float cy = y * tilesize + block.offset;
+        Color color = valid ? rainbow() : Pal.remove.cpy();
+        float outline = color.a(0.5f).toFloatBits();
+        float from = color.a(0.25f).toFloatBits();
+        float to = color.a(0).toFloatBits();
+        Draw.color(color);
+        Draw.alpha(0.35f);
+        for (int i = 0; i < 4; i += 1) {
+            for (int j = 0; j < 3; j += 1) {
+                float ccx = j % 2 == 1 ? cx : cx + (block.size * tilesize - width) / 2f * d4(i + j - 1).x;
+                float ccy = j % 2 == 1 ? cy : cy + (block.size * tilesize - width) / 2f * d4(i + j - 1).y;
+                r[1] = wr[j % 2];
+                float c = j % 2 == 1 ? from : outline;
+                Fill.quad(
+                        ccx + r[i % 2] * d8edge(i).x,
+                        ccy + r[(i + 1) % 2] * d8edge(i).y, c,
+                        ccx + r[i % 2] * d8edge(i - 1).x,
+                        ccy + r[(i + 1) % 2] * d8edge(i - 1).y, c,
+                        ccx + r[(i + 1) % 2 + 1] * d8edge(i - 1).x,
+                        ccy + r[i % 2 + 1] * d8edge(i - 1).y, to,
+                        ccx + r[(i + 1) % 2 + 1] * d8edge(i).x,
+                        ccy + r[i % 2 + 1] * d8edge(i).y, to);
+            }
+            Fill.rect(
+                    cx + (r[0] + wr[0]) * d4(i).x,
+                    cy + (r[0] + wr[0]) * d4(i).y,
+                    wr[i % 2] * 2,
+                    wr[(i + 1) % 2] * 2);
+        }
+        Draw.color();
+    }
+
+    public static void drawPlace(Block block, int x, int y) {
+        float[] r = new float[]{block.size * tilesize / 2f, tilesize * 16};
+        float cx = x * tilesize + block.offset;
+        float cy = y * tilesize + block.offset;
+        Color color = rainbow();
+        float from = color.a(0.25f).toFloatBits();
+        float to = color.a(0).toFloatBits();
+        for (int i = 0; i < 4; ++i)
+            Fill.quad(
+                    cx + r[0] * d8edge(i).x, cy + r[0] * d8edge(i).y, from,
+                    cx + r[0] * d8edge(i - 1).x, cy + r[0] * d8edge(i - 1).y, from,
+                    cx + r[(i + 1) % 2] * d8edge(i - 1).x, cy + r[i % 2] * d8edge(i - 1).y, to,
+                    cx + r[(i + 1) % 2] * d8edge(i).x, cy + r[i % 2] * d8edge(i).y, to
+            );
+    }
+
+    public static void drawProximity(int x, int y, int size, Color color) {
+        Draw.color(color);
+        Draw.alpha(0.5f);
+        Fill.square((x - 1) * tilesize, y * tilesize, 2 * size);
+        Fill.square((x + 1) * tilesize, y * tilesize, 2 * size);
+        Fill.square(x * tilesize, (y - 1) * tilesize, 2 * size);
+        Fill.square(x * tilesize, (y + 1) * tilesize, 2 * size);
     }
 
 }

@@ -22,6 +22,8 @@ import mindustry.world.blocks.payloads.UnitPayload;
 import tjTool.core.*;
 
 import static mindustry.Vars.*;
+import static mindustry.ctype.ContentType.item;
+import static mindustry.ctype.ContentType.liquid;
 import static mindustry.graphics.Layer.overlayUI;
 
 /**
@@ -81,6 +83,7 @@ public class AnySource extends BaseSource {
         };
     }
 
+    @SuppressWarnings("unused")
     public class AnySourceBuild extends BaseSourceBuild {
         public int status = 1;
         private boolean handle;
@@ -113,38 +116,35 @@ public class AnySource extends BaseSource {
             if (status == 1) {
                 try {
 
-                    for (var other : proximity) {
-                        if (checkBuild(other)) {
-                            if (other.block.hasItems)
-                                for (Item item : content.items())
-                                    other.handleStack(item, other.acceptStack(item, 1000000, this), this);
-                            if (other.block.hasLiquids)
-                                for (Liquid liquid : content.liquids())
-                                    if (other.acceptLiquid(this, liquid))
-                                        other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid)));
-                            if (other.block.acceptsPayload)
-                                for (var v : content.blocks()) {
-                                    var payload = new BuildPayload(v, team);
-                                    if (other.acceptPayload(this, payload))
-                                        other.handlePayload(this, payload);
-                                }
-                            if (other.block.acceptsUnitPayloads)
-                                for (var v : content.units()) {
-                                    var payload = new UnitPayload(v.create(team));
-                                    if (other.acceptPayload(this, payload))
-                                        other.handlePayload(this, payload);
-                                }
-                        }
-                    }
-                    for (Item item : content.items()) {
+                    proximity.each(this::checkBuild, other -> {
+                        if (other.block.hasItems)
+                            content.items().each(item -> other.handleStack(item, other.acceptStack(item, 1000000, this), this));
+                        if (other.block.hasLiquids)
+                            content.liquids().each(
+                                    liquid -> other.acceptLiquid(this, liquid),
+                                    liquid -> other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid))));
+                        if (other.block.acceptsPayload)
+                            content.blocks().each(v -> {
+                                var payload = new BuildPayload(v, team);
+                                if (other.acceptPayload(this, payload))
+                                    other.handlePayload(this, payload);
+                            });
+                        if (other.block.acceptsUnitPayloads)
+                            content.units().each(v -> {
+                                var payload = new UnitPayload(v.create(team));
+                                if (other.acceptPayload(this, payload))
+                                    other.handlePayload(this, payload);
+                            });
+                    });
+                    content.items().each(item -> {
                         handle = true;
                         for (int i = 10; i-- > 0 && handle; )
                             offload(item);
-                    }
-                    for (Liquid liquid : content.liquids()) {
+                    });
+                    content.liquids().each(liquid -> {
                         liquids.set(liquid, 10000f);
                         dumpLiquid(liquid);
-                    }
+                    });
                     liquids.clear();
 
                 } catch (RuntimeException e) { // NullPointerException

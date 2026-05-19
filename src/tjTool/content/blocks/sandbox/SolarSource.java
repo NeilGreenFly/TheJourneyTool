@@ -41,10 +41,18 @@ public class SolarSource extends SolarGenerator {
     public void setBars() {
         super.setBars();
         removeBar("power");
+        addBar("health", TjBar.makeHealthBalance);
         addBar("power", makePowerBalance());
         addBar("batteries", makeBatteryBalance());
     }
 
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid) {
+        super.drawPlace(x, y, rotation, valid);
+        TjDraw.drawPlace(this, x, y, valid);
+    }
+
+    @SuppressWarnings("unused")
     public class SolarSourceBuild extends GeneratorBuild {
         protected int index = 0;
 

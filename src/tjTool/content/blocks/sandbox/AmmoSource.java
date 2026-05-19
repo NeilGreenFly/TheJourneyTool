@@ -48,6 +48,7 @@ public class AmmoSource extends BaseSource {
         });
     }
 
+    @SuppressWarnings("unused")
     public class AmmoSourceBuild extends BaseSourceBuild {
         public @Nullable BaseTurret.BaseTurretBuild turretBuild = null;
         public ConfigPack pack = new ConfigPack(this).with(
@@ -126,34 +127,25 @@ public class AmmoSource extends BaseSource {
                 turretBuild = baseTurretBuild;
 
                 if (turretBuild.block.hasItems)
-                    for (var item : content.items())
-                        if (turretBuild.block.consumesItem(item))
-                            consumes.add(item);
+                    consumes.addAll(content.items().select(turretBuild.block::consumesItem));
                 if (turretBuild.block.hasLiquids)
-                    for (var liquid : content.liquids())
-                        if (turretBuild.block.consumesLiquid(liquid))
-                            consumes.add(liquid);
-                if (turretBuild instanceof ItemTurret.ItemTurretBuild) {
-                    for (var v : consumes)
-                        if (v instanceof Item)
-                            ammoTypes.add(v);
-                } else if (turretBuild instanceof LiquidTurret.LiquidTurretBuild) {
-                    for (var v : consumes)
-                        if (v instanceof Liquid)
-                            ammoTypes.add(v);
-                } else if (turretBuild instanceof ContinuousLiquidTurret.ContinuousLiquidTurretBuild) {
-                    for (var v : consumes)
-                        if (v instanceof Liquid)
-                            ammoTypes.add(v);
-                }
-                for (var v : ammoTypes)
-                    consumes.remove(v);
-                if (((BaseTurret) turretBuild.block).coolant != null)
-                    for (var liquid : content.liquids())
-                        if (((BaseTurret) turretBuild.block).coolant.consumes(liquid)) {
-                            coolant.add(liquid);
-                            consumes.remove(liquid);
-                        }
+                    consumes.addAll(content.liquids().select(turretBuild.block::consumesLiquid));
+
+                if (turretBuild instanceof ItemTurret.ItemTurretBuild)
+                    ammoTypes.addAll(consumes.select(Item.class::isInstance));
+                else if (turretBuild instanceof LiquidTurret.LiquidTurretBuild || turretBuild instanceof ContinuousLiquidTurret.ContinuousLiquidTurretBuild)
+                    ammoTypes.addAll(consumes.select(Liquid.class::isInstance));
+                ammoTypes.map(consumes::remove);
+
+                var turretCoolant = ((BaseTurret) turretBuild.block).coolant;
+                if (turretCoolant != null)
+                    content.liquids().each(
+                            turretCoolant::consumes,
+                            liquid -> {
+                                coolant.add(liquid);
+                                consumes.remove(liquid);
+                            });
+
                 pack.get(0).setIcon(new Image(turretBuild.block.uiIcon)).setTip(turretBuild.block.localizedName).setOptions(ammoTypes.map(optionMapper));
                 pack.get(1).setOptions(coolant.map(
                         turretBuild instanceof ReloadTurret.ReloadTurretBuild reloadTurretBuild
@@ -171,11 +163,12 @@ public class AmmoSource extends BaseSource {
         public void updateTile() {
             heat = Mathf.lerpDelta(heat, pack.get(3).getIndex() > -1 ? 1f : 0f, 0.08f);
             if (turretBuild != null) {
-                for (var v : consumes)
-                    if (v instanceof Item item && turretBuild.acceptItem(this, item))
-                        turretBuild.handleItem(this, item);
+                consumes.each(v -> {
+                    if (v instanceof Item item)
+                        turretBuild.handleStack(item, turretBuild.acceptStack(item, 1000000, this), this);
                     else if (v instanceof Liquid liquid)
-                        turretBuild.liquids.set(liquid, turretBuild.block.liquidCapacity);
+                        turretBuild.liquids.set(liquid, Math.max(turretBuild.block.liquidCapacity, turretBuild.liquids.get(liquid)));
+                });
                 if (turretBuild instanceof ItemTurret.ItemTurretBuild build) {
                     if (getAmmo() instanceof Item item) {
                         if (build.ammo.size == 1 && ((ItemTurret.ItemEntry) build.ammo.first()).item == item) {
@@ -193,15 +186,12 @@ public class AmmoSource extends BaseSource {
                     if (getAmmo() instanceof Liquid liquid)
                         turretBuild.liquids.set(liquid, turretBuild.block.liquidCapacity);
                     else
-                        for (var v : ammoTypes)
-                            if (v instanceof Liquid liquid)
-                                turretBuild.liquids.set(liquid, 0f);
+                        ammoTypes.each(Liquid.class::isInstance, (Liquid liquid) -> turretBuild.liquids.set(liquid, 0f));
                 }
                 if (getCool() != null)
                     turretBuild.liquids.set(getCool(), turretBuild.block.liquidCapacity);
                 else
-                    for (var liquid : coolant)
-                        turretBuild.liquids.set(liquid, 0f);
+                    coolant.each(liquid -> turretBuild.liquids.set(liquid, 0f));
                 if (pack.get(3).getIndex() > -1)
                     turretBuild.applyBoost(overdrives[pack.get(3).getIndex()], 61.0f);
             }

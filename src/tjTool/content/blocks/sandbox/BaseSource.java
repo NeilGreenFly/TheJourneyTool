@@ -60,20 +60,15 @@ public class BaseSource extends Block {
 
     @Override
     public void setBars() {
-        addBar("health", TjBar.makeHealthBalance());
+        super.setBars();
+        addBar("health", TjBar.makeHealthBalance);
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
         super.drawPlace(x, y, rotation, valid);
-        if (valid && !rotate) {
-            Draw.color(player.team().color);
-            Draw.alpha(0.5f);
-            Fill.square((x - 1) * tilesize, y * tilesize, 2 * size);
-            Fill.square((x + 1) * tilesize, y * tilesize, 2 * size);
-            Fill.square(x * tilesize, (y - 1) * tilesize, 2 * size);
-            Fill.square(x * tilesize, (y + 1) * tilesize, 2 * size);
-        }
+        if (!rotate)
+            TjDraw.drawPlace(this, x, y, valid);
     }
 
     @Override

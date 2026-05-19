@@ -24,10 +24,10 @@ public class Bedrock extends Wall {
         placeEffect = new MultiEffect(placeEffect, Fx.drillSteam.startDelay(0f));
         breakEffect = new MultiEffect(breakEffect, Fx.mineImpact, new Effect(60,
                 e -> randLenVectors(e.id, 1, e.finpow() * 5f,
-                (x, y) -> {
-                    float r = size * tilesize * e.fout();
-                    Draw.rect(region, e.x + x, e.y + y, r, r);
-                })));
+                        (x, y) -> {
+                            float r = size * tilesize * e.fout();
+                            Draw.rect(region, e.x + x, e.y + y, r, r);
+                        })));
         allowRectanglePlacement = true;
         placeableLiquid = true;
         alwaysUnlocked = true;
@@ -41,9 +41,17 @@ public class Bedrock extends Wall {
 
     @Override
     public void setBars() {
-        addBar("health", TjBar.makeHealthBalance());
+        super.setBars();
+        addBar("health", TjBar.makeHealthBalance);
     }
 
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid) {
+        super.drawPlace(x, y, rotation, valid);
+        TjDraw.drawPlace(this, x, y, valid);
+    }
+
+    @SuppressWarnings("unused")
     public class BedrockBuild extends Building {
         @Override
         public float handleDamage(float amount) {

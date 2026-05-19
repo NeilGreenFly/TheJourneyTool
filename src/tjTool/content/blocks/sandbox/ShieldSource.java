@@ -34,7 +34,8 @@ public class ShieldSource extends BaseShield {
 
     @Override
     public void setBars() {
-        addBar("health", TjBar.makeHealthBalance());
+        super.setBars();
+        addBar("health", TjBar.makeHealthBalance);
     }
 
     @Override
@@ -43,6 +44,7 @@ public class ShieldSource extends BaseShield {
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, (lastConfig != null ? (float) lastConfig : 0) * radius, TjDraw.rainbow());
     }
 
+    @SuppressWarnings("unused")
     public class ShieldSourceBuild extends BaseShieldBuild {
         @Override
         public void buildConfiguration(Table table) {
