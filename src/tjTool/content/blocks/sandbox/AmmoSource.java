@@ -103,7 +103,7 @@ public class AmmoSource extends BaseSource {
         public void drawSelect() {
             super.drawSelect();
             if (turretBuild != null) {
-                TjDraw.lightPoly(turretBuild, TjDraw.rainbow());
+                TjDraw.lightPoly(turretBuild, TjDraw.rainbow);
                 drawItemSelection(turretBuild.block);
                 drawItemSelections(turretBuild, Seq.with(getAmmo(), getCool()));
             }

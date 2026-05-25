@@ -39,7 +39,7 @@ public class TjStat {
             if (listener != null) image.addListener(listener);
             frame.add(image).tooltip(name, true).size(40f).pad(12f).left().top();
             frame.table(label -> {
-                label.label(() -> TjDraw.colorToString(TjDraw.rainbow()) + name).growX().left().row();
+                label.label(() -> TjDraw.colorToString(TjDraw.rainbow) + name).growX().left().row();
                 label.label(() -> description).growX().left().row();
             }).growX().pad(12f).padLeft(0f).row();
         }).growX().pad(5f).row();

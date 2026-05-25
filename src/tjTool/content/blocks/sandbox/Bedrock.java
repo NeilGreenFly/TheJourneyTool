@@ -5,14 +5,12 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.util.Time;
 import mindustry.content.Fx;
-import mindustry.entities.Effect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.world.blocks.defense.Wall;
 import tjTool.core.*;
 
-import static arc.math.Angles.randLenVectors;
 import static mindustry.Vars.tilesize;
 
 public class Bedrock extends Wall {
@@ -22,12 +20,7 @@ public class Bedrock extends Wall {
         health = Integer.MAX_VALUE;
         update = true;
         placeEffect = new MultiEffect(placeEffect, Fx.drillSteam.startDelay(0f));
-        breakEffect = new MultiEffect(breakEffect, Fx.mineImpact, new Effect(60,
-                e -> randLenVectors(e.id, 1, e.finpow() * 5f,
-                        (x, y) -> {
-                            float r = size * tilesize * e.fout();
-                            Draw.rect(region, e.x + x, e.y + y, r, r);
-                        })));
+        breakEffect = new MultiEffect(breakEffect, Fx.mineImpact, TjEffect.blockBecomeSmaller(this));
         allowRectanglePlacement = true;
         placeableLiquid = true;
         alwaysUnlocked = true;

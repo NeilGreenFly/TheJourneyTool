@@ -41,7 +41,7 @@ public class ShieldSource extends BaseShield {
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
         super.drawPlace(x, y, rotation, valid);
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, (lastConfig != null ? (float) lastConfig : 0) * radius, TjDraw.rainbow());
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, (lastConfig != null ? (float) lastConfig : 0) * radius, TjDraw.rainbow);
     }
 
     @SuppressWarnings("unused")
@@ -64,13 +64,13 @@ public class ShieldSource extends BaseShield {
         @Override
         public void drawSelect() {
             super.drawSelect();
-            Drawf.dashCircle(x, y, optionalEfficiency * radius, TjDraw.rainbow());
+            Drawf.dashCircle(x, y, optionalEfficiency * radius, TjDraw.rainbow);
         }
 
         @Override
         public void drawConfigure() {
             drawSelect();
-            TjDraw.lightPoly(this, TjDraw.rainbow());
+            TjDraw.lightPoly(this, TjDraw.rainbow);
         }
 
         @Override

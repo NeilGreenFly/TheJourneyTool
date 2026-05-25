@@ -15,10 +15,12 @@ import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.ui.Styles;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.BuildTurret;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.blocks.payloads.BuildPayload;
 import mindustry.world.blocks.payloads.UnitPayload;
+import mindustry.world.blocks.storage.CoreBlock;
 import tjTool.core.*;
 
 import static mindustry.Vars.*;
@@ -31,10 +33,8 @@ import static mindustry.graphics.Layer.overlayUI;
  * 这并非一方不能兼容另一方导致的, 如果只是为了合并而合并, 我们可以让任意源具有方向, 这样即可将弹药源一起并入功能分支. 
  * 但显然绝大部分情况下 (事实上是所有情况下) 任意源和邻接源都不需要方向, 如果只是为了兼容弹药源这是没有必要的. 
  * 因此我们更需要的是一种更灵活的转换方式, 这对于各方面来说都会是必要的.
- * </p>
  * <p>
  * 另外的, 弹药源存在一些设计缺失, 比如我们或许应该阻止凭空放置弹药源 (即没有面向且邻接炮台时) , 目前该方案仍在评估, 条件允许时我们会考虑补充.
- * </p>
  */
 public class AnySource extends BaseSource {
     public TextureRegion[] regions;
@@ -85,6 +85,7 @@ public class AnySource extends BaseSource {
     public class AnySourceBuild extends BaseSourceBuild {
         public int status = 1;
         private boolean handle;
+        private boolean warning = false;
         private String exception = """
                 如果您重启过游戏, 在提交日志前请复现一次该异常,
                 否则开发者将不会知道这是由什么导致的...
@@ -101,12 +102,28 @@ public class AnySource extends BaseSource {
             Draw.rect(status == 1 ? region : regions[status], x, y);
             Draw.reset();
             drawSelecting();
+            if (warning) {
+                Draw.z(overlayUI);
+                drawPlaceText(TjBundle.getBlock(name, "warning"), tile.x, tile.y, false);
+            }
+        }
+
+        public boolean canProduce(Block block){
+            return block.isVisible() && !(block instanceof CoreBlock) && !state.rules.isBanned(block) && block.environmentBuildable();
+        }
+
+        public boolean canProduce(UnitType unit){
+            return !unit.isHidden() && !unit.isBanned() && unit.supportsEnv(state.rules.env);
+        }
+
+        @Override
+        public void onProximityUpdate() {
             for (var other : proximity)
                 if (other instanceof BaseTurret.BaseTurretBuild && !(other instanceof BuildTurret.BuildTurretBuild)) {
-                    Draw.z(overlayUI);
-                    drawPlaceText(TjBundle.getBlock(name, "warning"), tile.x, tile.y, false);
-                    break;
+                    warning = true;
+                    return;
                 }
+            warning = false;
         }
 
         @Override
@@ -117,18 +134,19 @@ public class AnySource extends BaseSource {
                     proximity.each(this::checkBuild, other -> {
                         if (other.block.hasItems)
                             content.items().each(item -> other.handleStack(item, other.acceptStack(item, 1000000, this), this));
-                        if (other.block.hasLiquids)
-                            content.liquids().each(
-                                    liquid -> other.acceptLiquid(this, liquid),
-                                    liquid -> other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid))));
+                        // 这部分通常是不安全的, 以及液体的交互方式与物品略有不同, 因此这个在这里不那么重要
+                        // if (other.block.hasLiquids)
+                        //     content.liquids().each(
+                        //             liquid -> other.acceptLiquid(this, liquid),
+                        //             liquid -> other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid))));
                         if (other.block.acceptsPayload)
-                            content.blocks().each(v -> {
+                            content.blocks().each(this::canProduce, v -> {
                                 var payload = new BuildPayload(v, team);
                                 if (other.acceptPayload(this, payload))
                                     other.handlePayload(this, payload);
                             });
                         if (other.block.acceptsUnitPayloads)
-                            content.units().each(v -> {
+                            content.units().each(this::canProduce, v -> {
                                 var payload = new UnitPayload(v.create(team));
                                 if (other.acceptPayload(this, payload))
                                     other.handlePayload(this, payload);
@@ -140,7 +158,7 @@ public class AnySource extends BaseSource {
                             offload(item);
                     });
                     content.liquids().each(liquid -> {
-                        liquids.set(liquid, 10000f);
+                        liquids.set(liquid, 1000000f);
                         dumpLiquid(liquid);
                     });
                     liquids.clear();

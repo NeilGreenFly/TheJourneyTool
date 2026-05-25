@@ -1,6 +1,5 @@
 package tjTool.core;
 
-import arc.func.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
@@ -16,12 +15,18 @@ import static mindustry.Vars.tilesize;
 @SuppressWarnings("unused")
 public class TjDraw {
 
+    public static Color rainbow = new Color();
+
+    public static void update() {
+        rainbow = rainbow(25f, 100f);
+    }
+
     public static String colorToString(Color color) {
         return "[#" + color + "]";
     }
 
     public static Color rainbow() {
-        return rainbow(25f, 100f);
+        return rainbow;
     }
 
     public static Color rainbow(float s, float v) {
@@ -96,13 +101,30 @@ public class TjDraw {
         Draw.reset();
     }
 
+    /**
+     * Draw reference lines when placing.
+     * For example:
+     * <blockquote><pre>
+     *     {@code @Override}
+     *     public void drawPlace(int x, int y, int rotation, boolean valid) {
+     *         super.drawPlace(x, y, rotation, valid);
+     *         TjDraw.drawPlace(this, x, y, valid);
+     *     }
+     * </pre></blockquote>
+     * @param block The block which is placing
+     * @param x     x
+     * @param y     y
+     * @param valid Whether it is allowed to place this block here
+     * @author NeilGreenFly
+     * @see mindustry.world.Block#drawPlace(int, int, int, boolean)
+     */
     public static void drawPlace(Block block, int x, int y, boolean valid) {
         float width = 2;
         float[] r = new float[]{block.size * tilesize / 2f, 0, tilesize * 16};
         float[] wr = new float[]{width / 2f, block.size * tilesize / 2f - width};
         float cx = x * tilesize + block.offset;
         float cy = y * tilesize + block.offset;
-        Color color = valid ? rainbow() : Pal.remove.cpy();
+        Color color = valid ? rainbow : Pal.remove.cpy();
         float outline = color.a(0.5f).toFloatBits();
         float from = color.a(0.25f).toFloatBits();
         float to = color.a(0).toFloatBits();
@@ -137,7 +159,7 @@ public class TjDraw {
         float[] r = new float[]{block.size * tilesize / 2f, tilesize * 16};
         float cx = x * tilesize + block.offset;
         float cy = y * tilesize + block.offset;
-        Color color = rainbow();
+        Color color = rainbow;
         float from = color.a(0.25f).toFloatBits();
         float to = color.a(0).toFloatBits();
         for (int i = 0; i < 4; ++i)
@@ -145,8 +167,7 @@ public class TjDraw {
                     cx + r[0] * d8edge(i).x, cy + r[0] * d8edge(i).y, from,
                     cx + r[0] * d8edge(i - 1).x, cy + r[0] * d8edge(i - 1).y, from,
                     cx + r[(i + 1) % 2] * d8edge(i - 1).x, cy + r[i % 2] * d8edge(i - 1).y, to,
-                    cx + r[(i + 1) % 2] * d8edge(i).x, cy + r[i % 2] * d8edge(i).y, to
-            );
+                    cx + r[(i + 1) % 2] * d8edge(i).x, cy + r[i % 2] * d8edge(i).y, to);
     }
 
     public static void drawProximity(int x, int y, int size, Color color) {

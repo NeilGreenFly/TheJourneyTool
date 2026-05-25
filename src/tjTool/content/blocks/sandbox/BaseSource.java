@@ -60,7 +60,6 @@ public class BaseSource extends Block {
 
     @Override
     public void setBars() {
-        super.setBars();
         addBar("health", TjBar.makeHealthBalance);
     }
 
@@ -112,7 +111,7 @@ public class BaseSource extends Block {
 
         @Override
         public void drawConfigure() {
-            TjDraw.lightPoly(this, TjDraw.rainbow());
+            TjDraw.lightPoly(this, TjDraw.rainbow);
         }
 
         @Override
