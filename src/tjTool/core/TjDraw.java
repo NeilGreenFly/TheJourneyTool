@@ -1,20 +1,24 @@
 package tjTool.core;
 
+import arc.func.Boolf3;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.gen.Building;
+import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.world.Block;
 
+import static arc.Core.camera;
 import static arc.math.geom.Geometry.*;
 import static mindustry.Vars.tilesize;
 
 @SuppressWarnings("unused")
 public class TjDraw {
 
+    public static float z = 2f;
     public static Color rainbow = new Color();
 
     public static void update() {
@@ -45,6 +49,11 @@ public class TjDraw {
         for (int i = 0; i < string.length(); i += 1)
             rainbowString.append(TjDraw.colorToString(color.cpy().lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
         return rainbowString.toString();
+    }
+
+    public static void arcCircle(float x, float y, float radius, int sectors, float fraction, float rotateSpeed) {
+        for (int i = 0; i < sectors; i += 1)
+            Lines.arc(x, y, radius, fraction, i * 360f / sectors - Time.time * rotateSpeed);
     }
 
     public static void lightPoly(Building building) {
@@ -168,6 +177,87 @@ public class TjDraw {
                     cx + r[0] * d8edge(i - 1).x, cy + r[0] * d8edge(i - 1).y, from,
                     cx + r[(i + 1) % 2] * d8edge(i - 1).x, cy + r[i % 2] * d8edge(i - 1).y, to,
                     cx + r[(i + 1) % 2] * d8edge(i).x, cy + r[i % 2] * d8edge(i).y, to);
+    }
+
+    public static void beacon(Building building, Color color, TextureRegion icon) {
+        Boolf3<Float, Float, Integer> b = (x, y, i) -> {
+            // Building building = world.buildWorld(x, y);
+            Building other = null;
+            if (building != null) other = building.nearby(d4x[i] * (building.block.size / 2 + 1), d4y[i] * (building.block.size / 2 + 1));
+            return (building == null || other == null || !(building.block == other.block &&
+                    building.x + building.block.size * tilesize * d4x[i] == other.x &&
+                    building.y + building.block.size * tilesize * d4y[i] == other.y));
+        };
+        beacon(building.x, building.y, building.block.size * tilesize / 2f, color, 0.7f, b, icon);
+    }
+
+    public static void beacon(float x, float y, float r, Color color, Float alpha) {
+        beacon(x, y, r, color, alpha, null, null);
+    }
+
+    /**
+     * 绘制一个信标.
+     * <p>
+     * 您可以像这样绘制一个信标 :
+     * <blockquote><pre>
+     *     {@code @Override}
+     *     public void draw() {
+     *         super.draw();
+     *         float r = size * tilesize / 2f;
+     *         beacon(x, y, r, team.color.cpy(), 0.7f, null, null);
+     *     }
+     * </pre></blockquote>
+     * @param x     中心坐标 x
+     * @param y     中心坐标 y
+     * @param r     半径
+     * @param color 颜色
+     * @param alpha alpha 通道最大值
+     * @param b     是否绘制当前面
+     * @param icon  图标投影
+     * @author NeilGreenFly
+     * @see mindustry.world.Block#drawPlace(int, int, int, boolean)
+     * @see arc.func.Boolf3
+     */
+    public static void beacon(float x, float y, float r, Color color, float alpha, Boolf3<Float, Float, Integer> b, TextureRegion icon) {
+        float dx = camera.position.x - x;
+        float dy = camera.position.y - y;
+        float hx = camera.position.x - dx * z;
+        float hy = camera.position.y - dy * z;
+        float hr = r * z;
+        float len = (Mathf.len(dx, dy) - tilesize * 16) / 128f;
+        float a = Math.min(len, alpha);
+        float from = color.a(Mathf.clamp(a)).toFloatBits();
+        float to = color.a(0f).toFloatBits();
+        Draw.z(Layer.effect - 1); // Layer.flyingUnit + 1   Layer.blockOver
+        for (int i = 0; i < 4; i += 1) {
+            if ((d4x[i] * dx > r || d4y[i] * dy > r) && (b == null || b.get(x, y, i)))
+                Fill.quad(
+                        x + r * d8edge(i).x,
+                        y + r * d8edge(i).y, from,
+                        x + r * d8edge(i - 1).x,
+                        y + r * d8edge(i - 1).y, from,
+                        hx + hr * d8edge(i - 1).x,
+                        hy + hr * d8edge(i - 1).y, to,
+                        hx + hr * d8edge(i).x,
+                        hy + hr * d8edge(i).y, to
+                );
+        }
+        if (icon != null) {
+            float iconSize = 320;
+            float d = z * 0.95f;
+            Draw.z(Layer.effect);
+            Lines.stroke(32);
+            Draw.color(color.a(Mathf.clamp(a, 0f, 0.3f)));
+            Lines.circle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize);
+            Draw.color(color.a(Mathf.clamp(a, 0f, 0.5f)));
+            arcCircle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize + 64, 6, 0.1f, 0.5f);
+            d = z * 0.9f;
+            Draw.color(color.a(Mathf.clamp(a, 0f, 0.25f)));
+            arcCircle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize / 2, 3, 0.16f, -0.5f);
+            Draw.color();
+            Draw.alpha(len);
+            Draw.rect(icon, hx, hy, iconSize, iconSize);
+        }
     }
 
     public static void drawProximity(int x, int y, int size, Color color) {

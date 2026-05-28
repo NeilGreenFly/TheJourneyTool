@@ -342,6 +342,7 @@ public class TjConfigTable {
                 新增 >>
                 - 护盾源
                 - 基岩
+                - 信标
                 """, false);
         titleTable(table, "v1.1.4", """
                 回退 >>
