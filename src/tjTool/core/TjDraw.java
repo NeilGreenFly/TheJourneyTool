@@ -133,7 +133,7 @@ public class TjDraw {
         float[] wr = new float[]{width / 2f, block.size * tilesize / 2f - width};
         float cx = x * tilesize + block.offset;
         float cy = y * tilesize + block.offset;
-        Color color = valid ? rainbow : Pal.remove.cpy();
+        Color color = (valid ? rainbow : Pal.remove).cpy();
         float outline = color.a(0.5f).toFloatBits();
         float from = color.a(0.25f).toFloatBits();
         float to = color.a(0).toFloatBits();
@@ -215,7 +215,6 @@ public class TjDraw {
      * @param b     是否绘制当前面
      * @param icon  图标投影
      * @author NeilGreenFly
-     * @see mindustry.world.Block#drawPlace(int, int, int, boolean)
      * @see arc.func.Boolf3
      */
     public static void beacon(float x, float y, float r, Color color, float alpha, Boolf3<Float, Float, Integer> b, TextureRegion icon) {

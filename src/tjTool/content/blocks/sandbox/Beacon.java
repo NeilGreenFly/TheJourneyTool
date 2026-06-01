@@ -53,6 +53,7 @@ public class Beacon extends SandboxBlock {
     @SuppressWarnings("unused")
     public class BeaconBuild extends SandboxBuild {
         public Color color = team.color;
+        // public TextureRegion region = team.id < 4 ? teamIcons[team.id] : null;
         public int index = -1;
         public Layout layout = new Layout(this::configure).with(
                 new Content<>(content.items(), v -> v.uiIcon, v -> v.localizedName, () -> content.item(unPack(index, 0)), v -> pack(v.id, 0)).setIcon(Icon.box),
@@ -108,9 +109,7 @@ public class Beacon extends SandboxBlock {
 
         @Override
         public void updateTile() {
-            if (Mathf.chanceDelta(0.1)) {
-                TjEffect.rising.at(x, y, size, color);
-            }
+            if (Mathf.chanceDelta(size * 0.02)) TjEffect.rising.at(x, y, size, color);
         }
     }
 }

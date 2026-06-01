@@ -142,11 +142,11 @@ public class TjTable {
 
             table.table(list -> {
                 ButtonGroup<ImageButton> listGroup = new ButtonGroup<>();
-                for (var content : contents)
-                    list.button(content.icon, Styles.clearNoneTogglei, iconSize, () -> {
-                        grid.clearChildren();
-                        content.build(grid, closeSelect);
-                    }).size(uiSize).group(listGroup).row();
+                contents.each(content ->
+                        list.button(content.icon, Styles.clearNoneTogglei, iconSize, () -> {
+                            grid.clearChildren();
+                            content.build(grid, closeSelect);
+                        }).size(uiSize).group(listGroup).row());
                 list.getChildren().get(0).fireClick();
             }).top();
             table.image().width(5).color(Pal.gray).growY().padRight(10);
