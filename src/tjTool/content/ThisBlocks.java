@@ -140,6 +140,8 @@ public class ThisBlocks {
         block.requirements(cat, BuildVisibility.sandboxOnly, with());
         block.alwaysUnlocked = true;
         block.placeableLiquid = true;
+        block.description = TjBundle.description(block, "sandbox");
+        block.details = TjBundle.details(block, "sandbox");
     }
 
 }

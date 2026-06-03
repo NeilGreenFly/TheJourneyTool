@@ -1,6 +1,7 @@
 package tjTool.core;
 
 import arc.Core;
+import mindustry.ctype.UnlockableContent;
 
 public class TjBundle {
 
@@ -18,6 +19,16 @@ public class TjBundle {
 
     public static String getBlock(String name, String attribute) {
         return get("block", name, attribute);
+    }
+
+    public static String description(UnlockableContent content, String name) {
+        return (content.description != null ? content.description + "\n" : "")
+                + get(content.getContentType().toString(), name, "description");
+    }
+
+    public static String details(UnlockableContent content, String name) {
+        return get(content.getContentType().toString(), name, "details")
+                + (content.details != null ? "\n\n" + content.details : "");
     }
 
 }

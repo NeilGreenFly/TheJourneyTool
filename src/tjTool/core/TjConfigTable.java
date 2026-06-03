@@ -343,17 +343,20 @@ public class TjConfigTable {
                 - 护盾源
                 - 基岩
                 - 信标
+                
+                为了避免碎片化的更新, 在 115 我们会尽可能多得添加内容,
+                因此版本的更新会停滞一段时间.
                 """, false);
         titleTable(table, "v1.1.4", """
                 回退 >>
                 - 弹药源 因UI缺陷和严重崩溃等问题回退至上一版本
                 新增 >>
                 - 任意源 现在可以输出载荷
-                """, false);
+                """);
         titleTable(table, "v1.1.3", """
                 新增 >>
                 - 弹药源 现在可以切换同尺寸的炮台类型
-                """, false);
+                """);
         titleTable(table, "v1.1.2", """
                 调整 >>
                 - v157
@@ -363,7 +366,7 @@ public class TjConfigTable {
                     更新逻辑优化
                     配置面板全面重构
                     炮台和选项的角标分离绘制
-                """, false);
+                """);
         titleTable(table, "v1.1.1", """
                 新增 >>
                 - 为 StatusEffects.none 覆盖新的精灵(原为空)
@@ -372,14 +375,14 @@ public class TjConfigTable {
                 覆盖 >>
                 - 为 emanate(发散) 添加更多part
                 - 为 逻辑显示单元 启用矩形放置
-                """, false);
+                """);
         titleTable(table, "v1.1", """
                 调整 >>
                 - 完善语言包, 现已覆盖简体中文和英文
                 - 完善建筑介绍
                 修复 >>
                 - 修复弹药源跨队伍供弹的BUG
-                """, false);
+                """);
         titleTable(table, "v1.0.3", """
                 调整 >>
                 - 降低了 弹药源 的放置优先级
