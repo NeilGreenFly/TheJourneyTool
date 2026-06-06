@@ -227,6 +227,7 @@ public class TjDraw {
         float a = Math.min(len, alpha);
         float from = color.a(Mathf.clamp(a)).toFloatBits();
         float to = color.a(0f).toFloatBits();
+        if (a <= 0.01f) return;
         Draw.z(Layer.effect - 1); // Layer.flyingUnit + 1   Layer.blockOver
         for (int i = 0; i < 4; i += 1) {
             if ((d4x[i] * dx > r || d4y[i] * dy > r) && (b == null || b.get(x, y, i)))

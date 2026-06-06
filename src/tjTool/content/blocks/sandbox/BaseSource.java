@@ -3,7 +3,7 @@ package tjTool.content.blocks.sandbox;
 import mindustry.world.blocks.heat.HeatBlock;
 import mindustry.world.meta.BlockGroup;
 
-public class BaseSource extends SandboxBlock {
+public abstract class BaseSource extends SandboxBlock {
     public float powerProduction = 1000000f / 60f;
     public float heatOutput = 1000f;
 
@@ -17,7 +17,7 @@ public class BaseSource extends SandboxBlock {
     }
 
     @SuppressWarnings("unused")
-    public class BaseSourceBuild extends SandboxBuild implements HeatBlock {
+    public abstract class BaseSourceBuild extends SandboxBuild implements HeatBlock {
 
         @Override
         public float getPowerProduction() {

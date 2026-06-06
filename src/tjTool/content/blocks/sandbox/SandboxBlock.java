@@ -18,7 +18,7 @@ import tjTool.core.*;
 
 import static mindustry.Vars.tilesize;
 
-public class SandboxBlock extends Block {
+public abstract class SandboxBlock extends Block {
     public DrawBlock drawer = new DrawDefault();
     public boolean drawProximity = false;
 
@@ -89,7 +89,7 @@ public class SandboxBlock extends Block {
     }
 
     @SuppressWarnings("unused")
-    public class SandboxBuild extends Building {
+    public abstract class SandboxBuild extends Building {
         protected boolean selecting = false;
         protected float selectingDrawRadius = 0f;
 

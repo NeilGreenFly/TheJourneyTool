@@ -202,6 +202,10 @@ public class AmmoSource extends BaseSource {
             if (turretBuild != null) {
                 table.clear();
                 table.background(Tex.pane).left();
+                table.table(bars -> {
+                    bars.defaults().growX().height(18f).pad(4);
+                    turretBuild.displayBars(bars);
+                }).growX().padBottom(10).row();
                 pack.build(table).row();
             }
         }
