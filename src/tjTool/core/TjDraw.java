@@ -244,6 +244,7 @@ public class TjDraw {
         }
         if (icon != null) {
             float iconSize = 320;
+            float multiple = iconSize / Math.max(icon.width, icon.height);
             float d = z * 0.95f;
             Draw.z(Layer.effect);
             Lines.stroke(32);
@@ -256,7 +257,7 @@ public class TjDraw {
             arcCircle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize / 2, 3, 0.16f, -0.5f);
             Draw.color();
             Draw.alpha(len);
-            Draw.rect(icon, hx, hy, iconSize, iconSize);
+            Draw.rect(icon, hx, hy, icon.width * multiple, icon.height * multiple);
         }
     }
 

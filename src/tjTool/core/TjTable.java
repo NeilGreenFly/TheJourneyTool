@@ -16,6 +16,7 @@ import mindustry.gen.Icon;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
 import mindustry.world.Block;
+import mindustry.world.blocks.ItemSelection;
 
 import java.util.Iterator;
 
@@ -57,6 +58,7 @@ import static mindustry.Vars.control;
  *     });
  * </pre></blockquote>
  * @author NeilGreenFly
+ * @see ItemSelection#buildTable(Block, Table, Seq, Prov, Cons, boolean, int, int)
  */
 
 @SuppressWarnings("unused")
@@ -126,27 +128,25 @@ public class TjTable {
          */
         public void build(@Nullable Block block, Table table, boolean closeSelect) {
             table.left();
-            Table grid = new Table().top().left();
-            grid.defaults().size(uiSize); // .background(Styles.black6)
-            ScrollPane panel = new ScrollPane(grid, Styles.smallPane);
+            Table frame = new Table().top().left(); // .background(Styles.black6)
+            ScrollPane panel = new ScrollPane(frame, Styles.smallPane);
             panel.setScrollingDisabled(true, false);
             panel.setOverscroll(false, false);
 
             panel.exited(() -> {
-                if(panel.hasScroll()) Core.scene.setScrollFocus(null);
+                if (panel.hasScroll()) Core.scene.setScrollFocus(null);
             });
-            if(block != null) {
+            if (block != null) {
                 panel.setScrollYForce(block.selectScroll);
                 panel.update(() -> block.selectScroll = panel.getScrollY());
             }
 
             table.table(list -> {
                 ButtonGroup<ImageButton> listGroup = new ButtonGroup<>();
-                contents.each(content ->
-                        list.button(content.icon, Styles.clearNoneTogglei, iconSize, () -> {
-                            grid.clearChildren();
-                            content.build(grid, closeSelect);
-                        }).size(uiSize).group(listGroup).row());
+                contents.each(content -> list.button(content.icon, Styles.clearNoneTogglei, iconSize, () -> {
+                    frame.clearChildren();
+                    frame.table(content.build(closeSelect));
+                }).size(uiSize).group(listGroup).row());
                 list.getChildren().get(0).fireClick();
             }).top();
             table.image().width(5).color(Pal.gray).growY().padRight(10);
@@ -154,22 +154,34 @@ public class TjTable {
         }
     }
 
-    public static class Content<Type> {
+    abstract public static class Content<Type> {
         public static Func<? extends UnlockableContent, TextureRegion> getRegion = v -> v.uiIcon;
         public static Func<? extends UnlockableContent, String> getTip = v -> v.localizedName;
 
+        protected Layout layout;
+        protected Drawable icon = Icon.star;
+        protected int config = -2;
+        public boolean save;
+
+        abstract protected void configure(int config);
+        abstract protected int getConfig();
+        abstract protected Cons<Table> build(boolean closeSelect);
+
+        public Content<Type> setIcon(Drawable icon) {
+            this.icon = icon;
+            return this;
+        }
+    }
+
+    public static class Selection<Type> extends Content<Type> {
         public Seq<Type> items;
         public Func<Type, TextureRegion> buttonRegion;
         public Func<Type, String> buttonTip;
         public Prov<Type> holder;
         public Boolf2<Type, Type> comparer;
         public Func<Type, Integer> configure;
-        protected Layout layout;
-        protected Drawable icon = Icon.star;
-        protected int config = -2;
-        public boolean save;
 
-        public Content(Seq<Type> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder, Boolf2<Type, Type> comparer, Func<Type, Integer> configure) {
+        public Selection(Seq<Type> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder, Boolf2<Type, Type> comparer, Func<Type, Integer> configure) {
             this.items = items;
             this.buttonRegion = buttonRegion;
             this.buttonTip = buttonTip;
@@ -178,39 +190,40 @@ public class TjTable {
             this.configure = configure;
         }
 
-        public Content(Seq<Type> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder, Func<Type, Integer> configure) {
+        public Selection(Seq<Type> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder, Func<Type, Integer> configure) {
             this(items, buttonRegion, buttonTip, holder, (a, b) -> a == b, configure);
         }
 
-        public void configure(int config) {
+        @Override
+        protected void configure(int config) {
             // config = Mathf.clamp(config, -1, items.size);
             this.config = config;
             layout.configure();
             this.config = -2;
         }
 
-        public Content<Type> setIcon(Drawable icon) {
-            this.icon = icon;
-            return this;
-        }
-
-        public int getConfig() {
+        @Override
+        protected int getConfig() {
             if (config != -2) return config;
             Type item = holder.get();
             return item != null ? configure.get(item) : -1;
         }
 
-        public void build(Table table, boolean closeSelect) {
-            ButtonGroup<ImageButton> group = new ButtonGroup<>();
-            group.setMinCheckCount(0);
-            forEach(items, (idx, item) -> {
-                ImageButton button = table.button(new TextureRegionDrawable(buttonRegion.get(item)), Styles.clearNoneTogglei, iconSize, () -> {
-                    if(closeSelect) control.input.config.hideConfig();
-                }).tooltip(buttonTip.get(item)).group(group).get();
-                button.changed(() -> configure(button.isChecked() ? configure.get(item) : -1));
-                button.update(() -> button.setChecked(comparer.get(holder.get(), item)));
-                if (idx % 8 == 7) table.row();
-            });
+        @Override
+        protected Cons<Table> build(boolean closeSelect) {
+            return table -> {
+                table.top().left().defaults().size(uiSize);
+                ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                group.setMinCheckCount(0);
+                forEach(items, (idx, item) -> {
+                    ImageButton button = table.button(new TextureRegionDrawable(buttonRegion.get(item)), Styles.clearNoneTogglei, iconSize, () -> {
+                        if (closeSelect) control.input.config.hideConfig();
+                    }).tooltip(buttonTip.get(item)).group(group).get();
+                    button.changed(() -> configure(button.isChecked() ? configure.get(item) : -1));
+                    button.update(() -> button.setChecked(comparer.get(holder.get(), item)));
+                    if (idx % 8 == 7) table.row();
+                });
+            };
         }
     }
 

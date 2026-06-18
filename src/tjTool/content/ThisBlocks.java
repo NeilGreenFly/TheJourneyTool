@@ -42,7 +42,7 @@ public class ThisBlocks {
         }};
 
         beacon = new Beacon("beacon") {{
-            staticRequirements(this, Category.distribution);
+            staticRequirements(this, Category.effect);
         }};
 
         mendSource = new MendProjector("mend-source") {

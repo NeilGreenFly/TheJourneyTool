@@ -56,10 +56,10 @@ public class Beacon extends SandboxBlock {
         // public TextureRegion region = team.id < 4 ? teamIcons[team.id] : null;
         public int index = -1;
         public Layout layout = new Layout(this::configure).with(
-                new Content<>(content.items(), v -> v.uiIcon, v -> v.localizedName, () -> content.item(unPack(index, 0)), v -> pack(v.id, 0)).setIcon(Icon.box),
-                new Content<>(content.liquids(), v -> v.uiIcon, v -> v.localizedName, () -> content.liquid(unPack(index, 1)), v -> pack(v.id, 1)).setIcon(Icon.liquid),
-                new Content<>(content.blocks().select(this::canProduce), v -> v.uiIcon, v -> v.localizedName, () -> content.block(unPack(index, 2)), v -> pack(v.id, 2)).setIcon(Icon.crafting),
-                new Content<>(content.units().select(this::canProduce), v -> v.uiIcon, v -> v.localizedName, () -> content.unit(unPack(index, 3)), v -> pack(v.id, 3)).setIcon(Icon.units)
+                new Selection<>(content.items(), v -> v.uiIcon, v -> v.localizedName, () -> content.item(unPack(index, 0)), v -> pack(v.id, 0)).setIcon(Icon.box),
+                new Selection<>(content.liquids(), v -> v.uiIcon, v -> v.localizedName, () -> content.liquid(unPack(index, 1)), v -> pack(v.id, 1)).setIcon(Icon.liquid),
+                new Selection<>(content.blocks().select(this::canProduce), v -> v.uiIcon, v -> v.localizedName, () -> content.block(unPack(index, 2)), v -> pack(v.id, 2)).setIcon(Icon.crafting),
+                new Selection<>(content.units().select(this::canProduce), v -> v.uiIcon, v -> v.localizedName, () -> content.unit(unPack(index, 3)), v -> pack(v.id, 3)).setIcon(Icon.units)
         );
 
         public boolean canProduce(Block block){
