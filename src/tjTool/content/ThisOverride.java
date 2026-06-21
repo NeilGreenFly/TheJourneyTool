@@ -13,6 +13,8 @@ public class ThisOverride {
 
     public static void load() {
 
+        // 2026/6/21
+        // 本是由于原版未启用此属性而添加的覆写, 但现已提pr, 在未来将不再需要此覆写.
         tileLogicDisplay.allowRectanglePlacement = true;
 
         StatusEffects.none.color = Color.green;

@@ -180,7 +180,6 @@ public class AnySource extends BaseSource {
             table.background(Tex.pane).top();
             if (status == 3) {
                 table.label(() -> TjDraw.flashingStream(exception + " >>>", Pal.remove, Color.valueOf("#f59f9f"))).growX().left().row();
-//                table.label(() -> TjDraw.rainbowStream("NullPointerException >>>")).growX().left().row();
                 table.image().color(Pal.remove).height(4).growX().padTop(5).padBottom(5).row();
                 table.label(() -> """
                         这里似乎出现了异常...

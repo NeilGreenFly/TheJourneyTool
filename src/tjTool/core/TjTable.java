@@ -66,32 +66,35 @@ public class TjTable {
     public static final float uiSize = 44f;
     public static final float iconSize = 32f;
 
-    public static <T> void forEach(Iterator<T> it, Cons2<Integer, T> cons) {
+    public static Func<? extends UnlockableContent, TextureRegion> getRegion = v -> v.uiIcon;
+    public static Func<? extends UnlockableContent, String> getTip = v -> v.localizedName;
+
+    public static <T> void forEach(Iterator<T> it, ForCons<T> cons) {
         for (int index = 0; it.hasNext(); index += 1) cons.get(index, it.next());
     }
 
-    public static <T> void forEach(T[] it, Cons2<Integer, T> cons) {
+    public static <T> void forEach(T[] it, ForCons<T> cons) {
         for (int index = 0; index < it.length; index += 1) cons.get(index, it[index]);
     }
 
-    public static <T> void forEach(Seq<T> it, Cons2<Integer, T> cons) {
+    public static <T> void forEach(Seq<T> it, ForCons<T> cons) {
         for (int index = 0; index < it.size; index += 1) cons.get(index, it.get(index));
     }
 
     public static class Layout {
         public Cons<int[]> configure;
-        public Seq<Content<?>> contents = new Seq<>();
+        public Seq<Content> contents = new Seq<>();
 
         public Layout(Cons<int[]> configure) {
             this.configure = configure;
         }
 
-        public Layout add(Content<?> content) {
+        public Layout add(Content content) {
             contents.add(content);
             return content.layout = this;
         }
 
-        public Layout with(Content<?>... contents) {
+        public Layout with(Content... contents) {
             for (var content : contents) add(content);
             return this;
         }
@@ -102,18 +105,21 @@ public class TjTable {
 
         public int[] config() {
             int[] items = new int[contents.size];
-            forEach(contents, (idx, item) -> items[idx] = item.getConfig());
+            forEach(contents, (idx, item) -> {
+                if (item instanceof ConfigurableContent cItem)
+                    items[idx] = cItem.getConfig();
+            });
             return items;
         }
 
-        public int[] config(boolean save) {
-            int[] items = new int[contents.size];
-            for (int i = 0; i < contents.size; ++i)
-                items[i] = !save || contents.get(i).save
-                        ? contents.get(i).config
-                        : -1;
-            return items;
-        }
+//        public int[] config(boolean save) {
+//            int[] items = new int[contents.size];
+//            for (int i = 0; i < contents.size; ++i)
+//                items[i] = !save || contents.get(i).save
+//                        ? contents.get(i).config
+//                        : -1;
+//            return items;
+//        }
 
         /**
          * For example:
@@ -154,26 +160,27 @@ public class TjTable {
         }
     }
 
-    abstract public static class Content<Type> {
-        public static Func<? extends UnlockableContent, TextureRegion> getRegion = v -> v.uiIcon;
-        public static Func<? extends UnlockableContent, String> getTip = v -> v.localizedName;
-
+    abstract public static class Content {
         protected Layout layout;
         protected Drawable icon = Icon.star;
-        protected int config = -2;
-        public boolean save;
 
-        abstract protected void configure(int config);
-        abstract protected int getConfig();
         abstract protected Cons<Table> build(boolean closeSelect);
 
-        public Content<Type> setIcon(Drawable icon) {
+        public Content setIcon(Drawable icon) {
             this.icon = icon;
             return this;
         }
     }
 
-    public static class Selection<Type> extends Content<Type> {
+    abstract public static class ConfigurableContent extends Content {
+        protected int config = -2;
+        public boolean save;
+
+        abstract protected void configure(int config);
+        abstract protected int getConfig();
+    }
+
+    public static class Selection<Type> extends ConfigurableContent {
         public Seq<Type> items;
         public Func<Type, TextureRegion> buttonRegion;
         public Func<Type, String> buttonTip;
