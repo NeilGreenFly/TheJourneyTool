@@ -47,7 +47,7 @@ public class TjDraw {
     public static String flashingStream(String string, Color color, Color colorTo) {
         StringBuilder rainbowString = new StringBuilder();
         for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(TjDraw.colorToString(color.cpy().lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
+            rainbowString.append(TjDraw.colorToString(Tmp.c1.set(color).lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
         return rainbowString.toString();
     }
 
@@ -133,7 +133,7 @@ public class TjDraw {
         float[] wr = new float[]{width / 2f, block.size * tilesize / 2f - width};
         float cx = x * tilesize + block.offset;
         float cy = y * tilesize + block.offset;
-        Color color = (valid ? rainbow : Pal.remove).cpy();
+        Color color = Tmp.c1.set(valid ? rainbow : Pal.remove);
         float outline = color.a(0.5f).toFloatBits();
         float from = color.a(0.25f).toFloatBits();
         float to = color.a(0).toFloatBits();
@@ -204,7 +204,7 @@ public class TjDraw {
      *     public void draw() {
      *         super.draw();
      *         float r = size * tilesize / 2f;
-     *         beacon(x, y, r, team.color.cpy(), 0.7f, null, null);
+     *         beacon(x, y, r, Tmp.c1.set(team.color), 0.7f, null, null);
      *     }
      * </pre></blockquote>
      * @param x     中心坐标 x

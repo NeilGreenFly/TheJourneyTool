@@ -11,14 +11,11 @@ import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
-import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
 import mindustry.world.Block;
 import mindustry.world.blocks.ItemSelection;
-
-import java.util.Iterator;
 
 import static mindustry.Vars.control;
 
@@ -34,23 +31,35 @@ import static mindustry.Vars.control;
  *     public Block block = null;
  *     public UnitType unit = null;
  *     public Layout layout = new Layout(this::configure).with(
- *             new Content&lt;&gt;(content.items(),
- *                           v -> v.uiIcon, v -> v.localizedName,
- *                           () -> item, v -> (int) v.id).setIcon(Icon.box),
- *             new Content&lt;&gt;(content.liquids(),
- *                           v -> v.uiIcon, v -> v.localizedName,
- *                           () -> liquid, v -> (int) v.id).setIcon(Icon.liquid),
- *             new Content&lt;&gt;(content.blocks().select(this::canProduce),
- *                           v -> v.uiIcon, v -> v.localizedName,
- *                           () -> block, v -> (int) v.id).setIcon(Icon.crafting),
- *             new Content&lt;&gt;(content.units().select(this::canProduce),
- *                           v -> v.uiIcon, v -> v.localizedName,
- *                           () -> unit, v -> (int) v.id).setIcon(Icon.units)
+ *             new Page(Icon.box).with(new Selection&lt;&gt;(
+ *                     () -> content.items(),
+ *                     v -> v.uiIcon,
+ *                     v -> v.localizedName,
+ *                     () -> item,
+ *                     v -> (int) v.id)),
+ *             new Page(Icon.liquid).with(new Selection&lt;&gt;(
+ *                     () -> content.liquids(),
+ *                     v -> v.uiIcon,
+ *                     v -> v.localizedName,
+ *                     () -> liquid,
+ *                     v -> (int) v.id)),
+ *             new Page(Icon.crafting).with(new Selection&lt;&gt;(
+ *                     () -> content.blocks().select(this::canProduce),
+ *                     v -> v.uiIcon,
+ *                     v -> v.localizedName,
+ *                     () -> block,
+ *                     v -> (int) v.id)),
+ *             new Page(Icon.units).with(new Selection&lt;&gt;(
+ *                     () -> content.units().select(this::canProduce),
+ *                     v -> v.uiIcon,
+ *                     v -> v.localizedName,
+ *                     () -> unit,
+ *                     v -> (int) v.id))
  *     );
  * } </pre></blockquote>
  * 在构造方法中注册 :
  * <blockquote><pre>
- *     config(int[].class, (BeaconBuild tile, int[] config) -> {
+ *     config(int[].class, (MyBuild tile, int[] config) -> {
  *         tile.item = content.item(config[0]);
  *         tile.liquid = content.liquid(config[1]);
  *         tile.block = content.block(config[2]);
@@ -66,13 +75,6 @@ public class TjTable {
     public static final float uiSize = 44f;
     public static final float iconSize = 32f;
 
-    public static Func<? extends UnlockableContent, TextureRegion> getRegion = v -> v.uiIcon;
-    public static Func<? extends UnlockableContent, String> getTip = v -> v.localizedName;
-
-    public static <T> void forEach(Iterator<T> it, ForCons<T> cons) {
-        for (int index = 0; it.hasNext(); index += 1) cons.get(index, it.next());
-    }
-
     public static <T> void forEach(T[] it, ForCons<T> cons) {
         for (int index = 0; index < it.length; index += 1) cons.get(index, it[index]);
     }
@@ -82,20 +84,21 @@ public class TjTable {
     }
 
     public static class Layout {
-        public Cons<int[]> configure;
-        public Seq<Content> contents = new Seq<>();
+        public Seq<Page> pages = new Seq<>();
+        public Cons<Object> configure;
 
-        public Layout(Cons<int[]> configure) {
+        public Layout(Cons<Object> configure) {
             this.configure = configure;
         }
 
-        public Layout add(Content content) {
-            contents.add(content);
-            return content.layout = this;
+        public Layout add(Page page) {
+            pages.add(page);
+            page.contents.each(content -> content.layout = this);
+            return this;
         }
 
-        public Layout with(Content... contents) {
-            for (var content : contents) add(content);
+        public Layout with(Page... pages) {
+            for (var page : pages) add(page);
             return this;
         }
 
@@ -104,22 +107,11 @@ public class TjTable {
         }
 
         public int[] config() {
+            Seq<Content<?>> contents = pages.flatMap(page -> page.contents.select(content -> content.value != null));
             int[] items = new int[contents.size];
-            forEach(contents, (idx, item) -> {
-                if (item instanceof ConfigurableContent cItem)
-                    items[idx] = cItem.getConfig();
-            });
+            forEach(contents, (idx, item) -> items[idx] = item.getConfig());
             return items;
         }
-
-//        public int[] config(boolean save) {
-//            int[] items = new int[contents.size];
-//            for (int i = 0; i < contents.size; ++i)
-//                items[i] = !save || contents.get(i).save
-//                        ? contents.get(i).config
-//                        : -1;
-//            return items;
-//        }
 
         /**
          * For example:
@@ -149,9 +141,9 @@ public class TjTable {
 
             table.table(list -> {
                 ButtonGroup<ImageButton> listGroup = new ButtonGroup<>();
-                contents.each(content -> list.button(content.icon, Styles.clearNoneTogglei, iconSize, () -> {
+                pages.each(page -> list.button(page.icon, Styles.clearNoneTogglei, iconSize, () -> {
                     frame.clearChildren();
-                    frame.table(content.build(closeSelect));
+                    page.contents.each(content -> frame.table(content.build(closeSelect)));
                 }).size(uiSize).group(listGroup).row());
                 list.getChildren().get(0).fireClick();
             }).top();
@@ -160,49 +152,60 @@ public class TjTable {
         }
     }
 
-    abstract public static class Content {
-        protected Layout layout;
-        protected Drawable icon = Icon.star;
+    public static class Page {
+        public Seq<Content<?>> contents = new Seq<>();
+        public Drawable icon;
 
-        abstract protected Cons<Table> build(boolean closeSelect);
-
-        public Content setIcon(Drawable icon) {
+        public Page(Drawable icon) {
             this.icon = icon;
+        }
+
+        public Page() {
+            this(Icon.star);
+        }
+
+        // public Page setIcon(Drawable icon) {
+        //     this.icon = icon;
+        //     return this;
+        // }
+
+        public Page with(Content<?>... contents) {
+            this.contents.add(contents);
             return this;
         }
     }
 
-    abstract public static class ConfigurableContent extends Content {
+    public static abstract class Content<Type> {
+        public Intf<Type> value;
+        protected Layout layout;
         protected int config = -2;
-        public boolean save;
+        // public boolean save;
 
-        abstract protected void configure(int config);
+        abstract public Cons<Table> build(boolean closeSelect);
+        abstract protected void call(int config);
         abstract protected int getConfig();
     }
 
-    public static class Selection<Type> extends ConfigurableContent {
-        public Seq<Type> items;
+    public static class Selection<Type> extends Content<Type> {
+        public Prov<Seq<Type>> items;
         public Func<Type, TextureRegion> buttonRegion;
         public Func<Type, String> buttonTip;
         public Prov<Type> holder;
-        public Boolf2<Type, Type> comparer;
-        public Func<Type, Integer> configure;
 
-        public Selection(Seq<Type> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder, Boolf2<Type, Type> comparer, Func<Type, Integer> configure) {
+        public Selection(Prov<Seq<Type>> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder) {
             this.items = items;
             this.buttonRegion = buttonRegion;
             this.buttonTip = buttonTip;
             this.holder = holder;
-            this.comparer = comparer;
-            this.configure = configure;
         }
 
-        public Selection(Seq<Type> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder, Func<Type, Integer> configure) {
-            this(items, buttonRegion, buttonTip, holder, (a, b) -> a == b, configure);
+        public Selection(Prov<Seq<Type>> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder, Intf<Type> value) {
+            this(items, buttonRegion, buttonTip, holder);
+            this.value = value;
         }
 
         @Override
-        protected void configure(int config) {
+        public void call(int config) {
             // config = Mathf.clamp(config, -1, items.size);
             this.config = config;
             layout.configure();
@@ -210,24 +213,26 @@ public class TjTable {
         }
 
         @Override
-        protected int getConfig() {
+        public int getConfig() {
             if (config != -2) return config;
             Type item = holder.get();
-            return item != null ? configure.get(item) : -1;
+            return item != null ? value.get(item) : -1;
         }
 
         @Override
-        protected Cons<Table> build(boolean closeSelect) {
+        public Cons<Table> build(boolean closeSelect) {
             return table -> {
                 table.top().left().defaults().size(uiSize);
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
                 group.setMinCheckCount(0);
-                forEach(items, (idx, item) -> {
+                forEach(items.get(), (idx, item) -> {
                     ImageButton button = table.button(new TextureRegionDrawable(buttonRegion.get(item)), Styles.clearNoneTogglei, iconSize, () -> {
                         if (closeSelect) control.input.config.hideConfig();
                     }).tooltip(buttonTip.get(item)).group(group).get();
-                    button.changed(() -> configure(button.isChecked() ? configure.get(item) : -1));
-                    button.update(() -> button.setChecked(comparer.get(holder.get(), item)));
+                    button.changed(value == null
+                            ? () -> layout.configure.get(button.isChecked() ? item : null)
+                            : () -> call(button.isChecked() ? value.get(item) : -1));
+                    button.update(() -> button.setChecked(holder.get() == item));
                     if (idx % 8 == 7) table.row();
                 });
             };
