@@ -11,6 +11,7 @@ import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
+import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
@@ -23,7 +24,7 @@ import static mindustry.Vars.control;
  * - 该部分暂未完善 -<p>
  * - 该部分暂未完善 -<p>
  * - 该部分暂未完善 -<p>
- * 由于旧的 TjConfigTable 将用户面和数据过度耦合导致极难扩展, 所以我们需要一种新的设计, 但是显然这需要一点时间...<p>
+ * 由于旧的 {@code TjConfigTable} 将用户面和数据过度耦合导致极难扩展, 所以我们需要一种新的设计, 但是显然这需要一点时间...<p>
  * For example:
  * <blockquote><pre> {@code
  *     public Item item = null;
@@ -31,30 +32,18 @@ import static mindustry.Vars.control;
  *     public Block block = null;
  *     public UnitType unit = null;
  *     public Layout layout = new Layout(this::configure).with(
- *             new Page(Icon.box).with(new Selection&lt;&gt;(
- *                     () -> content.items(),
- *                     v -> v.uiIcon,
- *                     v -> v.localizedName,
- *                     () -> item,
- *                     v -> (int) v.id)),
- *             new Page(Icon.liquid).with(new Selection&lt;&gt;(
- *                     () -> content.liquids(),
- *                     v -> v.uiIcon,
- *                     v -> v.localizedName,
- *                     () -> liquid,
- *                     v -> (int) v.id)),
- *             new Page(Icon.crafting).with(new Selection&lt;&gt;(
- *                     () -> content.blocks().select(this::canProduce),
- *                     v -> v.uiIcon,
- *                     v -> v.localizedName,
- *                     () -> block,
- *                     v -> (int) v.id)),
- *             new Page(Icon.units).with(new Selection&lt;&gt;(
- *                     () -> content.units().select(this::canProduce),
- *                     v -> v.uiIcon,
- *                     v -> v.localizedName,
- *                     () -> unit,
- *                     v -> (int) v.id))
+ *             new Page(Icon.box).with(Selection.unlockableContent(
+ *                     () -> content.items().as(),
+ *                     () -> item).setValue(v -> (int) v.id)),
+ *             new Page(Icon.liquid).with(Selection.unlockableContent(
+ *                     () -> content.liquids().as(),
+ *                     () -> liquid).setValue(v -> (int) v.id)),
+ *             new Page(Icon.crafting).with(Selection.unlockableContent(
+ *                     () -> content.blocks().select(this::canProduce).as(),
+ *                     () -> block).setValue(v -> (int) v.id)),
+ *             new Page(Icon.units).with(Selection.unlockableContent(
+ *                     () -> content.units().select(this::canProduce).as(),
+ *                     () -> unit).setValue(v -> (int) v.id))
  *     );
  * } </pre></blockquote>
  * 在构造方法中注册 :
@@ -199,9 +188,13 @@ public class TjTable {
             this.holder = holder;
         }
 
-        public Selection(Prov<Seq<Type>> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder, Intf<Type> value) {
-            this(items, buttonRegion, buttonTip, holder);
+        public Selection<Type> setValue(Intf<Type> value) {
             this.value = value;
+            return this;
+        }
+
+        public static Selection<UnlockableContent> unlockableContent(Prov<Seq<UnlockableContent>> items, Prov<UnlockableContent> holder) {
+            return new Selection<>(items, item -> item.uiIcon, item -> item.localizedName, holder);
         }
 
         @Override

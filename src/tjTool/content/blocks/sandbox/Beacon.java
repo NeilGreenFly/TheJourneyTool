@@ -18,13 +18,10 @@ import mindustry.type.Liquid;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.blocks.storage.CoreBlock;
-import tjTool.core.TjDraw;
-import tjTool.core.TjEffect;
+import tjTool.core.*;
 import tjTool.core.TjTable.*;
 
-import static java.util.Objects.requireNonNull;
 import static mindustry.Vars.*;
-import static mindustry.Vars.state;
 
 public class Beacon extends SandboxBlock {
     public TextureRegion[] teamIcons = new TextureRegion[4];
@@ -75,10 +72,10 @@ public class Beacon extends SandboxBlock {
         public TextureRegion icon;
         public Color color;
         public Layout layout = new Layout(this::configure).with(
-                new Page(Icon.box).with(new Selection<>(() -> content.items(), v -> requireNonNull(v).uiIcon, v -> requireNonNull(v).localizedName, () -> c instanceof Item v ? v : null)),
-                new Page(Icon.liquid).with(new Selection<>(() -> content.liquids(), v -> requireNonNull(v).uiIcon, v -> requireNonNull(v).localizedName, () -> c instanceof Liquid v ? v : null)),
-                new Page(Icon.crafting).with(new Selection<>(() -> content.blocks().select(this::canProduce), v -> requireNonNull(v).uiIcon, v -> requireNonNull(v).localizedName, () -> c instanceof Block v ? v : null)),
-                new Page(Icon.units).with(new Selection<>(() -> content.units().select(this::canProduce), v -> requireNonNull(v).uiIcon, v -> requireNonNull(v).localizedName, () -> c instanceof UnitType v ? v : null))
+                new Page(Icon.box).with(Selection.unlockableContent(() -> content.items().as(), () -> c instanceof Item v ? v : null)),
+                new Page(Icon.liquid).with(Selection.unlockableContent(() -> content.liquids().as(), () -> c instanceof Liquid v ? v : null)),
+                new Page(Icon.crafting).with(Selection.unlockableContent(() -> content.blocks().select(this::canProduce).as(), () -> c instanceof Block v ? v : null)),
+                new Page(Icon.units).with(Selection.unlockableContent(() -> content.units().select(this::canProduce).as(), () -> c instanceof UnitType v ? v : null))
         );
 
         public boolean canProduce(Block block) {

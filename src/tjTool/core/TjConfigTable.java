@@ -17,11 +17,10 @@ import mindustry.ui.Styles;
 
 import java.util.Objects;
 
+import static tjTool.core.TjTable.*;
+
 @SuppressWarnings("unused")
 public class TjConfigTable {
-
-    public static final float uiSize = 44f;
-    public static final float iconSize = 32f;
 
     public static Func<UnlockableContent, Option> optionMapper = item -> new Option(item.uiIcon, item.localizedName);
 

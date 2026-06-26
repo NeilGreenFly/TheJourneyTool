@@ -1,7 +1,10 @@
 package tjTool.content.blocks.sandbox;
 
+import arc.Core;
+import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
@@ -10,17 +13,24 @@ import arc.util.Nullable;
 import arc.util.io.*;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
+import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 import mindustry.type.*;
+import mindustry.ui.Styles;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
 import tjTool.core.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 import static tjTool.core.TjConfigTable.*;
+import static tjTool.core.TjTable.*;
 
 public class AmmoSource extends BaseSource {
+    public boolean shown = true;
+
     public AmmoSource(String name) {
         super(name);
         rotate = true;
@@ -34,6 +44,11 @@ public class AmmoSource extends BaseSource {
                 new DrawHeatOutput()
         );
         config(int[].class, (AmmoSourceBuild tile, int[] v) -> tile.pack.receive(v));
+        config(Block.class, (AmmoSourceBuild tile, Block v) -> {
+            float rotation = tile.turretBuild.rotation;
+            tile.turretBuild.tile.setBlock(v, tile.team);
+            tile.turretBuild.rotation = rotation;
+        });
     }
 
     @Override
@@ -60,6 +75,10 @@ public class AmmoSource extends BaseSource {
                         new Option(Blocks.overdriveProjector.uiIcon, "225%"),
                         new Option(Blocks.overdriveDome.uiIcon, "250%")
                 )).setFavorite(2).setAlwaysBuild(false).setStatic(true)
+        );
+        public Layout layout = new Layout(this::configure).with(
+                new Page(Icon.wrench).with(Selection.unlockableContent(() -> content.blocks().select(
+                        block -> block instanceof BaseTurret && block.size == turretBuild.block.size).as(), () -> turretBuild != null ? turretBuild.block : null))
         );
         public Seq<UnlockableContent> consumes = new Seq<>();
         public Seq<UnlockableContent> ammoTypes = new Seq<>();
@@ -103,7 +122,7 @@ public class AmmoSource extends BaseSource {
         public void drawSelect() {
             super.drawSelect();
             if (turretBuild != null) {
-                TjDraw.lightPoly(turretBuild, TjDraw.rainbow);
+                TjDraw.drawPlace(turretBuild.block, turretBuild.tile.x, turretBuild.tile.y, true);
                 drawItemSelection(turretBuild.block);
                 drawItemSelections(turretBuild, Seq.with(getAmmo(), getCool()));
             }
@@ -156,6 +175,8 @@ public class AmmoSource extends BaseSource {
             } else {
                 turretBuild = null;
                 pack.reset();
+                if (control.input.config.getSelected() == self())
+                    control.input.config.hideConfig();
             }
         }
 
@@ -197,17 +218,46 @@ public class AmmoSource extends BaseSource {
             }
         }
 
+        protected Runnable rebuild(Table table) {
+            return () -> {
+                shown = !shown;
+                table.background(null).clear();
+                buildConfiguration(table);
+                table.pack();
+            };
+        }
+
         @Override
         public void buildConfiguration(Table table) {
-            if (turretBuild != null) {
-                table.clear();
-                table.background(Tex.pane).left();
-                table.table(bars -> {
-                    bars.defaults().growX().height(18f).pad(4);
-                    turretBuild.displayBars(bars);
-                }).growX().padBottom(10).row();
-                pack.build(table).row();
+            if (turretBuild == null) return;
+            if (!shown) {
+                table.table(Tex.paneLeft, t -> t.button(Icon.eyeOffSmall, Styles.clearNonei, rebuild(table)).tooltip("unshown", true).size(uiSize)).size(uiSize).top();
+                table.table(Tex.pane, frame -> pack.build(frame));
+                return;
             }
+            table.background(Tex.pane).left();
+            table.table(frame -> {
+                frame.table(list -> {
+                    list.button(Icon.info, Styles.flati, () -> {
+                        ui.content.show(turretBuild.block);
+                        Events.fire(new EventType.BlockInfoEvent());
+                    }).tooltip(Core.bundle.get("info.title"), true).size(uiSize).row();
+                    list.button(Icon.wrench, Styles.flati, () -> {
+                        table.background(Tex.pane).clear();
+                        layout.build(block, table, false);
+                        table.pack();
+                    }).tooltip("exchange\nsize: " + turretBuild.block.size, true).size(uiSize).row();
+                    list.button(Icon.eyeSmall, Styles.flati, rebuild(table)).tooltip("shown", true).size(uiSize).row();
+                }).top();
+                frame.image(new TextureRegion(turretBuild.block.uiIcon)).tooltip(turretBuild.block.localizedName, true).size(100f).pad(10f);
+                frame.image().color(Pal.gray).width(4f).pad(-9f, 8f, -9f, 8f).growY();
+                pack.build(frame).row();
+            }).row();
+            table.image().color(Pal.gray).height(4f).pad(8f, -9f, 8f, -9f).growX().row();
+            table.table(bars -> {
+                bars.defaults().growX().minWidth(300f).height(18f).pad(4f);
+                turretBuild.displayBars(bars);
+            }).growX().row();
         }
 
         @Override

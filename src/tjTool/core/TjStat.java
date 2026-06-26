@@ -37,7 +37,8 @@ public class TjStat {
         table.table(Styles.grayPanel, frame -> {
             Image image = new Image(region);
             if (listener != null) image.addListener(listener);
-            frame.add(image).tooltip(name, true).size(40f).pad(12f).left().top();
+            float multiple = 40f / Math.max(region.width, region.height);
+            frame.table(in -> in.add(image).tooltip(name, true).size(region.width * multiple, region.height * multiple)).size(40f).pad(12f).left().top();
             frame.table(label -> {
                 label.label(() -> TjDraw.colorToString(TjDraw.rainbow) + name).growX().left().row();
                 label.label(() -> description).growX().left().row();
