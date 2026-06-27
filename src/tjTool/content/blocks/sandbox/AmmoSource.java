@@ -45,6 +45,8 @@ public class AmmoSource extends BaseSource {
         );
         config(int[].class, (AmmoSourceBuild tile, int[] v) -> tile.pack.receive(v));
         config(Block.class, (AmmoSourceBuild tile, Block v) -> {
+            lastConfig = null;
+            if (tile.turretBuild == null) return;
             float rotation = tile.turretBuild.rotation;
             tile.turretBuild.tile.setBlock(v, tile.team);
             tile.turretBuild.rotation = rotation;
