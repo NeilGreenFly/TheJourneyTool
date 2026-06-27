@@ -107,8 +107,7 @@ public class TjTable {
          * <blockquote><pre>
          *     {@code @Override}
          *     public void buildConfiguration({@code Table table}) {
-         *         table.background(Tex.pane).left();
-         *         layout.build(block, table, false);
+         *         layout.build(block, table.background(Tex.pane), false);
          *     }
          * </pre></blockquote>
          * @author NeilGreenFly

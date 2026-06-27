@@ -105,8 +105,7 @@ public class Beacon extends SandboxBlock {
 
         @Override
         public void buildConfiguration(Table table) {
-            table.background(Tex.pane).left();
-            layout.build(block, table, false);
+            layout.build(block, table.background(Tex.pane), false);
         }
 
         @Override

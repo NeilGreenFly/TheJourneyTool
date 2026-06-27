@@ -48,6 +48,7 @@ public class AmmoSource extends BaseSource {
             float rotation = tile.turretBuild.rotation;
             tile.turretBuild.tile.setBlock(v, tile.team);
             tile.turretBuild.rotation = rotation;
+            tile.turretBuild.block.placeEffect.at(tile.turretBuild, tile.turretBuild.block.size);
         });
     }
 
@@ -218,20 +219,20 @@ public class AmmoSource extends BaseSource {
             }
         }
 
-        protected Runnable rebuild(Table table) {
-            return () -> {
-                shown = !shown;
-                table.background(null).clear();
-                buildConfiguration(table);
-                table.pack();
-            };
+        protected void rebuild(Table table) {
+            table.background(null).clear();
+            buildConfiguration(table);
+            table.pack();
         }
 
         @Override
         public void buildConfiguration(Table table) {
             if (turretBuild == null) return;
             if (!shown) {
-                table.table(Tex.paneLeft, t -> t.button(Icon.eyeOffSmall, Styles.clearNonei, rebuild(table)).tooltip("unshown", true).size(uiSize)).size(uiSize).top();
+                table.table(Tex.paneLeft, t -> t.button(Icon.eyeOffSmall, Styles.clearNonei, () -> {
+                    shown = !shown;
+                    rebuild(table);
+                }).tooltip("unshown", true).size(uiSize).pad(-12)).top();
                 table.table(Tex.pane, frame -> pack.build(frame));
                 return;
             }
@@ -243,11 +244,15 @@ public class AmmoSource extends BaseSource {
                         Events.fire(new EventType.BlockInfoEvent());
                     }).tooltip(Core.bundle.get("info.title"), true).size(uiSize).row();
                     list.button(Icon.wrench, Styles.flati, () -> {
-                        table.background(Tex.pane).clear();
-                        layout.build(block, table, false);
+                        table.background(null).clear();
+                        table.table(Tex.paneLeft, t -> t.button(Icon.undo, Styles.clearNonei, () -> rebuild(table)).tooltip("back", true).size(uiSize).pad(-12)).top();
+                        table.table(Tex.pane, t -> layout.build(block, t, false));
                         table.pack();
                     }).tooltip("exchange\nsize: " + turretBuild.block.size, true).size(uiSize).row();
-                    list.button(Icon.eyeSmall, Styles.flati, rebuild(table)).tooltip("shown", true).size(uiSize).row();
+                    list.button(Icon.eyeSmall, Styles.flati, () -> {
+                        shown = !shown;
+                        rebuild(table);
+                    }).tooltip("shown", true).size(uiSize).row();
                 }).top();
                 frame.image(new TextureRegion(turretBuild.block.uiIcon)).tooltip(turretBuild.block.localizedName, true).size(100f).pad(10f);
                 frame.image().color(Pal.gray).width(4f).pad(-9f, 8f, -9f, 8f).growY();

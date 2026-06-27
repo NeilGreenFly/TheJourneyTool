@@ -14,6 +14,7 @@ import mindustry.world.meta.BuildVisibility;
 import tjTool.content.blocks.sandbox.*;
 import tjTool.core.*;
 
+import static mindustry.type.Category.*;
 import static mindustry.type.ItemStack.*;
 
 public class ThisBlocks {
@@ -26,28 +27,28 @@ public class ThisBlocks {
     public static void load() {
 
         anySource = new AnySource("any-source") {{
-            staticRequirements(this, Category.distribution);
+            staticRequirements(this, distribution);
         }};
 
         ammoSource = new AmmoSource("ammo-source") {{
-            staticRequirements(this, Category.distribution);
+            staticRequirements(this, distribution);
         }};
 
         solarSource = new SolarSource("solar-source") {{
-            staticRequirements(this, Category.power);
+            staticRequirements(this, power);
         }};
 
         bedrock = new Bedrock("bedrock") {{
-            staticRequirements(this, Category.defense);
+            staticRequirements(this, defense);
         }};
 
         beacon = new Beacon("beacon") {{
-            staticRequirements(this, Category.effect);
+            staticRequirements(this, effect);
         }};
 
         mendSource = new MendProjector("mend-source") {
             {
-                staticRequirements(this, Category.effect);
+                staticRequirements(this, effect);
                 hasPower = false;
                 hasItems = false;
                 size = 2;
@@ -67,7 +68,7 @@ public class ThisBlocks {
 
         overdriveSource = new OverdriveProjector("overdrive-source") {
             {
-                staticRequirements(this, Category.effect);
+                staticRequirements(this, effect);
                 hasPower = false;
                 hasItems = false;
                 hasBoost = false;
@@ -131,7 +132,7 @@ public class ThisBlocks {
         };
 
         shieldSource = new ShieldSource("shield-source") {{
-            staticRequirements(this, Category.effect);
+            staticRequirements(this, effect);
         }};
 
     }
