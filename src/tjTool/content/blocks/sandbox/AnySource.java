@@ -3,9 +3,9 @@ package tjTool.content.blocks.sandbox;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
+import arc.struct.Seq;
 import arc.util.Eachable;
 import arc.util.Log;
 import arc.util.io.*;
@@ -25,6 +25,7 @@ import tjTool.core.*;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.overlayUI;
+import static tjTool.core.TjTable.*;
 
 /**
  * 邻接源现已并入任意源, 原邻接源已被移除, 但可能会因其他测试重新加入, 不过这只会是暂时的. 
@@ -47,7 +48,14 @@ public class AnySource extends BaseSource {
         saveConfig = true;
         clearOnDoubleTap = true;
 
-        config(Integer.class, (AnySourceBuild tile, Integer status) -> tile.status = status);
+        config(Integer.class, (AnySourceBuild tile, Integer status) -> {
+            tile.status = status;
+            placeEffect.at(tile.x, tile.y, size);
+        });
+        config(UnitType.class, (AnySourceBuild tile, UnitType v) -> {
+            lastConfig = null;
+            Fx.spawn.at(v.spawn(tile.team, tile.x, tile.y + tilesize, 90));
+        });
     }
 
     @Override
@@ -96,6 +104,10 @@ public class AnySource extends BaseSource {
                 但是不排除您可能只是重启了存档, 在日志未被清空的情况下
                 您当然可以继续提交. 这是被容许的.
                 """;
+        public Layout layout = new Layout(this::configure).with(
+                new Page(Icon.units).with(Selection.unlockableContent(() -> content.units().select(this::canProduce).as(), () -> null)),
+                new Page(Icon.wrench).with(new Selection<>(() -> Seq.with(0, 1), i -> regions[i], i -> TjBundle.getBlock(name, "config-name-" + i), () -> status))
+        );
 
         @Override
         public void draw() {
@@ -176,9 +188,8 @@ public class AnySource extends BaseSource {
 
         @Override
         public void buildConfiguration(Table table) {
-            table.clear();
-            table.background(Tex.pane).top();
             if (status == 3) {
+                table.background(Tex.pane);
                 table.label(() -> TjDraw.flashingStream(exception + " >>>", Pal.remove, Color.valueOf("#f59f9f"))).growX().left().row();
                 table.image().color(Pal.remove).height(4).growX().padTop(5).padBottom(5).row();
                 table.label(() -> """
@@ -190,29 +201,8 @@ public class AnySource extends BaseSource {
                         开发者需要的是日志而不是一段文本!""").color(Pal.remove).growX().left();
                 return;
             }
-            table.table(newTable -> {
-                newTable.clear();
-                newTable.background(Styles.black6).left().defaults().size(56f);
-                ButtonGroup<ImageButton> group = new ButtonGroup<>();
-                for (int i = 0; i < 2; i += 1) {
-                    int finalI = i;
-                    ImageButton button = newTable.button(
-                            Tex.whiteui,
-                            Styles.clearNoneTogglei,
-                            36f,
-                            () -> {}
-                    ).tooltip(TjBundle.getBlock(name, "config-name-" + finalI)).group(group).get();
-                    button.changed(() -> {
-                        if (button.isChecked()) {
-                            configure(finalI);
-                            placeEffect.at(x, y, size);
-                        }
-                    });
-                    button.getStyle().imageUp = new TextureRegionDrawable(regions[i]);
-                    button.update(() -> button.setChecked(status == finalI));
-                }
-            }).row();
-            table.label(() -> TjBundle.getBlock(name, "config-name-" + status)).size(120f, 40f).growX().center();
+            table.table(Tex.pane, frame -> layout.build(block, frame, false)).row();
+            table.table(Styles.black6, l -> l.label(() -> "Create a unit above").pad(10f)).left();
         }
 
         @Override
