@@ -290,9 +290,9 @@ public class TjConfigTable {
                     table.table(table()).left();
                     if (!lock) {
                         if (save)
-                            table.button(Icon.undo, Styles.clearNonei, iconSize, () -> setIndex(-1)).size(uiSize).tooltip(TjBundle.get("table", "reset")).center();
+                            table.button(Icon.undo, Styles.clearNonei, iconSize, () -> setIndex(-1)).size(uiSize).tooltip("@table.reset").center();
                         if (favorite > -1 && favorite < options.size)
-                            table.button(Icon.star, Styles.clearNonei, iconSize, () -> setIndex(favorite)).size(uiSize).tooltip(TjBundle.get("table", "favorite")).center();
+                            table.button(Icon.star, Styles.clearNonei, iconSize, () -> setIndex(favorite)).size(uiSize).tooltip("@table.favorite").center();
                     }
                 } else table.image(Icon.cancel).size(iconSize).center();
                 table.left().row();

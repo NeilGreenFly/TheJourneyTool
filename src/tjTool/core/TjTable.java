@@ -13,6 +13,7 @@ import arc.struct.Seq;
 import arc.util.Nullable;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
 import mindustry.world.Block;
@@ -70,6 +71,10 @@ public class TjTable {
 
     public static <T> void forEach(Seq<T> it, ForCons<T> cons) {
         for (int index = 0; index < it.size; index += 1) cons.get(index, it.get(index));
+    }
+
+    public static void leftList(Table table, Cons<Table> cons) {
+        table.table(Tex.paneLeft, t -> t.table(cons).pad(-12)).top();
     }
 
     public static class Layout {

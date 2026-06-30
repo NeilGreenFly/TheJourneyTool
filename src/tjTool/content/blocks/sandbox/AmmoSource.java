@@ -231,30 +231,30 @@ public class AmmoSource extends BaseSource {
         public void buildConfiguration(Table table) {
             if (turretBuild == null) return;
             if (!shown) {
-                table.table(Tex.paneLeft, t -> t.button(Icon.eyeOffSmall, Styles.clearNonei, () -> {
+                leftList(table, t -> t.button(Icon.eyeOffSmall, Styles.clearNonei, () -> {
                     shown = !shown;
                     rebuild(table);
-                }).tooltip("unshown", true).size(uiSize).pad(-12)).top();
+                }).tooltip("@table.unshown", true).size(uiSize));
                 table.table(Tex.pane, frame -> pack.build(frame));
                 return;
             }
             table.background(Tex.pane).left();
             table.table(frame -> {
-                frame.table(list -> {
-                    list.button(Icon.info, Styles.flati, () -> {
+                frame.table(Styles.black6, list -> {
+                    list.button(Icon.info, Styles.clearNonei, () -> {
                         ui.content.show(turretBuild.block);
                         Events.fire(new EventType.BlockInfoEvent());
-                    }).tooltip(Core.bundle.get("info.title"), true).size(uiSize).row();
-                    list.button(Icon.wrench, Styles.flati, () -> {
+                    }).tooltip("@info.title", true).size(uiSize).row();
+                    list.button(Icon.wrench, Styles.clearNonei, () -> {
                         table.background(null).clear();
-                        table.table(Tex.paneLeft, t -> t.button(Icon.undo, Styles.clearNonei, () -> rebuild(table)).tooltip("back", true).size(uiSize).pad(-12)).top();
+                        leftList(table, t -> t.button(Icon.undo, Styles.clearNonei, () -> rebuild(table)).tooltip("@back", true).size(uiSize));
                         table.table(Tex.pane, t -> layout.build(block, t, false));
                         table.pack();
                     }).tooltip("exchange\nsize: " + turretBuild.block.size, true).size(uiSize).row();
-                    list.button(Icon.eyeSmall, Styles.flati, () -> {
+                    list.button(Icon.eyeSmall, Styles.clearNonei, () -> {
                         shown = !shown;
                         rebuild(table);
-                    }).tooltip("shown", true).size(uiSize).row();
+                    }).tooltip("@table.shown", true).size(uiSize).row();
                 }).top();
                 frame.image(new TextureRegion(turretBuild.block.uiIcon)).tooltip(turretBuild.block.localizedName, true).size(100f).pad(10f);
                 frame.image().color(Pal.gray).width(4f).pad(-9f, 8f, -9f, 8f).growY();

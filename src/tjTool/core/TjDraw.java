@@ -91,7 +91,7 @@ public class TjDraw {
         float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * building.block.size * tilesize / 2f - f - 0.2f);
         float w = Mathf.clamp(0.5f - f) * building.block.size * tilesize;
 
-        Draw.color(Color.valueOf(hexTo), Color.valueOf(hex), f);
+        Draw.color(Color.valueOf(Tmp.c1, hexTo), Color.valueOf(Tmp.c2, hex), f);
         Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
         Draw.alpha(1f);
         Lines.stroke((2f * f + 0.1f) * heat);

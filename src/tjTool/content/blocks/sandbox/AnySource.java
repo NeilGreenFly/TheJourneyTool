@@ -8,6 +8,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Eachable;
 import arc.util.Log;
+import arc.util.Tmp;
 import arc.util.io.*;
 import mindustry.content.Fx;
 import mindustry.entities.units.BuildPlan;
@@ -190,7 +191,7 @@ public class AnySource extends BaseSource {
         public void buildConfiguration(Table table) {
             if (status == 3) {
                 table.background(Tex.pane);
-                table.label(() -> TjDraw.flashingStream(exception + " >>>", Pal.remove, Color.valueOf("#f59f9f"))).growX().left().row();
+                table.label(() -> TjDraw.flashingStream(exception + " >>>", Pal.remove, Color.valueOf(Tmp.c4, "#f59f9f"))).growX().left().row();
                 table.image().color(Pal.remove).height(4).growX().padTop(5).padBottom(5).row();
                 table.label(() -> """
                         这里似乎出现了异常...
