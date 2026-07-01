@@ -1,6 +1,8 @@
 package tjTool.content.blocks.sandbox;
 
+import arc.Core;
 import arc.Events;
+import arc.func.Cons;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
@@ -18,6 +20,7 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.ui.Styles;
+import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
@@ -80,7 +83,37 @@ public class AmmoSource extends BaseSource {
         );
         public Layout layout = new Layout(this::configure).with(
                 new Page(Icon.wrench).with(Selection.unlockableContent(() -> content.blocks().select(
-                        block -> block instanceof BaseTurret && block.size == turretBuild.block.size).as(), () -> turretBuild != null ? turretBuild.block : null))
+                        block -> block instanceof BaseTurret && block.size == turretBuild.block.size).as(), () -> turretBuild != null ? turretBuild.block : null)),
+                new Page(Icon.link).with(new Content<>() {
+                    private final BaseDialog dialog = new BaseDialog("@openlink");
+
+                    {
+                        dialog.cont.label(() -> "即将打开链接").center().row();
+                        dialog.cont.button("QQ Group: 1078329722", Icon.link, Styles.grayt,
+                                () -> Core.app.openURI("https://qm.qq.com/q/ZfZKpzUzaU"))
+                                .tooltip("@openlink", true).margin(8f).size(300f, 50f).pad(10f).row();
+                        dialog.cont.label(() -> "由于拦截不良账号的需要，在入群申请中请输入答案: [sky]DeepSpace[]").padTop(50f).center().row();
+                        dialog.cont.label(() -> "不仅仅是BUG, 如果您有新的[accent]需求[]或[accent]想法[], 也可以向我们提交它们!").padTop(50f).center().row();
+                        dialog.addCloseButton();
+                    }
+
+                    @Override
+                    public Cons<Table> build(boolean closeSelect) {
+                        return table -> {
+                            table.label(() -> "遇到了[accent]BUG[]? 向我们提交它们!").padTop(20f).center().row();
+                            table.button("Submit", Icon.link, Styles.grayt, dialog::show)
+                                    .tooltip("@openlink", true).margin(8f).size(300f, 50f).pad(10f);
+                        };
+                    }
+
+                    @Override
+                    protected void call(int config) {}
+
+                    @Override
+                    protected int getConfig() {
+                        return 0;
+                    }
+                })
         );
         public Seq<UnlockableContent> consumes = new Seq<>();
         public Seq<UnlockableContent> ammoTypes = new Seq<>();
