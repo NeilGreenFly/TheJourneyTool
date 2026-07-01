@@ -1,6 +1,5 @@
 package tjTool.content.blocks.sandbox;
 
-import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;

@@ -191,7 +191,7 @@ public class AnySource extends BaseSource {
         public void buildConfiguration(Table table) {
             if (status == 3) {
                 table.background(Tex.pane);
-                table.label(() -> TjDraw.flashingStream(exception + " >>>", Pal.remove, Color.valueOf(Tmp.c4, "#f59f9f"))).growX().left().row();
+                table.label(() -> TjDraw.flashingStream(exception + " >>>", Pal.remove, Color.valueOf(Tmp.c1, "#f59f9f"))).growX().left().row();
                 table.image().color(Pal.remove).height(4).growX().padTop(5).padBottom(5).row();
                 table.label(() -> """
                         这里似乎出现了异常...

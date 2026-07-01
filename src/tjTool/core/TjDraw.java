@@ -5,7 +5,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.Time;
-import arc.util.Tmp;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
@@ -17,6 +16,9 @@ import static mindustry.Vars.tilesize;
 
 @SuppressWarnings("unused")
 public class TjDraw {
+
+    private static final Color c1 = new Color();
+    private static final Color c2 = new Color();
 
     public static float z = 2f;
     public static Color rainbow = new Color();
@@ -40,14 +42,14 @@ public class TjDraw {
     public static String rainbowStream(String string) {
         StringBuilder rainbowString = new StringBuilder();
         for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(TjDraw.colorToString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f))).append(string.charAt(i));
+            rainbowString.append(TjDraw.colorToString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f, c1))).append(string.charAt(i));
         return rainbowString.toString();
     }
 
     public static String flashingStream(String string, Color color, Color colorTo) {
         StringBuilder rainbowString = new StringBuilder();
         for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(TjDraw.colorToString(Tmp.c1.set(color).lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
+            rainbowString.append(TjDraw.colorToString(c1.set(color).lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
         return rainbowString.toString();
     }
 
@@ -73,8 +75,8 @@ public class TjDraw {
                 Math.max(0f, radius * 0.6f),
                 radius,
                 0f,
-                Tmp.c3.set(color).a(0f),
-                Tmp.c2.set(color).a(0.7f)
+                c1.set(color).a(0f),
+                c2.set(color).a(0.7f)
         );
         Lines.stroke(1f);
         Draw.color(color);
@@ -91,7 +93,7 @@ public class TjDraw {
         float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * building.block.size * tilesize / 2f - f - 0.2f);
         float w = Mathf.clamp(0.5f - f) * building.block.size * tilesize;
 
-        Draw.color(Color.valueOf(Tmp.c1, hexTo), Color.valueOf(Tmp.c2, hex), f);
+        Draw.color(Color.valueOf(c1, hexTo), Color.valueOf(c2, hex), f);
         Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
         Draw.alpha(1f);
         Lines.stroke((2f * f + 0.1f) * heat);
@@ -133,7 +135,7 @@ public class TjDraw {
         float[] wr = new float[]{width / 2f, block.size * tilesize / 2f - width};
         float cx = x * tilesize + block.offset;
         float cy = y * tilesize + block.offset;
-        Color color = Tmp.c1.set(valid ? rainbow : Pal.remove);
+        Color color = c1.set(valid ? rainbow : Pal.remove);
         float outline = color.a(0.5f).toFloatBits();
         float from = color.a(0.25f).toFloatBits();
         float to = color.a(0).toFloatBits();
@@ -204,7 +206,7 @@ public class TjDraw {
      *     public void draw() {
      *         super.draw();
      *         float r = size * tilesize / 2f;
-     *         beacon(x, y, r, Tmp.c1.set(team.color), 0.7f, null, null);
+     *         beacon(x, y, r, c1.set(team.color), 0.7f, null, null);
      *     }
      * </pre></blockquote>
      * @param x     中心坐标 x
