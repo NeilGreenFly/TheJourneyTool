@@ -4,6 +4,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.util.Time;
+import arc.util.Tmp;
 import mindustry.content.Fx;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Building;
@@ -60,7 +61,7 @@ public class Bedrock extends Wall {
         @Override
         public void draw() {
             super.draw();
-            Draw.color(Color.HSVtoRGB((Time.time + x + y) % 360.0F, 25.0F, 100.0F));
+            Draw.color(Color.HSVtoRGB((Time.time + x + y) % 360.0F, 25.0F, 100.0F, Tmp.c1.a(1f)));
             Draw.z(Layer.shields);
             Fill.rect(x, y, size * tilesize, size * tilesize);
             Draw.reset();

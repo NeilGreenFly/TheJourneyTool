@@ -24,11 +24,15 @@ public class TjDraw {
     public static Color rainbow = new Color();
 
     public static void update() {
-        rainbow = rainbow(25f, 100f);
+        rainbow.set(rainbow(25f, 100f));
     }
 
     public static String colorToString(Color color) {
         return "[#" + color + "]";
+    }
+
+    public static Color a(Color color) {
+        return color.a(1f);
     }
 
     public static Color rainbow() {
@@ -36,13 +40,13 @@ public class TjDraw {
     }
 
     public static Color rainbow(float s, float v) {
-        return Color.HSVtoRGB(Time.time % 360, s, v);
+        return Color.HSVtoRGB(Time.time % 360, s, v, a(c1));
     }
 
     public static String rainbowStream(String string) {
         StringBuilder rainbowString = new StringBuilder();
         for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(TjDraw.colorToString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f, c1))).append(string.charAt(i));
+            rainbowString.append(TjDraw.colorToString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f, a(c1)))).append(string.charAt(i));
         return rainbowString.toString();
     }
 

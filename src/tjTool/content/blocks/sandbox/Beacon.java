@@ -19,9 +19,9 @@ import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.blocks.storage.CoreBlock;
 import tjTool.core.*;
-import tjTool.core.TjTable.*;
 
 import static mindustry.Vars.*;
+import static tjTool.core.TjTable.*;
 
 public class Beacon extends SandboxBlock {
     public TextureRegion[] teamIcons = new TextureRegion[4];

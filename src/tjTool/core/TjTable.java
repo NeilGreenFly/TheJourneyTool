@@ -8,6 +8,7 @@ import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.ButtonGroup;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.ScrollPane;
+import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
@@ -58,6 +59,7 @@ import static mindustry.Vars.control;
  * </pre></blockquote>
  * @author NeilGreenFly
  * @see ItemSelection#buildTable(Block, Table, Seq, Prov, Cons, boolean, int, int)
+ * @see TextField#setMessageText(String)
  */
 
 @SuppressWarnings("unused")
