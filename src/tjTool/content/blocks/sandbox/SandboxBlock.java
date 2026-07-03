@@ -16,9 +16,11 @@ import mindustry.world.draw.DrawDefault;
 import mindustry.world.meta.Env;
 import tjTool.core.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public abstract class SandboxBlock extends Block {
+    public static Building input;
+
     public DrawBlock drawer = new DrawDefault();
     public boolean drawProximity = false;
 
@@ -90,7 +92,6 @@ public abstract class SandboxBlock extends Block {
 
     @SuppressWarnings("unused")
     public abstract class SandboxBuild extends Building {
-        protected boolean selecting = false;
         protected float selectingDrawRadius = 0f;
 
         public boolean checkBuild(Building other) {
@@ -98,11 +99,9 @@ public abstract class SandboxBlock extends Block {
         }
 
         public void drawSelecting() {
-            selectingDrawRadius = Mathf.lerpDelta(selectingDrawRadius, selecting ? 1f : -.1f, 0.1f);
-            if (selectingDrawRadius > 0f) {
+            if ((selectingDrawRadius = Mathf.lerpDelta(selectingDrawRadius, this == input ? 1f : -.1f, 0.1f)) > 0f) {
                 Draw.z(Layer.overlayUI);
                 TjDraw.lightPoly(x, y, 4, block.size * tilesize * selectingDrawRadius, team.color);
-                selecting = false;
             }
         }
 
@@ -125,7 +124,6 @@ public abstract class SandboxBlock extends Block {
 
         @Override
         public void drawSelect() {
-            selecting = true;
             if (drawProximity && !rotate)
                 proximity.each(
                         other -> checkBuild(other) && (other.block.hasItems || other.block.hasLiquids),

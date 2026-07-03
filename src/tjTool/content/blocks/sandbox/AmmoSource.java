@@ -167,7 +167,6 @@ public class AmmoSource extends BaseSource {
         public void drawConfigure() {
             super.drawConfigure();
             drawSelect();
-            selecting = false;
         }
 
         @Override
