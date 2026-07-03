@@ -203,7 +203,7 @@ public class AmmoSource extends BaseSource {
                 pack.get(0).setIcon(new Image(turretBuild.block.uiIcon)).setTip(turretBuild.block.localizedName).setOptions(ammoTypes.map(optionMapper));
                 pack.get(1).setOptions(coolant.map(
                         turretBuild instanceof ReloadTurret.ReloadTurretBuild reloadTurretBuild
-                        ? liquid -> new Option(liquid.uiIcon, liquid.localizedName + "\n" + TjStat.boosters((ReloadTurret) reloadTurretBuild.block, true, liquid))
+                        ? liquid -> new Option(liquid.uiIcon, liquid.emoji() + liquid.localizedName + "\n" + TjStat.boosters((ReloadTurret) reloadTurretBuild.block, true, liquid))
                         : liquid -> new Option(liquid.uiIcon, liquid.localizedName)
                 )).setFavorite(coolant.indexOf(coolant.max(liquid -> liquid.heatCapacity)));
                 pack.get(2).setOptions(consumes.map(optionMapper));
@@ -282,12 +282,12 @@ public class AmmoSource extends BaseSource {
                         leftList(table, t -> t.button(Icon.undo, Styles.clearNonei, () -> rebuild(table)).tooltip("@back", true).size(uiSize));
                         table.table(Tex.pane, t -> layout.build(block, t, false));
                         table.pack();
-                    }).tooltip("exchange\nsize: " + turretBuild.block.size, true).size(uiSize).row();
+                    }).tooltip(Core.bundle.format("table.change-turret", turretBuild.block.size), true).size(uiSize).row();
                     list.button(Icon.eyeSmall, Styles.clearNonei, () -> {
                         shown = !shown;
                         rebuild(table);
                     }).tooltip("@table.shown", true).size(uiSize).row();
-                }).top();
+                }).padRight(8f).top();
                 frame.image(new TextureRegion(turretBuild.block.uiIcon)).tooltip(turretBuild.block.localizedName, true).size(100f).pad(10f);
                 frame.image().color(Pal.gray).width(4f).pad(-9f, 8f, -9f, 8f).growY();
                 pack.build(frame).row();
