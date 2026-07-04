@@ -131,37 +131,38 @@ public class TjDraw {
      */
     public static void drawPlace(Block block, int x, int y, boolean valid) {
         float width = 2;
-        float[] r = new float[]{block.size * tilesize / 2f, 0, tilesize * 16};
-        float[] wr = new float[]{width / 2f, block.size * tilesize / 2f - width};
-        float cx = x * tilesize + block.offset;
-        float cy = y * tilesize + block.offset;
+        float r = tilesize * block.size / 2f;
+        float l = tilesize * 16;
+        float[] w = new float[]{width / 2f, r - width};
+        float cx = tilesize * x + block.offset;
+        float cy = tilesize * y + block.offset;
         Color color = c1.set(valid ? rainbow : Pal.remove);
-        float outline = color.a(0.5f).toFloatBits();
-        float from = color.a(0.25f).toFloatBits();
-        float to = color.a(0).toFloatBits();
-        Draw.color(color);
-        Draw.alpha(0.35f);
+        float[] c = {
+                color.a(0.5f).toFloatBits(),
+                color.a(0.25f).toFloatBits(),
+                color.a(0).toFloatBits()};
+        Draw.color(color.a(0.35f));
         for (int i = 0; i < 4; i += 1) {
             for (int j = 0; j < 3; j += 1) {
-                float ccx = j % 2 == 1 ? cx : cx + (block.size * tilesize - width) / 2f * d4(i + j - 1).x;
-                float ccy = j % 2 == 1 ? cy : cy + (block.size * tilesize - width) / 2f * d4(i + j - 1).y;
-                r[1] = wr[j % 2];
-                float c = j % 2 == 1 ? from : outline;
+                float ccx = cx + r * d4(i).x + d4(i).y * (r - width / 2f) * d4(i + j - 1).x;
+                float ccy = cy + r * d4(i).y + d4(i).x * (r - width / 2f) * d4(i + j - 1).y;
+                float dx = d4(i).y * w[j % 2];
+                float dy = d4(i).x * w[j % 2];
                 Fill.quad(
-                        ccx + r[i % 2] * d8edge(i).x,
-                        ccy + r[(i + 1) % 2] * d8edge(i).y, c,
-                        ccx + r[i % 2] * d8edge(i - 1).x,
-                        ccy + r[(i + 1) % 2] * d8edge(i - 1).y, c,
-                        ccx + r[(i + 1) % 2 + 1] * d8edge(i - 1).x,
-                        ccy + r[i % 2 + 1] * d8edge(i - 1).y, to,
-                        ccx + r[(i + 1) % 2 + 1] * d8edge(i).x,
-                        ccy + r[i % 2 + 1] * d8edge(i).y, to);
+                        ccx + dx,
+                        ccy + dy, c[j % 2],
+                        ccx - dx,
+                        ccy - dy, c[j % 2],
+                        ccx - dx + d4(i).x * l,
+                        ccy - dy + d4(i).y * l, c[2],
+                        ccx + dx + d4(i).x * l,
+                        ccy + dy + d4(i).y * l, c[2]);
             }
             Fill.rect(
-                    cx + (r[0] + wr[0]) * d4(i).x,
-                    cy + (r[0] + wr[0]) * d4(i).y,
-                    wr[i % 2] * 2,
-                    wr[(i + 1) % 2] * 2);
+                    cx + (r + w[0]) * d4(i).x,
+                    cy + (r + w[0]) * d4(i).y,
+                    w[i % 2] * 2,
+                    w[(i + 1) % 2] * 2);
         }
         Draw.color();
     }

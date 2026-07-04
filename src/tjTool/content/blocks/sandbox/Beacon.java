@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 import static tjTool.core.TjTable.*;
 
 public class Beacon extends SandboxBlock {
-    public TextureRegion[] teamIcons = new TextureRegion[4];
+    public static final TextureRegion[] teamIcons = new TextureRegion[4];
 
     public Beacon(String name) {
         super(name);
