@@ -20,20 +20,28 @@ public class TjConfigTable {
     public static class Pack {
         protected Seq<BaseContent> contents = new Seq<>();
         protected Cons<Object> configure;
+        protected Intp prefix;
 
         public Pack(Cons<Object> configure) {
             this.configure = configure;
         }
 
-        public final <Type> Pack with(BaseContent... contents) {
+        public Pack prefix(Intp prefix) {
+            this.prefix = prefix;
+            return this;
+        }
+
+        public final Pack with(BaseContent... contents) {
             for (var content : contents) (content.pack = this).contents.add(content);
             return this;
         }
 
         public int[] config() {
+            int i = prefix != null ? 1 : 0;
             var contents = this.contents.select(BaseContent::isEnabled);
-            int[] items = new int[contents.size];
-            forEach(contents, (idx, item) -> items[idx] = item.getConfig());
+            int[] items = new int[contents.size + i];
+            if (prefix != null) items[0] = prefix.get();
+            forEach(contents, (idx, item) -> items[idx + i] = item.getConfig());
             return items;
         }
 

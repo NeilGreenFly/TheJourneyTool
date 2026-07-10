@@ -22,7 +22,8 @@ import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.type.*;
+import mindustry.type.Item;
+import mindustry.type.Liquid;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
@@ -51,9 +52,10 @@ public class DirSource extends BaseSource {
                 new DrawHeatOutput()
         );
         config(int[].class, (DirSourceBuild tile, int[] v) -> {
-            tile.ammo = content.item(v[0]);
-            tile.coolant = content.liquid(v[1]);
-            tile.overdrive = v[2];
+            if (tile.target != content.block(v[0])) return;
+            tile.ammo = content.item(v[1]);
+            tile.coolant = content.liquid(v[2]);
+            tile.overdrive = v[3];
         });
         config(Block.class, (DirSourceBuild tile, Block v) -> {
             lastConfig = null;
@@ -92,7 +94,7 @@ public class DirSource extends BaseSource {
         public float[] overdrives = {1.5f, 2.25f, 2.5f};
         public float heat;
 
-        public Pack pack = new Pack(this::configure).with(
+        public Pack pack = new Pack(this::configure).prefix(() -> w(target)).with(
                 TypeContent.unlockableContent(() -> new Image(target.uiIcon), () -> target.localizedName, () -> ammoTypes, () -> ammo).setAlwaysBuild(true).setLock(() -> target instanceof BaseTurret),
                 TypeContent.unlockableContent(() -> new Image(Icon.star), () -> getBlock(name, "config-boost"), coolants::as, v -> target instanceof ReloadTurret reloadTurret ? v.emoji() + v.localizedName + "\n" + TjStat.boosters(reloadTurret, true, (Liquid) v) : v.localizedName, () -> coolant).setFavorite(v -> ((Liquid) v).heatCapacity),
                 TypeContent.unlockableContent(() -> new Image(Icon.download), () -> getBlock(name, "config-consumes"), () -> new Seq<UnlockableContent>(items).add(liquids), null),
@@ -182,7 +184,7 @@ public class DirSource extends BaseSource {
             liquids.clear();
             ammoTypes.clear();
             coolants.clear();
-            if ((targetBuild = front()) == null) {
+            if (!checkBuild(targetBuild = front())) {
                 if (control.input.config.getSelected() == self())
                     control.input.config.hideConfig();
                 target = null;
@@ -220,32 +222,45 @@ public class DirSource extends BaseSource {
 
             items.each(item -> targetBuild.handleStack(item, targetBuild.acceptStack(item, 1000000, this), this));
             liquids.each(liquid -> targetBuild.liquids.set(liquid, Math.max(targetBuild.block.liquidCapacity, targetBuild.liquids.get(liquid))));
+            if (overdrive > -1) targetBuild.applyBoost(overdrives[overdrive], 61.0f);
+            if (targetBuild.block.acceptsPayload)
+                content.blocks().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
+                    boolean b = targetBuild.acceptPayload(this, payload);
+                    if (b) targetBuild.handlePayload(this, payload);
+                    return b;
+                }));
+            if (targetBuild.block.acceptsUnitPayloads)
+                content.units().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
+                    boolean b = targetBuild.acceptPayload(this, payload);
+                    if (b) targetBuild.handlePayload(this, payload);
+                    return b;
+                }));
 
-            if (targetBuild instanceof ItemTurret.ItemTurretBuild build) {
-                if (ammo instanceof Item item) {
-                    if (build.ammo.size == 1 && ((ItemTurret.ItemEntry) build.ammo.first()).item == item) {
-                        build.ammo.first().amount = build.totalAmmo = ((ItemTurret) build.block).maxAmmo;
+            if (target instanceof BaseTurret) {
+                if (targetBuild instanceof ItemTurret.ItemTurretBuild build) {
+                    if (ammo instanceof Item item) {
+                        if (build.ammo.size == 1 && ((ItemTurret.ItemEntry) build.ammo.first()).item == item) {
+                            build.ammo.first().amount = build.totalAmmo = ((ItemTurret) build.block).maxAmmo;
+                        } else {
+                            build.ammo.clear();
+                            build.handleItem(this, item);
+                        }
                     } else {
                         build.ammo.clear();
-                        build.handleItem(this, item);
+                        build.totalAmmo = 0;
+                        build.reloadCounter = 0f;
                     }
                 } else {
-                    build.ammo.clear();
-                    build.totalAmmo = 0;
-                    build.reloadCounter = 0f;
+                    if (ammo instanceof Liquid liquid)
+                        targetBuild.liquids.set(liquid, targetBuild.block.liquidCapacity);
+                    else
+                        ammoTypes.each(Liquid.class::isInstance, (Liquid liquid) -> targetBuild.liquids.set(liquid, 0f));
                 }
-            } else {
-                if (ammo instanceof Liquid liquid)
-                    targetBuild.liquids.set(liquid, targetBuild.block.liquidCapacity);
+                if (coolant != null)
+                    targetBuild.liquids.set(coolant, targetBuild.block.liquidCapacity);
                 else
-                    ammoTypes.each(Liquid.class::isInstance, (Liquid liquid) -> targetBuild.liquids.set(liquid, 0f));
+                    coolants.each(liquid -> targetBuild.liquids.set(liquid, 0f));
             }
-            if (coolant != null)
-                targetBuild.liquids.set(coolant, targetBuild.block.liquidCapacity);
-            else
-                coolants.each(liquid -> targetBuild.liquids.set(liquid, 0f));
-            if (overdrive > -1)
-                targetBuild.applyBoost(overdrives[overdrive], 61.0f);
         }
 
         protected void rebuild(Table table) {

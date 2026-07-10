@@ -1,7 +1,8 @@
 package tjTool.content.blocks.sandbox;
 
 import arc.graphics.Color;
-import arc.graphics.g2d.*;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
@@ -12,16 +13,15 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Fx;
 import mindustry.entities.units.BuildPlan;
-import mindustry.gen.*;
+import mindustry.gen.Building;
+import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
-import mindustry.type.*;
+import mindustry.type.Item;
+import mindustry.type.UnitType;
 import mindustry.ui.Styles;
-import mindustry.world.Block;
 import mindustry.world.blocks.defense.BuildTurret;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
-import mindustry.world.blocks.payloads.BuildPayload;
-import mindustry.world.blocks.payloads.UnitPayload;
-import mindustry.world.blocks.storage.CoreBlock;
 import tjTool.core.*;
 
 import static mindustry.Vars.*;
@@ -43,6 +43,7 @@ public class AnySource extends BaseSource {
 
     public AnySource(String name) {
         super(name);
+        solid = false;
         hasLiquids = true;
         liquidCapacity = 1f;
         configurable = true;
@@ -55,7 +56,7 @@ public class AnySource extends BaseSource {
         });
         config(UnitType.class, (AnySourceBuild tile, UnitType v) -> {
             lastConfig = null;
-            Fx.spawn.at(v.spawn(tile.team, tile.x, tile.y + tilesize, 90));
+            Fx.spawn.at(v.spawn(tile.team, tile.x, tile.y, 90));
         });
     }
 
@@ -106,7 +107,7 @@ public class AnySource extends BaseSource {
                 您当然可以继续提交. 这是被容许的.
                 """;
         public Layout layout = new Layout(this::configure).with(
-                new Page(Icon.units).with(Selection.unlockableContent(() -> content.units().select(this::canProduce).as(), () -> null)),
+                new Page(Icon.units).with(Selection.unlockableContent(() -> content.units().select(BaseSource::canProduce).as(), () -> null)),
                 new Page(Icon.wrench).with(new Selection<>(() -> Seq.with(0, 1), i -> regions[i], i -> TjBundle.getBlock(name, "config-name-" + i), () -> status))
         );
 
@@ -119,14 +120,6 @@ public class AnySource extends BaseSource {
                 Draw.z(overlayUI);
                 drawPlaceText(TjBundle.getBlock(name, "warning"), tile.x, tile.y, false);
             }
-        }
-
-        public boolean canProduce(Block block){
-            return block.isVisible() && !(block instanceof CoreBlock) && !state.rules.isBanned(block) && block.environmentBuildable();
-        }
-
-        public boolean canProduce(UnitType unit){
-            return !unit.isHidden() && !unit.isBanned() && unit.supportsEnv(state.rules.env);
         }
 
         @Override
@@ -153,17 +146,17 @@ public class AnySource extends BaseSource {
                         //             liquid -> other.acceptLiquid(this, liquid),
                         //             liquid -> other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid))));
                         if (other.block.acceptsPayload)
-                            content.blocks().each(this::canProduce, v -> {
-                                var payload = new BuildPayload(v, team);
-                                if (other.acceptPayload(this, payload))
-                                    other.handlePayload(this, payload);
-                            });
+                            content.blocks().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
+                                boolean b = other.acceptPayload(this, payload);
+                                if (b) other.handlePayload(this, payload);
+                                return b;
+                            }));
                         if (other.block.acceptsUnitPayloads)
-                            content.units().each(this::canProduce, v -> {
-                                var payload = new UnitPayload(v.create(team));
-                                if (other.acceptPayload(this, payload))
-                                    other.handlePayload(this, payload);
-                            });
+                            content.units().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
+                                boolean b = other.acceptPayload(this, payload);
+                                if (b) other.handlePayload(this, payload);
+                                return b;
+                            }));
                     });
                     content.items().each(item -> {
                         handle = true;
@@ -197,7 +190,7 @@ public class AnySource extends BaseSource {
                         这里似乎出现了异常...
                         您可以将 last_log.txt 发送给模组开发者,
                         也可以附带当前游戏内截图, 他们或许知道该怎么做.
-                        
+
                         但请不要仅将此界面截图发送!
                         开发者需要的是日志而不是一段文本!""").color(Pal.remove).growX().left();
                 return;
