@@ -72,10 +72,10 @@ public class Beacon extends SandboxBlock {
         public TextureRegion icon;
         public Color color;
         public Layout layout = new Layout(this::configure).with(
-                new Page(Icon.box).with(Selection.unlockableContent(() -> content.items().as(), () -> c instanceof Item v ? v : null)),
-                new Page(Icon.liquid).with(Selection.unlockableContent(() -> content.liquids().as(), () -> c instanceof Liquid v ? v : null)),
-                new Page(Icon.crafting).with(Selection.unlockableContent(() -> content.blocks().select(this::canProduce).as(), () -> c instanceof Block v ? v : null)),
-                new Page(Icon.units).with(Selection.unlockableContent(() -> content.units().select(this::canProduce).as(), () -> c instanceof UnitType v ? v : null))
+                new Page(Icon.box).with(Selection.unlockableContent(content.items()::as, () -> c instanceof Item v ? v : null)),
+                new Page(Icon.liquid).with(Selection.unlockableContent(content.liquids()::as, () -> c instanceof Liquid v ? v : null)),
+                new Page(Icon.crafting).with(Selection.unlockableContent(content.blocks().select(this::canProduce)::as, () -> c instanceof Block v ? v : null)),
+                new Page(Icon.units).with(Selection.unlockableContent(content.units().select(this::canProduce)::as, () -> c instanceof UnitType v ? v : null))
         );
 
         public boolean canProduce(Block block) {

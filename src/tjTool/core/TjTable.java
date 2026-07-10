@@ -29,32 +29,32 @@ import static mindustry.Vars.control;
  * 由于旧的 {@code TjConfigTable} 将用户面和数据过度耦合导致极难扩展, 所以我们需要一种新的设计, 但是显然这需要一点时间...<p>
  * For example:
  * <blockquote><pre> {@code
- *     public Item item = null;
- *     public Liquid liquid = null;
- *     public Block block = null;
- *     public UnitType unit = null;
+ *     public Item myItem = null;
+ *     public Liquid myLiquid = null;
+ *     public Block myBlock = null;
+ *     public UnitType myUnit = null;
  *     public Layout layout = new Layout(this::configure).with(
  *             new Page(Icon.box).with(Selection.unlockableContent(
- *                     () -> content.items().as(),
- *                     () -> item).setValue(v -> (int) v.id)),
+ *                     content.items()::as,
+ *                     () -> myItem).setValue(v -> (int) v.id)),
  *             new Page(Icon.liquid).with(Selection.unlockableContent(
- *                     () -> content.liquids().as(),
- *                     () -> liquid).setValue(v -> (int) v.id)),
+ *                     content.liquids()::as,
+ *                     () -> myLiquid).setValue(v -> (int) v.id)),
  *             new Page(Icon.crafting).with(Selection.unlockableContent(
- *                     () -> content.blocks().select(this::canProduce).as(),
- *                     () -> block).setValue(v -> (int) v.id)),
+ *                     content.blocks().select(this::canProduce)::as,
+ *                     () -> myBlock).setValue(v -> (int) v.id)),
  *             new Page(Icon.units).with(Selection.unlockableContent(
- *                     () -> content.units().select(this::canProduce).as(),
- *                     () -> unit).setValue(v -> (int) v.id))
+ *                     content.units().select(this::canProduce)::as,
+ *                     () -> myUnit).setValue(v -> (int) v.id))
  *     );
  * } </pre></blockquote>
  * 在构造方法中注册 :
  * <blockquote><pre>
  *     config(int[].class, (MyBuild tile, int[] config) -> {
- *         tile.item = content.item(config[0]);
- *         tile.liquid = content.liquid(config[1]);
- *         tile.block = content.block(config[2]);
- *         tile.unit = content.unit(config[3]);
+ *         tile.myItem = content.item(config[0]);
+ *         tile.myLiquid = content.liquid(config[1]);
+ *         tile.myBlock = content.block(config[2]);
+ *         tile.myUnit = content.unit(config[3]);
  *     });
  * </pre></blockquote>
  * @author NeilGreenFly

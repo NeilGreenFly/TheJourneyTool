@@ -20,7 +20,7 @@ import static mindustry.type.ItemStack.*;
 public class ThisBlocks {
 
     public static Block
-            anySource, ammoSource,
+            anySource, dirSource,
             solarSource, bedrock, beacon,
             mendSource, overdriveSource, regenSource, shieldSource;
 
@@ -30,7 +30,7 @@ public class ThisBlocks {
             staticRequirements(this, distribution);
         }};
 
-        ammoSource = new AmmoSource("ammo-source") {{
+        dirSource = new DirSource("dir-source") {{
             staticRequirements(this, distribution);
         }};
 
@@ -103,7 +103,7 @@ public class ThisBlocks {
                         new DrawLiquidTile(Liquids.hydrogen, 9f / 4f) {
                             @Override
                             public void draw(Building build) {
-                                LiquidBlock.drawTiledFrames(build.block.size, build.x, build.y, this.padLeft, this.padRight, this.padTop, this.padBottom, this.drawLiquid, this.alpha);
+                                LiquidBlock.drawTiledFrames(build.block.size, build.x, build.y, padLeft, padRight, padTop, padBottom, drawLiquid, alpha);
                             }
                         },
                         new DrawDefault(),

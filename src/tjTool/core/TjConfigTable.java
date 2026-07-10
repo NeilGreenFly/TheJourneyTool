@@ -1,317 +1,228 @@
 package tjTool.core;
 
 import arc.func.*;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Collapser;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
+import arc.util.Nullable;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
-
-import java.util.Objects;
 
 import static tjTool.core.TjTable.*;
 
 @SuppressWarnings("unused")
 public class TjConfigTable {
 
-    public static Func<UnlockableContent, Option> optionMapper = item -> new Option(item.uiIcon, item.localizedName);
+    public static class Pack {
+        protected Seq<BaseContent> contents = new Seq<>();
+        protected Cons<Object> configure;
 
-    public static class ConfigPack {
-        public Building building;
-        public Seq<ConfigContent> contents;
-
-        public ConfigPack(Building building) {
-            this.building = building;
-            this.contents = new Seq<>();
+        public Pack(Cons<Object> configure) {
+            this.configure = configure;
         }
 
-        public ConfigPack add(ConfigContent content) {
-            contents.add(content.setPack(this));
+        public final <Type> Pack with(BaseContent... contents) {
+            for (var content : contents) (content.pack = this).contents.add(content);
             return this;
-        }
-
-        public ConfigPack with(ConfigContent... contents) {
-            for (var content : contents)
-                add(content);
-            return this;
-        }
-
-        public ConfigContent get(int index) {
-            return contents.get(index);
-        }
-
-        public int getIndex(int index) {
-            return get(index).getIndex();
-        }
-
-        public <Type> Type from(Seq<Type> content, int index) {
-            int idx = getIndex(index);
-            return idx != -1 && idx < content.size
-                    ? content.get(idx)
-                    : null;
-        }
-
-        public void reset() {
-            for (var content : contents)
-                content.reset();
-        }
-
-        public void clear() {
-            for (var content : contents)
-                content.clear();
         }
 
         public int[] config() {
-            return config(true);
-        }
-
-        public int[] config(boolean save) {
+            var contents = this.contents.select(BaseContent::isEnabled);
             int[] items = new int[contents.size];
-            for (int i = 0; i < contents.size; ++i)
-                items[i] = !save || contents.get(i).save
-                        ? contents.get(i).index
-                        : -1;
+            forEach(contents, (idx, item) -> items[idx] = item.getConfig());
             return items;
         }
 
-        public void configure() {
-            building.configure(config(false));
-        }
-
-        public void receive(int[] v) {
-            for (int i = 0; i < contents.size; ++i)
-                contents.get(i).index = v[i];
-        }
-
-        public void write(Writes write) {
-            for (var content : contents)
-                if (content.save)
-                    write.i(content.index);
-        }
-
-        public void read(Reads read) {
-            for (var content : contents)
-                if (content.save)
-                    content.index = read.i();
-        }
-
-        public Table build(Table table) {
-            return table.table(t -> {
-                for (var content : contents)
-                    content.build(t);
-            }).get();
-        }
-
-        public Table build(Table table, ConfigPage... pages) {
-            ButtonGroup<ImageButton> group = new ButtonGroup<>();
-            Table panel = new Table();
-            table.table(list -> {
-                for (var page : pages)
-                    list.button(page.icon, Styles.clearNoneTogglei, iconSize, () -> {
-                        panel.clearChildren();
-                        for (var idx : page.contents)
-                            contents.get(idx).build(panel);
-                        table.pack();
-                    }).size(uiSize).group(group).row();
-                list.getChildren().get(0).fireClick();
-            }).top();
-            table.image().width(5).color(Pal.gray).growY().padRight(10);
-            table.add(panel).top();
-            return table;
+        public Cons<Table> build() {
+            return table -> contents.each(BaseContent::shouldBuild, content -> content.build.get(table).row());
         }
     }
 
-    public static class ConfigPage {
-        public Drawable icon;
-        public int[] contents;
+    public static abstract class BaseContent {
+        protected Pack pack;
+        protected int config = -2;
 
-        public ConfigPage(Drawable icon, int[] contents) {
-            this.icon = icon;
-            this.contents = contents;
-        }
-    }
+        protected Func<Table, Table> build;
 
-    public static class ConfigContent {
-        protected ConfigPack pack;
-        public boolean lock;
-        public boolean alwaysBuild;
-        public boolean isStatic;
-        public boolean unReset;
-        public boolean save;
-        protected Image icon;
-        protected String tip;
+        protected Intp favorite;
+        protected boolean alwaysBuild = false;
+        protected Boolp lock;
 
-        public Seq<Option> options;
-        protected int favorite;
-        protected int index;
+        abstract public boolean isEnabled();
+        abstract protected int getConfig();
 
-        public ConfigContent() {
-            this(new Image(Icon.cancel), "=w=");
+        public boolean shouldBuild() {
+            return (lock == null || lock.get()) && build();
         }
 
-        public ConfigContent(Image icon, String tip) {
-            this(icon, tip, new Seq<>());
+        public boolean build() {
+            return alwaysBuild;
         }
 
-        public ConfigContent(Image icon, String tip, Seq<Option> options) {
-            this.icon = icon;
-            this.tip = tip;
-            this.lock = false;
-            this.alwaysBuild = true;
-            this.isStatic = false;
-            this.unReset = false;
-            this.save = true;
-            this.options = options;
-            this.favorite = -1;
-            this.index = -1;
+        protected void call(int config) {
+            this.config = config;
+            pack.configure.get(pack.config());
+            this.config = -2;
         }
 
-        private ConfigContent setPack(ConfigPack pack) {
-            this.pack = pack;
-            return this;
-        }
-
-        public ConfigContent setLock(boolean lock) {
-            this.lock = lock;
-            return this;
-        }
-
-        public ConfigContent setAlwaysBuild(boolean alwaysBuild) {
+        public BaseContent setAlwaysBuild(boolean alwaysBuild) {
             this.alwaysBuild = alwaysBuild;
             return this;
         }
 
-        public ConfigContent setStatic(boolean aStatic) {
-            isStatic = aStatic;
+        public BaseContent setLock(Boolp lock) {
+            this.lock = lock;
             return this;
-        }
-
-        public ConfigContent setUnReset(boolean unReset) {
-            this.unReset = unReset;
-            return this;
-        }
-
-        public ConfigContent setSave(boolean save) {
-            this.save = save;
-            return this;
-        }
-
-        public ConfigContent setIcon(Image icon) {
-            this.icon = icon;
-            return this;
-        }
-
-        public ConfigContent setTip(String tip) {
-            this.tip = tip;
-            return this;
-        }
-
-        public ConfigContent setOptions(Seq<Option> options) {
-            this.options = options;
-            return this;
-        }
-
-        public ConfigContent setFavorite(int favorite) {
-            this.favorite = favorite;
-            return this;
-        }
-
-        public void setIndex(int index) {
-            index = Mathf.clamp(index, -1, options.size - 1);
-            if (this.index != index) {
-                this.index = index;
-                pack.configure();
-            }
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public int indexOf(Option option) {
-            for (int i = 0; i < options.size; i++)
-                if (options.get(i).equals(option))
-                    return i;
-            return -1;
-        }
-
-        public void reset() {
-            if (!unReset)
-                index = -1;
-        }
-
-        public void clear() {
-            if (!isStatic)
-                options = new Seq<>();
-        }
-
-        public void add(TextureRegion region, String tip) {
-            options.add(new Option(region, tip));
-        }
-
-        public Cons<Table> table() {
-            return !lock
-            ? table -> {
-                ButtonGroup<ImageButton> group = new ButtonGroup<>();
-                if (save) group.setMinCheckCount(0);
-                table.background(Styles.black6).defaults().size(uiSize);
-                for (int i = 0; i < options.size; ++i) {
-                    final int idx = i;
-                    Option option = options.get(idx);
-                    ImageButton button = table.button(new TextureRegionDrawable(option.region), Styles.clearNoneTogglei, iconSize, () -> {
-                    }).tooltip(option.tip).group(group).get();
-                    button.changed(() -> setIndex(button.isChecked() ? idx : -1));
-                    button.update(() -> button.setChecked(getIndex() == idx));
-                    if (i % 8 == 7) table.row();
-                }
-            }
-            : table -> {
-                table.background(Styles.black3).defaults().size(uiSize);
-                int count = 0;
-                for (var option : options) {
-                    table.table(t -> t.image(option.region).tooltip(option.tip).maxSize(iconSize).center());
-                    if (++count % 8 == 0) table.row();
-                }
-            };
-        }
-
-        public void build(Table table) {
-            if (alwaysBuild || options.any()) {
-                table.add(icon).size(uiSize).tooltip(tip, true).center();
-                if (options.any()) {
-                    table.table(table()).left();
-                    if (!lock) {
-                        if (save)
-                            table.button(Icon.undo, Styles.clearNonei, iconSize, () -> setIndex(-1)).size(uiSize).tooltip("@table.reset").center();
-                        if (favorite > -1 && favorite < options.size)
-                            table.button(Icon.star, Styles.clearNonei, iconSize, () -> setIndex(favorite)).size(uiSize).tooltip("@table.favorite").center();
-                    }
-                } else table.image(Icon.cancel).size(iconSize).center();
-                table.left().row();
-            }
         }
     }
 
-    public static class Option {
-        public TextureRegion region;
-        public String tip;
+    public static class IntContent extends BaseContent {
+        protected Seq<TextureRegionDrawable> buttonRegion = new Seq<>();
+        protected Seq<String> buttonTip = new Seq<>();
+        protected @Nullable Intp holder;
 
-        public Option(TextureRegion region, String tip) {
-            this.region = region;
-            this.tip = tip;
+        public IntContent(
+                Prov<Image> icon,
+                Prov<String> tip,
+                Intp holder) {
+            this.holder = holder;
+            this.build = table -> {
+                table.add(icon.get()).size(uiSize).tooltip(tip.get(), true).center();
+                table.table(holder != null ? Styles.black6 : Styles.black3, t -> {
+                    t.defaults().size(uiSize);
+                    ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                    group.setMinCheckCount(0);
+                    for (int i = 0; i < buttonRegion.size; i += 1) {
+                        final int item = i;
+                        if (holder != null) {
+                            ImageButton button = t.button(buttonRegion.get(item), Styles.clearNoneTogglei, iconSize, () -> {
+                            }).tooltip(buttonTip.get(item)).group(group).get();
+                            button.changed(() -> call(button.isChecked() ? item : -1));
+                            button.update(() -> button.setChecked(holder.get() == item));
+                        } else {
+                            t.table(f -> f.image(buttonRegion.get(item)).tooltip(buttonTip.get(item)).maxSize(iconSize).center());
+                        }
+                        if (i % 8 == 7) t.row();
+                    }
+                }).left();
+                if (holder != null) {
+                    table.button(Icon.undo, Styles.clearNonei, iconSize, () -> call(-1)).size(uiSize).tooltip("@table.reset").center();
+                    if (favorite != null)
+                        table.button(Icon.star, Styles.clearNonei, iconSize, () -> call(favorite.get())).size(uiSize).tooltip("@table.favorite").center();
+                }
+                return table;
+            };
         }
 
-        public boolean equals(Option other) {
-            return other.region == region && Objects.equals(other.tip, tip);
+        public IntContent add(TextureRegionDrawable buttonRegion, String buttonTip) {
+            this.buttonRegion.add(buttonRegion);
+            this.buttonTip.add(buttonTip);
+            return this;
         }
+
+        @Override
+        protected int getConfig() {
+            return config != -2 ? config : holder.get();
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return holder != null;
+        }
+
+        @Override
+        public boolean build() {
+            return super.build() || buttonRegion.any();
+        }
+
+        public IntContent setFavorite(int favorite) {
+            this.favorite = () -> favorite;
+            return this;
+        }
+    }
+
+    public static class TypeContent<Type> extends BaseContent {
+        protected Prov<Seq<Type>> items;
+        protected @Nullable Prov<Type> holder;
+        protected Intf<Type> value;
+
+        public TypeContent(
+                Prov<Image> icon,
+                Prov<String> tip,
+                Prov<Seq<Type>> items,
+                Func<Type, TextureRegionDrawable> buttonRegion,
+                Func<Type, String> buttonTip,
+                Prov<Type> holder, Intf<Type> value) {
+            this.items = items;
+            this.holder = holder;
+            this.value = value;
+            this.build = table -> {
+                table.add(icon.get()).size(uiSize).tooltip(tip.get(), true).center();
+                if (items.get().any()) {
+                    table.table(holder != null ? Styles.black6 : Styles.black3, t -> {
+                        t.defaults().size(uiSize);
+                        ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                        group.setMinCheckCount(0);
+                        forEach(items.get(), (i, item) -> {
+                            if (holder != null) {
+                                ImageButton button = t.button(buttonRegion.get(item), Styles.clearNoneTogglei, iconSize, () -> {
+                                }).tooltip(buttonTip.get(item)).group(group).get();
+                                button.changed(() -> call(button.isChecked() ? value.get(item) : -1));
+                                button.update(() -> button.setChecked(holder.get() == item));
+                            } else {
+                                t.table(f -> f.image(buttonRegion.get(item)).tooltip(buttonTip.get(item)).maxSize(iconSize).center());
+                            }
+                            if (i % 8 == 7) t.row();
+                        });
+                    }).left();
+                    if (holder != null) {
+                        table.button(Icon.undo, Styles.clearNonei, iconSize, () -> call(-1)).size(uiSize).tooltip("@table.reset").center();
+                        if (favorite != null)
+                            table.button(Icon.star, Styles.clearNonei, iconSize, () -> call(favorite.get())).size(uiSize).tooltip("@table.favorite").center();
+                    }
+                } else table.image(Icon.cancel).size(iconSize).center();
+                return table;
+            };
+        }
+
+        public static TypeContent<UnlockableContent> unlockableContent(Prov<Image> icon, Prov<String> tip, Prov<Seq<UnlockableContent>> items, Prov<UnlockableContent> holder) {
+            return unlockableContent(icon, tip, items, item -> item.localizedName, holder);
+        }
+
+        public static TypeContent<UnlockableContent> unlockableContent(Prov<Image> icon, Prov<String> tip, Prov<Seq<UnlockableContent>> items, Func<UnlockableContent, String> buttonTip, Prov<UnlockableContent> holder) {
+            return new TypeContent<>(icon, tip, items, item -> new TextureRegionDrawable(item.uiIcon), buttonTip, holder, item -> item.id);
+        }
+
+        @Override
+        protected int getConfig() {
+            if (config != -2) return config;
+            Type item = holder.get();
+            return item != null ? value.get(item) : -1;
+        }
+
+        @Override
+        public boolean build() {
+            return super.build() || items.get().any();
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return holder != null;
+        }
+
+        public TypeContent<Type> setFavorite(Floatf<Type> favorite) {
+            this.favorite = () -> value.get(items.get().max(favorite));
+            return this;
+        }
+
+        // public <T extends Comparable<T>> tContent<Type> setFavorite(Function<Type, T> favorite) {
+        //     this.favorite = value.get(items.get().max(Comparator.comparing(favorite)));
+        //     return this;
+        // }
     }
 
     public static void titleTable(Table table, String title, String label) {
@@ -342,7 +253,7 @@ public class TjConfigTable {
                 - 护盾源
                 - 基岩
                 - 信标
-                - 弹药源 功能恢复+新增
+                - 弹药源 更名为 定向源 功能恢复+新增
                 
                 为了避免碎片化的更新, 在 115 我们会尽可能多得添加内容,
                 因此版本的更新会停滞一段时间.
