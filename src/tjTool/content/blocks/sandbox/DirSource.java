@@ -54,7 +54,7 @@ public class DirSource extends BaseSource {
         );
         config(int[].class, (DirSourceBuild tile, int[] v) -> {
             if (tile.target != content.block(v[0])) return;
-            tile.ammo = content.item(v[1]);
+            tile.ammo = tile.target instanceof ItemTurret ? content.item(v[1]) : content.liquid(v[1]);
             tile.coolant = content.liquid(v[2]);
             tile.overdrive = v[3];
         });
