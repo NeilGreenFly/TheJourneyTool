@@ -5,7 +5,6 @@ import mindustry.content.StatusEffects;
 import mindustry.entities.part.DrawPart;
 import tjTool.core.*;
 
-import static mindustry.content.Blocks.tileLogicDisplay;
 import static mindustry.content.UnitTypes.emanate;
 import static mindustry.entities.part.DrawPart.PartProgress.warmup;
 
@@ -15,27 +14,27 @@ public class ThisOverride {
 
         // 2026/6/21
         // 本是由于原版未启用此属性而添加的覆写, 但现已提pr, 在未来将不再需要此覆写.
-        tileLogicDisplay.allowRectanglePlacement = true;
+        // tileLogicDisplay.allowRectanglePlacement = true;
 
         StatusEffects.none.color = Color.green;
 
         final float haloY = -16f;
         emanate.parts.add(new DrawPart[]{
-//                new TjPart.TjHaloPart() {{
-//                    color = Color.valueOf("#FF7FFF");
-//                    colorTo = Color.valueOf("#FFBFFF");
-//                    tri = false;
-//                    hollow = true;
-//                    moveY = 16;
-//                    sides = 3;
-//                    shapes = 2;
-//                    radius = 32;
-//                    radiusTo = 8;
-//                    stroke = 0;
-//                    strokeTo = 2;
-//                    haloRadius = 0;
-//                    rotateSpeed = 4;
-//                }},
+                // new TjPart.TjHaloPart() {{
+                //     color = Color.valueOf("#FF7FFF");
+                //     colorTo = Color.valueOf("#FFBFFF");
+                //     tri = false;
+                //     hollow = true;
+                //     moveY = 16;
+                //     sides = 3;
+                //     shapes = 2;
+                //     radius = 32;
+                //     radiusTo = 8;
+                //     stroke = 0;
+                //     strokeTo = 2;
+                //     haloRadius = 0;
+                //     rotateSpeed = 4;
+                // }},
                 new TjPart.TjShapePart() {{
                     circle = true;
                     hollow = true;

@@ -45,6 +45,13 @@ public class Bedrock extends Wall {
         TjDraw.drawPlace(this, x, y, valid);
     }
 
+    @Override
+    public void init() {
+        super.init();
+        drawDynamic = true;
+        drawCached = false;
+    }
+
     @SuppressWarnings("unused")
     public class BedrockBuild extends Building {
         @Override

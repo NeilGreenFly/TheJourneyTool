@@ -23,10 +23,9 @@ import mindustry.world.blocks.ItemSelection;
 import static mindustry.Vars.control;
 
 /**
- * - 该部分暂未完善 -<p>
- * - 该部分暂未完善 -<p>
- * - 该部分暂未完善 -<p>
  * 由于旧的 {@code TjConfigTable} 将用户面和数据过度耦合导致极难扩展, 所以我们需要一种新的设计, 但是显然这需要一点时间...<p>
+ * 但是后来我们发现这两个类的应用面并不能完全重合, 它们并不能完全替代对方, 因此我们完成了对 {@code TjConfigTable} 的优化并将其保留下来.<p>
+ * 接下来我们将时间交给 {@code TjTable} 的优化和完善...<p>
  * For example:
  * <blockquote><pre> {@code
  *     public Item myItem = null;
@@ -80,8 +79,8 @@ public class TjTable {
     }
 
     public static class Layout {
-        public Seq<Page> pages = new Seq<>();
-        public Cons<Object> configure;
+        protected Seq<Page> pages = new Seq<>();
+        protected Cons<Object> configure;
 
         public Layout(Cons<Object> configure) {
             this.configure = configure;
@@ -148,8 +147,8 @@ public class TjTable {
     }
 
     public static class Page {
-        public Seq<Content<?>> contents = new Seq<>();
-        public Drawable icon;
+        protected Seq<Content<?>> contents = new Seq<>();
+        protected Drawable icon;
 
         public Page(Drawable icon) {
             this.icon = icon;
@@ -171,21 +170,44 @@ public class TjTable {
     }
 
     public static abstract class Content<Type> {
-        public Intf<Type> value;
+        protected Intf<Type> value;
         protected Layout layout;
         protected int config = -2;
         // public boolean save;
 
         abstract public Cons<Table> build(boolean closeSelect);
-        abstract protected void call(int config);
         abstract protected int getConfig();
+
+        protected void call(int config) {
+            this.config = config;
+            layout.configure();
+            this.config = -2;
+        }
+    }
+
+    public static class EmptyContent<Type> extends Content<Type> {
+        protected Cons<Table> build;
+
+        public EmptyContent(Cons<Table> build) {
+            this.build = build;
+        }
+
+        @Override
+        protected int getConfig() {
+            return -1;
+        }
+
+        @Override
+        public Cons<Table> build(boolean closeSelect) {
+            return build;
+        }
     }
 
     public static class Selection<Type> extends Content<Type> {
-        public Prov<Seq<Type>> items;
-        public Func<Type, TextureRegion> buttonRegion;
-        public Func<Type, String> buttonTip;
-        public Prov<Type> holder;
+        protected Prov<Seq<Type>> items;
+        protected Func<Type, TextureRegion> buttonRegion;
+        protected Func<Type, String> buttonTip;
+        protected Prov<Type> holder;
 
         public Selection(Prov<Seq<Type>> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder) {
             this.items = items;
@@ -201,14 +223,6 @@ public class TjTable {
 
         public static Selection<UnlockableContent> unlockableContent(Prov<Seq<UnlockableContent>> items, Prov<UnlockableContent> holder) {
             return new Selection<>(items, item -> item.uiIcon, item -> item.localizedName, holder);
-        }
-
-        @Override
-        public void call(int config) {
-            // config = Mathf.clamp(config, -1, items.size);
-            this.config = config;
-            layout.configure();
-            this.config = -2;
         }
 
         @Override

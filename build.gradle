@@ -40,7 +40,7 @@ ext{
     // - latest: depend on the latest release of mindustry
     // - be: depend on the very latest commit of mindustry
     // - v<number>: depend on a specific commit
-    mindustryVersion = "v158.1"
+    mindustryVersion = "v159.2"
     isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
@@ -106,4 +106,9 @@ tasks.register('modBuild', Copy) {
     dependsOn build
     from "build/libs/${project.name}Desktop.jar"
     into System.getenv('APPDATA') + '/Mindustry/mods'
+}
+
+tasks.register('modRun', JavaExec) {
+    dependsOn modBuild
+    classpath = files("ignore/Mindustry.jar")
 }

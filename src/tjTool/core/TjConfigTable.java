@@ -64,10 +64,10 @@ public class TjConfigTable {
         abstract protected int getConfig();
 
         public boolean shouldBuild() {
-            return (lock == null || lock.get()) && build();
+            return (lock == null || lock.get()) && allowBuild();
         }
 
-        public boolean build() {
+        public boolean allowBuild() {
             return alwaysBuild;
         }
 
@@ -143,8 +143,8 @@ public class TjConfigTable {
         }
 
         @Override
-        public boolean build() {
-            return super.build() || buttonRegion.any();
+        public boolean allowBuild() {
+            return super.allowBuild() || buttonRegion.any();
         }
 
         public IntContent setFavorite(int favorite) {
@@ -213,8 +213,8 @@ public class TjConfigTable {
         }
 
         @Override
-        public boolean build() {
-            return super.build() || items.get().any();
+        public boolean allowBuild() {
+            return super.allowBuild() || items.get().any();
         }
 
         @Override
