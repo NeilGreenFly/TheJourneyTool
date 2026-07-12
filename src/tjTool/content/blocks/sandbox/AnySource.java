@@ -29,14 +29,13 @@ import static mindustry.graphics.Layer.*;
 import static tjTool.core.TjTable.*;
 
 /**
- * 邻接源现已并入任意源, 原邻接源已被移除, 但可能会因其他测试重新加入, 不过这只会是暂时的. 
- * <p>
+ * 邻接源现已并入任意源, 原邻接源已被移除, 但可能会因其他测试重新加入, 不过这只会是暂时的.<p>
  * 我们仍然希望可以将弹药源也合并到这个类中, 但是由于一些基本的属性差异以及操作方式的缺失, 这个计划未能实现. 
  * 这并非一方不能兼容另一方导致的, 如果只是为了合并而合并, 我们可以让任意源具有方向, 这样即可将弹药源一起并入功能分支. 
  * 但显然绝大部分情况下 (事实上是所有情况下) 任意源和邻接源都不需要方向, 如果只是为了兼容弹药源这是没有必要的. 
- * 因此我们更需要的是一种更灵活的转换方式, 这对于各方面来说都会是必要的.
- * <p>
- * 另外的, 弹药源存在一些设计缺失, 比如我们或许应该阻止凭空放置弹药源 (即没有面向且邻接炮台时) , 目前该方案仍在评估, 条件允许时我们会考虑补充.
+ * 因此我们更需要的是一种更灵活的转换方式, 这对于各方面来说都会是必要的.<p>
+ * 另外的, 弹药源存在一些设计缺失, 比如我们或许应该阻止凭空放置弹药源 (即没有面向且邻接炮台时) , 目前该方案仍在评估, 条件允许时我们会考虑补充.<p>
+ * 不过如今我们决定将弹药源更名为定向源, 并进一步完善其功能, 使其逐渐成为任意源的下位替代, 这或许会是一个还算不错的分支.
  */
 public class AnySource extends BaseSource {
     public TextureRegion[] regions;
@@ -56,6 +55,7 @@ public class AnySource extends BaseSource {
         });
         config(UnitType.class, (AnySourceBuild tile, UnitType v) -> {
             lastConfig = null;
+            if (net.client()) return;
             Fx.spawn.at(v.spawn(tile.team, tile.x, tile.y, 90));
         });
     }

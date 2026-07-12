@@ -171,6 +171,7 @@ public class TjTable {
 
     public static abstract class Content<Type> {
         protected Intf<Type> value;
+        protected Cons<Type> configure;
         protected Layout layout;
         protected int config = -2;
         // public boolean save;
@@ -182,6 +183,11 @@ public class TjTable {
             this.config = config;
             layout.configure();
             this.config = -2;
+        }
+
+        public Content<Type> configure(Cons<Type> configure) {
+            this.configure = configure;
+            return this;
         }
     }
 
@@ -242,9 +248,9 @@ public class TjTable {
                     ImageButton button = table.button(new TextureRegionDrawable(buttonRegion.get(item)), Styles.clearNoneTogglei, iconSize, () -> {
                         if (closeSelect) control.input.config.hideConfig();
                     }).tooltip(buttonTip.get(item)).group(group).get();
-                    button.changed(value == null
+                    button.changed(configure != null ? () -> configure.get(item) : (value == null
                             ? () -> layout.configure.get(button.isChecked() ? item : null)
-                            : () -> call(button.isChecked() ? value.get(item) : -1));
+                            : () -> call(button.isChecked() ? value.get(item) : -1)));
                     button.update(() -> button.setChecked(holder.get() == item));
                     if (idx % 8 == 7) table.row();
                 });
