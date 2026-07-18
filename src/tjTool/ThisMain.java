@@ -2,15 +2,10 @@ package tjTool;
 
 import arc.Events;
 import arc.util.Log;
-import arc.util.Strings;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.BaseDialog;
 import tjTool.content.*;
-
-import static arc.Core.*;
-import static mindustry.Vars.*;
-import static mindustry.core.Version.*;
 
 @SuppressWarnings("unused")
 public final class ThisMain extends Mod {
