@@ -106,7 +106,7 @@ public class AnySource extends BaseSource {
                 但是不排除您可能只是重启了存档, 在日志未被清空的情况下
                 您当然可以继续提交. 这是被容许的.
                 """;
-        public Layout layout = new Layout(this::configure).with(
+        public Layout layout = new Layout(this).with(
                 new Page(Icon.units).with(Selection.unlockableContent(() -> content.units().select(BaseSource::canProduce).as(), () -> null)),
                 new Page(Icon.wrench).with(new Selection<>(() -> Seq.with(0, 1), i -> regions[i], i -> TjBundle.getBlock(name, "config-name-" + i), () -> status))
         );

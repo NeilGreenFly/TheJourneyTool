@@ -96,17 +96,17 @@ public class DirSource extends BaseSource {
         public float[] overdrives = {1.5f, 2.25f, 2.5f};
         public float heat;
 
-        public Pack pack = new Pack(this::configure).prefix(() -> w(target)).with(
+        public Pack pack = new Pack(this).prefix(() -> w(target)).with(
                 TypeContent.unlockableContent(() -> new Image(target.uiIcon), () -> target.localizedName, () -> ammoTypes, () -> ammo).setAlwaysBuild(true).setLock(() -> target instanceof BaseTurret),
                 TypeContent.unlockableContent(() -> new Image(Icon.star), () -> getBlock(name, "config-boost"), coolants::as, v -> target instanceof ReloadTurret reloadTurret ? v.emoji() + v.localizedName + "\n" + TjStat.boosters(reloadTurret, true, (Liquid) v) : v.localizedName, () -> coolant).setFavorite(v -> ((Liquid) v).heatCapacity),
-                TypeContent.unlockableContent(() -> new Image(Icon.download), () -> getBlock(name, "config-consumes"), () -> new Seq<UnlockableContent>(items).add(liquids), null),
+                new StackContent(() -> new Image(Icon.download), () -> getBlock(name, "config-consumes"), () -> new Seq<UnlockableContent>(items).add(liquids), () -> target),
                 new IntContent(() -> new Image(Icon.effect), () -> getBlock(name, "config-overdrive"), () -> overdrive)
                         .add(new TextureRegionDrawable(Blocks.overdriveProjector.uiIcon), "150%")
                         .add(new TextureRegionDrawable(Blocks.overdriveProjector.uiIcon), "225%")
                         .add(new TextureRegionDrawable(Blocks.overdriveDome.uiIcon), "250%")
                         .setFavorite(2).setLock(() -> targetBuild != null && target.canOverdrive)
         );
-        public Layout layout = new Layout(this::configure).with(
+        public Layout layout = new Layout(this).with(
                 new Page(Icon.wrench).with(Selection.unlockableContent(() -> content.blocks().select(block -> block instanceof BaseTurret && block.size == targetBuild.block.size).as(), () -> targetBuild != null ? targetBuild.block : null)),
                 new Page(Icon.link).with(new EmptyContent<>(table -> {
                     BaseDialog dialog = new BaseDialog("@openlink");

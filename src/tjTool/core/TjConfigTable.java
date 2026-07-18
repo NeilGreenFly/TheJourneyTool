@@ -4,13 +4,23 @@ import arc.func.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Collapser;
+import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
+import arc.util.Scaling;
+import arc.util.Strings;
+import mindustry.core.UI;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
+import mindustry.type.Item;
+import mindustry.type.Liquid;
 import mindustry.ui.Styles;
+import mindustry.world.Block;
+import mindustry.world.consumers.ConsumeItems;
+import mindustry.world.consumers.ConsumeLiquid;
+import mindustry.world.consumers.ConsumeLiquids;
 
 import static tjTool.core.TjTable.*;
 
@@ -19,11 +29,11 @@ public class TjConfigTable {
 
     public static class Pack {
         protected Seq<BaseContent> contents = new Seq<>();
-        protected Cons<Object> configure;
+        protected Building building;
         protected Intp prefix;
 
-        public Pack(Cons<Object> configure) {
-            this.configure = configure;
+        public Pack(Building building) {
+            this.building = building;
         }
 
         public Pack prefix(Intp prefix) {
@@ -73,7 +83,7 @@ public class TjConfigTable {
 
         protected void call(int config) {
             this.config = config;
-            pack.configure.get(pack.config());
+            pack.building.configure(pack.config());
             this.config = -2;
         }
 
@@ -108,19 +118,19 @@ public class TjConfigTable {
                         final int item = i;
                         if (holder != null) {
                             ImageButton button = t.button(buttonRegion.get(item), Styles.clearNoneTogglei, iconSize, () -> {
-                            }).tooltip(buttonTip.get(item)).group(group).get();
+                            }).tooltip(buttonTip.get(item), true).group(group).get();
                             button.changed(() -> call(button.isChecked() ? item : -1));
                             button.update(() -> button.setChecked(holder.get() == item));
                         } else {
-                            t.table(f -> f.image(buttonRegion.get(item)).tooltip(buttonTip.get(item)).maxSize(iconSize).center());
+                            t.table(f -> f.image(buttonRegion.get(item)).tooltip(buttonTip.get(item), true).maxSize(iconSize).center());
                         }
                         if (i % 8 == 7) t.row();
                     }
                 }).left();
                 if (holder != null) {
-                    table.button(Icon.undo, Styles.clearNonei, iconSize, () -> call(-1)).size(uiSize).tooltip("@table.reset").center();
+                    table.button(Icon.undo, Styles.clearNonei, iconSize, () -> call(-1)).size(uiSize).tooltip("@table.reset", true).center();
                     if (favorite != null)
-                        table.button(Icon.star, Styles.clearNonei, iconSize, () -> call(favorite.get())).size(uiSize).tooltip("@table.favorite").center();
+                        table.button(Icon.star, Styles.clearNonei, iconSize, () -> call(favorite.get())).size(uiSize).tooltip("@table.favorite", true).center();
                 }
                 return table;
             };
@@ -178,19 +188,19 @@ public class TjConfigTable {
                         forEach(items.get(), (i, item) -> {
                             if (holder != null) {
                                 ImageButton button = t.button(buttonRegion.get(item), Styles.clearNoneTogglei, iconSize, () -> {
-                                }).tooltip(buttonTip.get(item)).group(group).get();
+                                }).tooltip(buttonTip.get(item), true).group(group).get();
                                 button.changed(() -> call(button.isChecked() ? value.get(item) : -1));
                                 button.update(() -> button.setChecked(holder.get() == item));
                             } else {
-                                t.table(f -> f.image(buttonRegion.get(item)).tooltip(buttonTip.get(item)).maxSize(iconSize).center());
+                                t.table(f -> f.image(buttonRegion.get(item)).tooltip(buttonTip.get(item), true).maxSize(iconSize).center());
                             }
                             if (i % 8 == 7) t.row();
                         });
                     }).left();
                     if (holder != null) {
-                        table.button(Icon.undo, Styles.clearNonei, iconSize, () -> call(-1)).size(uiSize).tooltip("@table.reset").center();
+                        table.button(Icon.undo, Styles.clearNonei, iconSize, () -> call(-1)).size(uiSize).tooltip("@table.reset", true).center();
                         if (favorite != null)
-                            table.button(Icon.star, Styles.clearNonei, iconSize, () -> call(favorite.get())).size(uiSize).tooltip("@table.favorite").center();
+                            table.button(Icon.star, Styles.clearNonei, iconSize, () -> call(favorite.get())).size(uiSize).tooltip("@table.favorite", true).center();
                     }
                 } else table.image(Icon.cancel).size(iconSize).center();
                 return table;
@@ -231,6 +241,95 @@ public class TjConfigTable {
         //     this.favorite = value.get(items.get().max(Comparator.comparing(favorite)));
         //     return this;
         // }
+    }
+
+    /**
+     * 这个类是为弥补{@code TypeContent}在构建不可选行时无法显示数字而特化出来的一个类, 仅用于显示传入建筑的消耗器列表(仅部分).<p>
+     * 但是这个类是极难维护的, 由于原版对于消耗器极其差异化的实现, 不同基类的元素也没有统一的方法获取消耗数量,
+     * 似乎{@code Anuke}只是在需要的位置临时实现了对数量的获取, 而不考虑其他位置可能也需要用到.
+     * 总之如果您也对这段实现感到窒息, 我们为此感到抱歉, 但我们绝无可能再回来优化它, 除非我们找到了更好的方法.<p>
+     * 虽然原版相关的方法是公开的, 如果我们十分摒弃重复造轮子也的确可以直接使用, 但很不幸的是我们使用的展示尺寸与原版方法是不一样的(是的, 原版方法直接把尺寸写死了)...
+     */
+    public static class StackContent extends BaseContent {
+        protected Prov<Seq<UnlockableContent>> items;
+
+        public StackContent(Prov<Image> icon, Prov<String> tip, Prov<Seq<UnlockableContent>> items, Prov<Block> block) {
+            this.items = items;
+            this.build = table -> {
+                table.add(icon.get()).size(uiSize).tooltip(tip.get(), true).center();
+                if (items.get().any()) {
+                    table.table(Styles.black3, row -> {
+                        row.defaults().size(uiSize);
+                        forEach(items.get(), (i, item) -> {
+                            boolean b = false;
+                            for (var c : block.get().consumers) if (item instanceof Item v && c instanceof ConsumeItems cItems) {
+                                for (var cItem : cItems.items) if (v == cItem.item) {
+                                    b = true;
+                                    row.add(stack(v, cItem.amount));
+                                    break;
+                                }
+                                if (b) break;
+                            } else if (item instanceof Liquid v) {
+                                if (c instanceof ConsumeLiquid cLiquid && v == cLiquid.liquid) {
+                                    b = true;
+                                    row.add(stack(v, cLiquid.amount));
+                                    break;
+                                } else if (c instanceof ConsumeLiquids cLiquids) {
+                                    for (var cLiquid : cLiquids.liquids) if (v == cLiquid.liquid) {
+                                        b = true;
+                                        row.add(stack(v, cLiquid.amount));
+                                        break;
+                                    }
+                                }
+                                if (b) break;
+                            }
+                            if (!b) row.add(stack(item));
+                            if (i % 8 == 7) row.row();
+                        });
+                    }).left();
+                } else table.image(Icon.cancel).size(iconSize).center();
+                return table;
+            };
+        }
+
+        protected Stack stack(UnlockableContent item) {
+            Stack stack = new Stack();
+            stack.add(new Table(o -> o.center().add(new Image(item.uiIcon)).size(iconSize).tooltip(item.localizedName, true).scaling(Scaling.fit)));
+            return stack;
+        }
+
+        protected Stack stack(Item item, int amount) {
+            Stack stack = stack(item);
+            if(amount != 0) stack.add(new Table(t -> {
+                t.left().bottom().add(amount >= 1000 ? UI.formatAmount(amount) : String.valueOf(amount)).style(Styles.outlineLabel);
+                t.pack();
+            }));
+            return stack;
+        }
+
+        protected Stack stack(Liquid liquid, float amount) {
+            Stack stack = stack(liquid);
+            if(amount != 0) stack.add(new Table(t -> {
+                t.left().bottom().add(Strings.autoFixed(amount * 60f, 3)).style(Styles.outlineLabel);
+                t.pack();
+            }));
+            return stack;
+        }
+
+        @Override
+        public boolean allowBuild() {
+            return super.allowBuild() || items.get().any();
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return false;
+        }
+
+        @Override
+        protected int getConfig() {
+            return -1;
+        }
     }
 
     public static void titleTable(Table table, String title, String label) {

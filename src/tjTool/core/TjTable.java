@@ -13,6 +13,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
 import mindustry.ctype.UnlockableContent;
+import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
@@ -80,10 +81,10 @@ public class TjTable {
 
     public static class Layout {
         protected Seq<Page> pages = new Seq<>();
-        protected Cons<Object> configure;
+        protected Building building;
 
-        public Layout(Cons<Object> configure) {
-            this.configure = configure;
+        public Layout(Building building) {
+            this.building = building;
         }
 
         public Layout add(Page page) {
@@ -98,7 +99,7 @@ public class TjTable {
         }
 
         public void configure() {
-            configure.get(config());
+            building.configure(config());
         }
 
         public int[] config() {
@@ -170,7 +171,7 @@ public class TjTable {
     }
 
     public static abstract class Content<Type> {
-        protected Intf<Type> value;
+        protected @Nullable Intf<Type> value;
         protected Cons<Type> configure;
         protected Layout layout;
         protected int config = -2;
@@ -249,7 +250,7 @@ public class TjTable {
                         if (closeSelect) control.input.config.hideConfig();
                     }).tooltip(buttonTip.get(item)).group(group).get();
                     button.changed(configure != null ? () -> configure.get(item) : (value == null
-                            ? () -> layout.configure.get(button.isChecked() ? item : null)
+                            ? () -> layout.building.configure(button.isChecked() ? item : null)
                             : () -> call(button.isChecked() ? value.get(item) : -1)));
                     button.update(() -> button.setChecked(holder.get() == item));
                     if (idx % 8 == 7) table.row();
