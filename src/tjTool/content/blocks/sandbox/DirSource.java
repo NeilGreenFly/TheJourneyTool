@@ -52,19 +52,23 @@ public class DirSource extends BaseSource {
                 new DrawDefault(),
                 new DrawHeatOutput()
         );
-        config(int[].class, (DirSourceBuild tile, int[] v) -> {
-            if (tile.target != content.block(v[0])) return;
-            tile.ammo = tile.target instanceof ItemTurret ? content.item(v[1]) : content.liquid(v[1]);
-            tile.coolant = content.liquid(v[2]);
-            tile.overdrive = v[3];
+    }
+
+    @Override
+    protected void config() {
+        config(int[].class, (DirSourceBuild build, int[] v) -> {
+            if (build.target != content.block(v[0])) return;
+            build.ammo = build.target instanceof ItemTurret ? content.item(v[1]) : content.liquid(v[1]);
+            build.coolant = content.liquid(v[2]);
+            build.overdrive = v[3];
         });
-        config(Block.class, (DirSourceBuild tile, Block v) -> {
+        config(Block.class, (DirSourceBuild build, Block v) -> {
             lastConfig = null;
-            if (!(tile.targetBuild instanceof BaseTurret.BaseTurretBuild turret)) return;
+            if (!(build.targetBuild instanceof BaseTurret.BaseTurretBuild turret)) return;
             InputHandler.unitClear(turret instanceof ControlBlock controlBlock ? controlBlock.unit().getPlayer() : null);
             float rotation = turret.rotation;
-            turret.tile.setBlock(v, tile.team);
-            turret = (BaseTurret.BaseTurretBuild) tile.targetBuild;
+            turret.tile.setBlock(v, build.team);
+            turret = (BaseTurret.BaseTurretBuild) build.targetBuild;
             turret.rotation = rotation;
             turret.block.placeEffect.at(turret, turret.block.size);
         });
@@ -107,7 +111,7 @@ public class DirSource extends BaseSource {
                         .setFavorite(2).setLock(() -> targetBuild != null && target.canOverdrive)
         );
         public Layout layout = new Layout(this).with(
-                new Page(Icon.wrench).with(Selection.unlockableContent(() -> content.blocks().select(block -> block instanceof BaseTurret && block.size == targetBuild.block.size).as(), () -> targetBuild != null ? targetBuild.block : null)),
+                new Page(Icon.wrench).with(Selection.unlockableContent(content.blocks().select(block -> block instanceof BaseTurret && block.size == targetBuild.block.size)::as, () -> targetBuild != null ? targetBuild.block : null)),
                 new Page(Icon.link).with(new EmptyContent<>(table -> {
                     BaseDialog dialog = new BaseDialog("@openlink");
                     dialog.cont.label(() -> "即将打开链接").center().row();
@@ -303,7 +307,7 @@ public class DirSource extends BaseSource {
             return targetBuild != null ? super.heat() : 0f;
         }
 
-        protected <T extends UnlockableContent> short w(T t) {
+        protected static <T extends UnlockableContent> short w(T t) {
             return t != null ? t.id : -1;
         }
 

@@ -2,7 +2,6 @@ package tjTool.core;
 
 import arc.Core;
 import arc.func.*;
-import arc.graphics.g2d.TextureRegion;
 import arc.scene.style.Drawable;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.ButtonGroup;
@@ -212,11 +211,11 @@ public class TjTable {
 
     public static class Selection<Type> extends Content<Type> {
         protected Prov<Seq<Type>> items;
-        protected Func<Type, TextureRegion> buttonRegion;
+        protected Func<Type, Drawable> buttonRegion;
         protected Func<Type, String> buttonTip;
         protected Prov<Type> holder;
 
-        public Selection(Prov<Seq<Type>> items, Func<Type, TextureRegion> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder) {
+        public Selection(Prov<Seq<Type>> items, Func<Type, Drawable> buttonRegion, Func<Type, String> buttonTip, Prov<Type> holder) {
             this.items = items;
             this.buttonRegion = buttonRegion;
             this.buttonTip = buttonTip;
@@ -229,7 +228,7 @@ public class TjTable {
         }
 
         public static Selection<UnlockableContent> unlockableContent(Prov<Seq<UnlockableContent>> items, Prov<UnlockableContent> holder) {
-            return new Selection<>(items, item -> item.uiIcon, item -> item.localizedName, holder);
+            return new Selection<>(items, item -> new TextureRegionDrawable(item.uiIcon), item -> item.localizedName, holder);
         }
 
         @Override
@@ -246,7 +245,7 @@ public class TjTable {
                 ButtonGroup<ImageButton> group = new ButtonGroup<>();
                 group.setMinCheckCount(0);
                 forEach(items.get(), (idx, item) -> {
-                    ImageButton button = table.button(new TextureRegionDrawable(buttonRegion.get(item)), Styles.clearNoneTogglei, iconSize, () -> {
+                    ImageButton button = table.button(buttonRegion.get(item), Styles.clearNoneTogglei, iconSize, () -> {
                         if (closeSelect) control.input.config.hideConfig();
                     }).tooltip(buttonTip.get(item)).group(group).get();
                     button.changed(configure != null ? () -> configure.get(item) : (value == null

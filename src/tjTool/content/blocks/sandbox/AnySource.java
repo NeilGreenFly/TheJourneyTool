@@ -4,19 +4,24 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
+import arc.math.geom.Vec2;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Eachable;
 import arc.util.Log;
+import arc.util.Nullable;
 import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Fx;
+import mindustry.entities.Units;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
+import mindustry.io.TypeIO;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
 import mindustry.ui.Styles;
@@ -48,15 +53,29 @@ public class AnySource extends BaseSource {
         configurable = true;
         saveConfig = true;
         clearOnDoubleTap = true;
+        commandable = true;
+    }
 
-        config(Integer.class, (AnySourceBuild tile, Integer status) -> {
-            tile.status = status;
-            placeEffect.at(tile.x, tile.y, size);
+    @Override
+    protected void config() {
+        config(Integer.class, (AnySourceBuild build, Integer v) -> {
+            if (v == 2) {
+                build.commandPos = null;
+                return;
+            }
+            build.status = v;
+            placeEffect.at(build.x, build.y, size);
         });
-        config(UnitType.class, (AnySourceBuild tile, UnitType v) -> {
+        config(UnitType.class, (AnySourceBuild build, UnitType v) -> {
             lastConfig = null;
+            if (v.useUnitCap && build.team.data().countType(v) >= Units.getCap(build.team)) {
+                Fx.unitCapKill.at(build);
+                return;
+            }
+            Fx.spawn.at(build);
             if (net.client()) return;
-            Fx.spawn.at(v.spawn(tile.team, tile.x, tile.y, 90));
+            var u = v.spawn(build.team, build.x, build.y, 90);
+            if (build.commandPos != null && u.isCommandable()) u.command().commandPosition(build.commandPos);
         });
     }
 
@@ -65,10 +84,9 @@ public class AnySource extends BaseSource {
         super.setStats();
         stats.add(TjStat.config, table -> {
             table.row();
-            for (int i = 0; i < 3; i++)
-                TjStat.newConfigStats(table, regions[i],
-                        TjBundle.getBlock(name, "config-name-" + i),
-                        TjBundle.getBlock(name, "config-description-" + i));
+            for (int i = 0; i < 3; i++) TjStat.newConfigStats(table, regions[i],
+                    "block-" + name + "config-name-" + i,
+                    "block-" + name + "config-description-" + i);
         });
     }
 
@@ -93,6 +111,7 @@ public class AnySource extends BaseSource {
 
     @SuppressWarnings("unused")
     public class AnySourceBuild extends BaseSourceBuild {
+        public @Nullable Vec2 commandPos;
         public int status = 1;
         private boolean handle;
         private boolean warning = false;
@@ -107,8 +126,8 @@ public class AnySource extends BaseSource {
                 您当然可以继续提交. 这是被容许的.
                 """;
         public Layout layout = new Layout(this).with(
-                new Page(Icon.units).with(Selection.unlockableContent(() -> content.units().select(BaseSource::canProduce).as(), () -> null)),
-                new Page(Icon.wrench).with(new Selection<>(() -> Seq.with(0, 1), i -> regions[i], i -> TjBundle.getBlock(name, "config-name-" + i), () -> status))
+                new Page(Icon.units).with(Selection.unlockableContent(content.units().select(BaseSource::canProduce)::as, () -> null)),
+                new Page(Icon.wrench).with(new Selection<>(() -> Seq.with(0, 1, 2), i -> i != 2 ? new TextureRegionDrawable(regions[i]) : Icon.trash, i -> i != 2 ? TjBundle.getBlock(name, "config-name-" + i) : "@clear", () -> status))
         );
 
         @Override
@@ -200,6 +219,16 @@ public class AnySource extends BaseSource {
         }
 
         @Override
+        public void onCommand(Vec2 target) {
+            commandPos = target;
+        }
+
+        @Override
+        public Vec2 getCommandPosition() {
+            return commandPos;
+        }
+
+        @Override
         public void handleItem(Building source, Item item) {
             handle = false;
         }
@@ -210,15 +239,22 @@ public class AnySource extends BaseSource {
         }
 
         @Override
+        public byte version() {
+            return 1;
+        }
+
+        @Override
         public void write(Writes write) {
             super.write(write);
             write.i(status);
+            TypeIO.writeVecNullable(write, commandPos);
         }
 
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
             status = read.i();
+            if (revision >= 1) commandPos = TypeIO.readVecNullable(read);
         }
     }
 }

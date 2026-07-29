@@ -355,6 +355,11 @@ public class TjConfigTable {
     public static Cons<Table> updateLog = table -> {
         table.add("更新日志").growX().left().color(Pal.accent).row();
         table.image().height(4).color(Pal.accent).growX().pad(5).padLeft(0).padRight(0).row();
+        titleTable(table, "v1.1.6", """
+                新增 >>
+                - 任意源 现在可以设置单位移动指令
+                - 定向源 部分消耗添加数量显示
+                """, false);
         titleTable(table, "v1.1.5", """
                 新增 >>
                 - 护盾源

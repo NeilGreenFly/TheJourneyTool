@@ -23,7 +23,7 @@ public class ShieldSource extends BaseShield {
         saveConfig = true;
         alwaysUnlocked = true;
         placeableLiquid = true;
-        config(Float.class, (ShieldSourceBuild tile, Float v) -> tile.optionalEfficiency = v);
+        config(Float.class, (ShieldSourceBuild build, Float v) -> build.optionalEfficiency = v);
     }
 
     @Override

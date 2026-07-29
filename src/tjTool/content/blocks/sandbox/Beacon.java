@@ -31,31 +31,34 @@ public class Beacon extends SandboxBlock {
         size = 5;
         configurable = true;
         placeEffect = new MultiEffect(placeEffect, TjEffect.place);
+    }
 
-        config(Item.class, (BeaconBuild tile, Item v) -> {
-            tile.c = v;
-            tile.icon = v.uiIcon;
-            tile.color = v.color;
+    @Override
+    protected void config() {
+        config(Item.class, (BeaconBuild build, Item v) -> {
+            build.c = v;
+            build.icon = v.uiIcon;
+            build.color = v.color;
         });
-        config(Liquid.class, (BeaconBuild tile, Liquid v) -> {
-            tile.c = v;
-            tile.icon = v.uiIcon;
-            tile.color = v.color;
+        config(Liquid.class, (BeaconBuild build, Liquid v) -> {
+            build.c = v;
+            build.icon = v.uiIcon;
+            build.color = v.color;
         });
-        config(Block.class, (BeaconBuild tile, Block v) -> {
-            tile.c = v;
-            tile.icon = v.uiIcon;
-            tile.color = null;
+        config(Block.class, (BeaconBuild build, Block v) -> {
+            build.c = v;
+            build.icon = v.uiIcon;
+            build.color = null;
         });
-        config(UnitType.class, (BeaconBuild tile, UnitType v) -> {
-            tile.c = v;
-            tile.icon = v.uiIcon;
-            tile.color = null;
+        config(UnitType.class, (BeaconBuild build, UnitType v) -> {
+            build.c = v;
+            build.icon = v.uiIcon;
+            build.color = null;
         });
-        configClear((BeaconBuild tile) -> {
-            tile.c = null;
-            tile.icon = null;
-            tile.color = null;
+        configClear((BeaconBuild build) -> {
+            build.c = null;
+            build.icon = null;
+            build.color = null;
         });
     }
 

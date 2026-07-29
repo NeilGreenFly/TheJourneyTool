@@ -26,6 +26,8 @@ public abstract class SandboxBlock extends Block {
 
     public SandboxBlock(String name) {
         super(name);
+        config();
+
         hasPower =
         outputsPower =
         consumesPower =
@@ -55,6 +57,8 @@ public abstract class SandboxBlock extends Block {
     public TextureRegion atlasFind(String suffix) {
         return Core.atlas.find(Vars.content.transformName(name + "-" + suffix));
     }
+
+    protected void config() {}
 
     @Override
     public void setStats() {
@@ -124,10 +128,9 @@ public abstract class SandboxBlock extends Block {
 
         @Override
         public void drawSelect() {
-            if (drawProximity && !rotate)
-                proximity.each(
-                        other -> checkBuild(other) && (other.block.hasItems || other.block.hasLiquids),
-                        other -> Drawf.selected(other.tile, team.color));
+            if (drawProximity && !rotate) proximity.each(
+                    other -> checkBuild(other) && (other.block.hasItems || other.block.hasLiquids),
+                    other -> Drawf.selected(other.tile, team.color));
         }
 
         @Override
