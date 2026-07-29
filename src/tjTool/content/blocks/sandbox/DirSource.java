@@ -111,7 +111,7 @@ public class DirSource extends BaseSource {
                         .setFavorite(2).setLock(() -> targetBuild != null && target.canOverdrive)
         );
         public Layout layout = new Layout(this).with(
-                new Page(Icon.wrench).with(Selection.unlockableContent(content.blocks().select(block -> block instanceof BaseTurret && block.size == targetBuild.block.size)::as, () -> targetBuild != null ? targetBuild.block : null)),
+                new Page(Icon.wrench).with(Selection.unlockableContent(() -> content.blocks().select(block -> block instanceof BaseTurret && block.size == targetBuild.block.size).as(), () -> targetBuild != null ? targetBuild.block : null)), // use ::as will throw NullPointerException.
                 new Page(Icon.link).with(new EmptyContent<>(table -> {
                     BaseDialog dialog = new BaseDialog("@openlink");
                     dialog.cont.label(() -> "即将打开链接").center().row();
