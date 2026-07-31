@@ -85,8 +85,8 @@ public class AnySource extends BaseSource {
         stats.add(TjStat.config, table -> {
             table.row();
             for (int i = 0; i < 3; i++) TjStat.newConfigStats(table, regions[i],
-                    "block-" + name + "config-name-" + i,
-                    "block-" + name + "config-description-" + i);
+                    TjBundle.getBlock(name, "config-name-" + i),
+                    TjBundle.getBlock(name, "config-description-" + i));
         });
     }
 

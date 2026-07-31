@@ -13,6 +13,10 @@ import mindustry.world.meta.*;
 
 public class TjStat {
     public static final Stat config = new Stat("config", StatCat.function);
+    public static BaseDialog updateDialog = new BaseDialog(TjBundle.getThis("saying")) {{
+        cont.table(TjConfigTable.updateLog);
+        addCloseButton();
+    }};
 
     public static StatValue acknowledgements(TextureRegion region) {
         return table -> {
@@ -20,10 +24,7 @@ public class TjStat {
             newConfigStats(table, region, TjBundle.getThis("acknowledgements"), TjBundle.getThis("saying"), new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    BaseDialog dialog = new BaseDialog(TjBundle.getThis("saying"));
-                    dialog.cont.table(TjConfigTable.updateLog);
-                    dialog.addCloseButton();
-                    dialog.show();
+                    updateDialog.show();
                 }
             });
         };
