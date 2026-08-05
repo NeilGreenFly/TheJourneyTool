@@ -1,6 +1,7 @@
 package tjTool.content.blocks.sandbox;
 
 import arc.func.Boolf;
+import arc.util.Log;
 import mindustry.game.Team;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
@@ -57,6 +58,23 @@ public abstract class BaseSource extends SandboxBlock {
 
     @SuppressWarnings("unused")
     public abstract class BaseSourceBuild extends SandboxBuild implements HeatBlock {
+
+        protected void tryUpdateTile() {}
+
+        protected void catchUpdateTile(Exception e) {
+            enabled = false;
+        }
+
+        @Override
+        public void updateTile() {
+            try {
+                tryUpdateTile();
+            } catch (Exception e) { // NullPointerException
+                catchUpdateTile(e);
+                Log.err(e);
+                deselect();
+            }
+        }
 
         @Override
         public float getPowerProduction() {

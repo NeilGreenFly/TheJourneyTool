@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.util.Eachable;
 import mindustry.Vars;
+import mindustry.ctype.UnlockableContent;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.graphics.*;
@@ -54,11 +55,15 @@ public abstract class SandboxBlock extends Block {
         alwaysUnlocked = true;
     }
 
+    protected void config() {}
+
+    protected static <T extends UnlockableContent> short w(T t) {
+        return t != null ? t.id : -1;
+    }
+
     public TextureRegion atlasFind(String suffix) {
         return Core.atlas.find(Vars.content.transformName(name + "-" + suffix));
     }
-
-    protected void config() {}
 
     @Override
     public void setStats() {

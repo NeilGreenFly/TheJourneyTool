@@ -173,8 +173,7 @@ public class DirSource extends BaseSource {
             ammoTypes.clear();
             coolants.clear();
             if (!checkBuild(targetBuild = front())) {
-                if (control.input.config.getSelected() == self())
-                    control.input.config.hideConfig();
+                deselect();
                 target = null;
                 ammo = null;
                 coolant = null;
@@ -305,10 +304,6 @@ public class DirSource extends BaseSource {
         @Override
         public float heat() {
             return targetBuild != null ? super.heat() : 0f;
-        }
-
-        protected static <T extends UnlockableContent> short w(T t) {
-            return t != null ? t.id : -1;
         }
 
         @Override

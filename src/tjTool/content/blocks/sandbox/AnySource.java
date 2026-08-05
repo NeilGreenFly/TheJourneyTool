@@ -9,7 +9,6 @@ import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Eachable;
-import arc.util.Log;
 import arc.util.Nullable;
 import arc.util.Tmp;
 import arc.util.io.Reads;
@@ -143,60 +142,56 @@ public class AnySource extends BaseSource {
 
         @Override
         public void onProximityUpdate() {
-            for (var other : proximity)
-                if (other instanceof BaseTurret.BaseTurretBuild && !(other instanceof BuildTurret.BuildTurretBuild)) {
-                    warning = true;
-                    return;
-                }
-            warning = false;
+            warning = proximity.contains(other -> other instanceof BaseTurret.BaseTurretBuild && !(other instanceof BuildTurret.BuildTurretBuild));
         }
 
         @Override
         public void updateTile() {
-            if (status == 1) {
-                try {
-
-                    proximity.each(this::checkBuild, other -> {
-                        if (other.block.hasItems)
-                            content.items().each(item -> other.handleStack(item, other.acceptStack(item, 1000000, this), this));
-                        // 这部分通常是不安全的, 以及液体的交互方式与物品略有不同, 因此这个在这里不那么重要
-                        // if (other.block.hasLiquids)
-                        //     content.liquids().each(
-                        //             liquid -> other.acceptLiquid(this, liquid),
-                        //             liquid -> other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid))));
-                        if (other.block.acceptsPayload)
-                            content.blocks().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
-                                boolean b = other.acceptPayload(this, payload);
-                                if (b) other.handlePayload(this, payload);
-                                return b;
-                            }));
-                        if (other.block.acceptsUnitPayloads)
-                            content.units().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
-                                boolean b = other.acceptPayload(this, payload);
-                                if (b) other.handlePayload(this, payload);
-                                return b;
-                            }));
-                    });
-                    content.items().each(item -> {
-                        handle = true;
-                        for (int i = 10; i-- > 0 && handle; )
-                            offload(item);
-                    });
-                    content.liquids().each(liquid -> {
-                        liquids.set(liquid, 1000000f);
-                        dumpLiquid(liquid);
-                    });
-                    liquids.clear();
-
-                } catch (RuntimeException e) { // NullPointerException
-                    exception = e.getClass().getName();
-                    Log.err(e);
-                    deselect();
-                    status = 3;
-                }
-            } else if (status == 3 && Mathf.chanceDelta(0.03)) {
-                Fx.regenSuppressParticle.at(x + Mathf.range(block.size * tilesize/2f - 1f), y + Mathf.range(block.size * tilesize/2f - 1f), Pal.remove);
+            if (status == 1) super.updateTile();
+            else if (status == 3 && Mathf.chanceDelta(0.03)) {
+                Fx.regenSuppressParticle.at(x + Mathf.range(block.size * tilesize / 2f - 1f), y + Mathf.range(block.size * tilesize / 2f - 1f), Pal.remove);
             }
+        }
+
+        @Override
+        public void tryUpdateTile() {
+            proximity.each(this::checkBuild, other -> {
+                if (other.block.hasItems)
+                    content.items().each(item -> other.handleStack(item, other.acceptStack(item, 1000000, this), this));
+                // 这部分通常是不安全的, 以及液体的交互方式与物品略有不同, 因此这个在这里不那么重要
+                // if (other.block.hasLiquids)
+                //     content.liquids().each(
+                //             liquid -> other.acceptLiquid(this, liquid),
+                //             liquid -> other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid))));
+                if (other.block.acceptsPayload)
+                    content.blocks().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
+                        boolean b = other.acceptPayload(this, payload);
+                        if (b) other.handlePayload(this, payload);
+                        return b;
+                    }));
+                if (other.block.acceptsUnitPayloads)
+                    content.units().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
+                        boolean b = other.acceptPayload(this, payload);
+                        if (b) other.handlePayload(this, payload);
+                        return b;
+                    }));
+            });
+            content.items().each(item -> {
+                handle = true;
+                for (int i = 10; i-- > 0 && handle; )
+                    offload(item);
+            });
+            content.liquids().each(liquid -> {
+                liquids.set(liquid, 1000000f);
+                dumpLiquid(liquid);
+            });
+            liquids.clear();
+        }
+
+        @Override
+        protected void catchUpdateTile(Exception e) {
+            exception = e.getClass().getName();
+            status = 3;
         }
 
         @Override
