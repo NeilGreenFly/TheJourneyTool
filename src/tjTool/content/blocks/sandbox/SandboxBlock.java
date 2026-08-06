@@ -35,9 +35,11 @@ public abstract class SandboxBlock extends Block {
         conductivePower =
         hasItems =
         hasLiquids =
+        unloadable =
 
         rotateDraw = false;
 
+        noUpdateDisabled = true;
         update = true;
         solid = true;
 
@@ -46,7 +48,6 @@ public abstract class SandboxBlock extends Block {
         clearOnDoubleTap = false;
         selectionRows = 5;
         selectionColumns = 6;
-        noUpdateDisabled = true;
 
         envEnabled = Env.any;
         schematicPriority = -9;

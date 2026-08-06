@@ -359,6 +359,7 @@ public class TjConfigTable {
                 新增 >>
                 - 任意源 现在可以设置单位移动指令
                 - 定向源 部分消耗添加数量显示
+                - 新增 任意黑洞
                 """, false);
         titleTable(table, "v1.1.5", """
                 新增 >>

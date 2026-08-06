@@ -10,17 +10,17 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.liquid.LiquidBlock;
 import mindustry.world.draw.*;
-import mindustry.world.meta.BuildVisibility;
 import tjTool.content.blocks.sandbox.*;
 import tjTool.core.*;
 
 import static mindustry.type.Category.*;
 import static mindustry.type.ItemStack.*;
+import static mindustry.world.meta.BuildVisibility.sandboxOnly;
 
 public class ThisBlocks {
 
     public static Block
-            anySource, dirSource,
+            anySource, dirSource, anyVoid,
             solarSource, bedrock, beacon,
             mendSource, overdriveSource, regenSource, shieldSource;
 
@@ -31,6 +31,10 @@ public class ThisBlocks {
         }};
 
         dirSource = new DirSource("dir-source") {{
+            staticRequirements(this, distribution);
+        }};
+
+        anyVoid = new AnyVoid("any-void") {{
             staticRequirements(this, distribution);
         }};
 
@@ -138,7 +142,7 @@ public class ThisBlocks {
     }
 
     public static void staticRequirements(Block block, Category cat) {
-        block.requirements(cat, BuildVisibility.sandboxOnly, with());
+        block.requirements(cat, sandboxOnly, empty);
         block.alwaysUnlocked = true;
         block.placeableLiquid = true;
         block.description = TjBundle.description(block, "sandbox");
