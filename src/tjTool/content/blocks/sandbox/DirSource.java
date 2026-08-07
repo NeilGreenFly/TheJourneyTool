@@ -8,6 +8,7 @@ import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.Image;
+import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
@@ -72,6 +73,7 @@ public class DirSource extends BaseSource {
             turret.rotation = rotation;
             turret.block.placeEffect.at(turret, turret.block.size);
         });
+        config(Boolean.class, (DirSourceBuild build, Boolean v) -> build.tap = v);
     }
 
     @Override
@@ -99,6 +101,7 @@ public class DirSource extends BaseSource {
         public Seq<Liquid> coolants = new Seq<>();
         public float[] overdrives = {1.5f, 2.25f, 2.5f};
         public float heat;
+        public boolean tap = false;
 
         public Pack pack = new Pack(this).prefix(() -> w(target)).with(
                 TypeContent.unlockableContent(() -> new Image(target.uiIcon), () -> target.localizedName, () -> ammoTypes, () -> ammo).setAlwaysBuild(true).setLock(() -> target instanceof BaseTurret),
@@ -111,7 +114,25 @@ public class DirSource extends BaseSource {
                         .setFavorite(2).setLock(() -> targetBuild != null && target.canOverdrive)
         );
         public Layout layout = new Layout(this).with(
-                new Page(Icon.wrench).with(Selection.unlockableContent(() -> content.blocks().select(block -> block instanceof BaseTurret && block.size == targetBuild.block.size).as(), () -> targetBuild != null ? targetBuild.block : null)), // use ::as will throw NullPointerException.
+                new Page(Icon.wrench).with(Selection.unlockableContent(() -> content.blocks().select(block -> targetBuild instanceof BaseTurret.BaseTurretBuild && block instanceof BaseTurret && block.size == targetBuild.block.size).as(), () -> targetBuild != null ? targetBuild.block : null)), // use ::as will throw NullPointerException.
+                new Page(Icon.filters).with(new EmptyContent<>(table -> {
+                    table.defaults().left();
+                    table.table(t -> {
+                        var b = new ImageButton(Icon.play, Styles.clearNoneTogglei);
+                        b.resizeImage(iconSize);
+                        b.update(() -> b.setChecked(tap));
+                        b.changed(() -> configure(b.isChecked()));
+                        t.add(b).size(uiSize);
+                        t.add("启用点击");
+                    }).row();
+                    table.table(Tex.whiteui, t -> {
+                        t.image().height(3).growX().color(Pal.remove).row();
+                        t.add("注意:\n这只是测试功能, 慎用!").pad(4).color(Pal.remove).row();
+                        t.image().height(3).growX().color(Pal.remove).row();
+                    }).color(Color.black).margin(10).padTop(10).row();
+                    table.add("部分模组会添加\"手摇发电机\",\n但是很抱歉我不想自己点.").color(Color.gray).padTop(10).row();
+                    table.add("这个配置并不会被保存.\n文本也没做本地化.\n当个彩蛋, 删不删看心情.").color(Color.gray).padTop(10).row();
+                })),
                 new Page(Icon.link).with(new EmptyContent<>(table -> {
                     BaseDialog dialog = new BaseDialog("@openlink");
                     dialog.cont.label(() -> "即将打开链接").center().row();
@@ -238,16 +259,13 @@ public class DirSource extends BaseSource {
                         build.reloadCounter = 0f;
                     }
                 } else {
-                    if (ammo instanceof Liquid liquid)
-                        targetBuild.liquids.set(liquid, targetBuild.block.liquidCapacity);
-                    else
-                        ammoTypes.each(Liquid.class::isInstance, (Liquid liquid) -> targetBuild.liquids.set(liquid, 0f));
+                    if (ammo instanceof Liquid liquid) targetBuild.liquids.set(liquid, targetBuild.block.liquidCapacity);
+                    else ammoTypes.each(Liquid.class::isInstance, (Liquid liquid) -> targetBuild.liquids.set(liquid, 0f));
                 }
-                if (coolant != null)
-                    targetBuild.liquids.set(coolant, targetBuild.block.liquidCapacity);
-                else
-                    coolants.each(liquid -> targetBuild.liquids.set(liquid, 0f));
+                if (coolant != null) targetBuild.liquids.set(coolant, targetBuild.block.liquidCapacity);
+                else coolants.each(liquid -> targetBuild.liquids.set(liquid, 0f));
             }
+            if (tap) targetBuild.configTapped();
         }
 
         protected void rebuild(Table table) {
@@ -274,12 +292,12 @@ public class DirSource extends BaseSource {
                         ui.content.show(targetBuild.block);
                         Events.fire(new EventType.BlockInfoEvent());
                     }).tooltip("@info.title", true).size(uiSize).row();
-                    if (target instanceof BaseTurret) list.button(Icon.wrench, Styles.clearNonei, () -> {
+                    list.button(Icon.wrench, Styles.clearNonei, () -> {
                         table.background(null).clear();
                         leftList(table, t -> t.button(Icon.undo, Styles.clearNonei, () -> rebuild(table)).tooltip("@back", true).size(uiSize));
                         table.table(Tex.pane, t -> layout.build(block, t, false));
                         table.pack();
-                    }).tooltip(Core.bundle.format("table.change-turret", targetBuild.block.size), true).size(uiSize).row();
+                    }).tooltip(target instanceof BaseTurret ? Core.bundle.format("table.change-turret", targetBuild.block.size) : "...", true).size(uiSize).row();
                     list.button(Icon.eyeSmall, Styles.clearNonei, () -> {
                         shown = !shown;
                         rebuild(table);
