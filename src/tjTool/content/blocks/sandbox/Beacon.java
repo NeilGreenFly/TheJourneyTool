@@ -17,7 +17,6 @@ import mindustry.type.Item;
 import mindustry.type.Liquid;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
-import mindustry.world.blocks.storage.CoreBlock;
 import tjTool.core.*;
 
 import static mindustry.Vars.*;
@@ -77,17 +76,9 @@ public class Beacon extends SandboxBlock {
         public Layout layout = new Layout(this).with(
                 new Page(Icon.box).with(Selection.unlockableContent(content.items()::as, () -> c instanceof Item v ? v : null)),
                 new Page(Icon.liquid).with(Selection.unlockableContent(content.liquids()::as, () -> c instanceof Liquid v ? v : null)),
-                new Page(Icon.crafting).with(Selection.unlockableContent(content.blocks().select(this::canProduce)::as, () -> c instanceof Block v ? v : null)),
-                new Page(Icon.units).with(Selection.unlockableContent(content.units().select(this::canProduce)::as, () -> c instanceof UnitType v ? v : null))
+                new Page(Icon.crafting).with(Selection.unlockableContent(content.blocks().select(BaseSource::canProduce)::as, () -> c instanceof Block v ? v : null)),
+                new Page(Icon.units).with(Selection.unlockableContent(content.units().select(BaseSource::canProduce)::as, () -> c instanceof UnitType v ? v : null))
         );
-
-        public boolean canProduce(Block block) {
-            return block.isVisible() && !(block instanceof CoreBlock) && !state.rules.isBanned(block) && block.environmentBuildable();
-        }
-
-        public boolean canProduce(UnitType unit) {
-            return !unit.isHidden() && !unit.isBanned() && unit.supportsEnv(state.rules.env);
-        }
 
         public Color getColor() {
             return Tmp.c1.set(color == null ? team.color : color);

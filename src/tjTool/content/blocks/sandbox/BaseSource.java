@@ -8,7 +8,6 @@ import mindustry.world.Block;
 import mindustry.world.blocks.heat.HeatBlock;
 import mindustry.world.blocks.payloads.BuildPayload;
 import mindustry.world.blocks.payloads.UnitPayload;
-import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.BlockGroup;
 
 import static mindustry.Vars.*;
@@ -48,11 +47,11 @@ public abstract class BaseSource extends SandboxBlock {
         if (run.get(unitPayloadPool[unit.id])) unitPayloadPool[unit.id] = null;
     }
 
-    protected static boolean canProduce(Block block){
-        return block.isVisible() && !(block instanceof CoreBlock) && !state.rules.isBanned(block) && block.environmentBuildable();
+    protected static boolean canProduce(Block block) {
+        return block.isVisible() && !state.rules.isBanned(block) && block.environmentBuildable();
     }
 
-    protected static boolean canProduce(UnitType unit){
+    protected static boolean canProduce(UnitType unit) {
         return !unit.isHidden() && !unit.isBanned() && unit.supportsEnv(state.rules.env);
     }
 

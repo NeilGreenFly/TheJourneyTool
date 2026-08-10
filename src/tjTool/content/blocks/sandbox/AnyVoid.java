@@ -28,12 +28,12 @@ public class AnyVoid extends SandboxBlock {
         }
 
         @Override
-        public boolean acceptItem(Building source, Item item){
+        public boolean acceptItem(Building source, Item item) {
             return enabled;
         }
 
         @Override
-        public void handleItem(Building source, Item item){
+        public void handleItem(Building source, Item item) {
             items.handleFlow(item, 1);
         }
 
