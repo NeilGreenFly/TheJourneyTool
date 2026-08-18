@@ -2,25 +2,33 @@ package tjTool.core;
 
 import arc.Core;
 import arc.func.*;
+import arc.graphics.Color;
 import arc.scene.style.Drawable;
 import arc.scene.style.TextureRegionDrawable;
-import arc.scene.ui.ButtonGroup;
-import arc.scene.ui.ImageButton;
-import arc.scene.ui.ScrollPane;
-import arc.scene.ui.TextField;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.Cell;
+import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
+import arc.util.Scaling;
+import mindustry.core.UI;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
+import mindustry.type.ItemStack;
+import mindustry.type.LiquidStack;
 import mindustry.ui.Styles;
 import mindustry.world.Block;
 import mindustry.world.blocks.ItemSelection;
 
+import static arc.util.Strings.autoFixed;
 import static mindustry.Vars.control;
+import static mindustry.ui.Styles.none;
+import static mindustry.ui.Styles.outlineLabel;
+import static tjTool.core.TjFunc.*;
 
 /**
  * 由于旧的 {@code TjConfigTable} 将用户面和数据过度耦合导致极难扩展, 所以我们需要一种新的设计, 但是显然这需要一点时间...<p>
@@ -66,16 +74,36 @@ public class TjTable {
     public static final float uiSize = 44f;
     public static final float iconSize = 32f;
 
-    public static <T> void forEach(T[] it, ForCons<T> cons) {
-        for (int index = 0; index < it.length; index += 1) cons.get(index, it[index]);
+    public static Button.ButtonStyle style = new Button.ButtonStyle() {{
+        down = none;
+        up = none;
+    }};
+
+    public static Cell<Stack> stack(Table table, ItemStack itemStack, float craftTime) {
+        return stack(table, new Image(itemStack.item.uiIcon), (itemStack.amount >= 1000 ? UI.formatAmount(itemStack.amount) : String.valueOf(itemStack.amount)) + "\n[lightgray]" + autoFixed(itemStack.amount / craftTime * 60f, 3) + "[gray]/s[][]");
     }
 
-    public static <T> void forEach(Seq<T> it, ForCons<T> cons) {
-        for (int index = 0; index < it.size; index += 1) cons.get(index, it.get(index));
+    public static Cell<Stack> stack(Table table, ItemStack itemStack) {
+        return stack(table, new Image(itemStack.item.uiIcon), itemStack.amount >= 1000 ? UI.formatAmount(itemStack.amount) : String.valueOf(itemStack.amount));
+    }
+
+    public static Cell<Stack> stack(Table table, LiquidStack liquidStack) {
+        return stack(table, new Image(liquidStack.liquid.uiIcon), autoFixed(liquidStack.amount * 60f, 3));
+    }
+
+    public static Cell<Stack> stack(Table table, Image image, String string) {
+        return stack(table, image, string, Color.white);
+    }
+
+    public static Cell<Stack> stack(Table table, Image image, String string, Color color) {
+        return table.stack(
+                new Table(t -> t.center().add(image).color(color).size(iconSize).scaling(Scaling.fit)),
+                new Table(t -> t.left().bottom().add(string).style(outlineLabel))
+        ).size(uiSize);
     }
 
     public static void leftList(Table table, Cons<Table> cons) {
-        table.table(Tex.paneLeft, t -> t.table(cons).pad(-12)).top();
+        table.table(Tex.paneLeft, cons).margin(0).top();
     }
 
     public static class Layout {

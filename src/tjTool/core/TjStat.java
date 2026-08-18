@@ -5,14 +5,25 @@ import arc.scene.event.*;
 import arc.scene.ui.Image;
 import arc.scene.ui.layout.Table;
 import arc.util.Strings;
+import mindustry.gen.Icon;
+import mindustry.graphics.Pal;
 import mindustry.type.Liquid;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.defense.turrets.ReloadTurret;
 import mindustry.world.meta.*;
 
+import static arc.util.Strings.autoFixed;
+import static mindustry.gen.Tex.*;
+import static mindustry.world.meta.StatCat.*;
+import static mindustry.world.meta.StatValues.withTooltip;
+import static tjTool.core.TjTable.*;
+
 public class TjStat {
-    public static final Stat config = new Stat("config", StatCat.function);
+
+    public static final Stat config = new Stat("config", function);
+    public static final Stat multiConsumersConfig = new Stat("config", crafting);
+
     public static BaseDialog updateDialog = new BaseDialog(TjBundle.getThis("saying")) {{
         cont.table(TjConfigTable.updateLog);
         addCloseButton();
@@ -28,6 +39,28 @@ public class TjStat {
                 }
             });
         };
+    }
+
+    public static StatValue multiConsumersConfig(MultiConsumer[] multiConsumers) {
+        return table -> table.row().table(paneLeft, multi -> {
+            for (var consumer : multiConsumers) {
+                multi.table(input -> {
+                    input.left();
+                    for (var v : consumer.input.items) withTooltip(stack(input, v, consumer.craftTime).get(), v.item, true);
+                    for (var v : consumer.input.liquids) withTooltip(stack(input, v).get(), v.liquid, true);
+                    if (consumer.consPower()) stack(input, new Image(Icon.power), autoFixed(consumer.usage * 60f, 3) + "[gray]/s[]", Pal.accent);
+                    if (consumer.consHeat()) stack(input, new Image(Icon.waves), String.valueOf((int) consumer.heatRequirement), Pal.remove);
+                }).growX();
+                multi.image(Icon.rightOpen).padLeft(10).padRight(10);
+                multi.add(autoFixed(consumer.craftTime / 60f, 3) + "[gray]s[]");
+                multi.image(Icon.rightOpen).padLeft(10).padRight(10);
+                multi.table(output -> {
+                    output.right();
+                    for (var v : consumer.output.items) withTooltip(stack(output, v, consumer.craftTime).get(), v.item, true);
+                    for (var v : consumer.output.liquids) withTooltip(stack(output, v).get(), v.liquid, true);
+                }).growX().padTop(10).padBottom(10).row();
+            }
+        }).marginLeft(30).padTop(5);
     }
 
     public static void newConfigStats(Table table, TextureRegion region, String name, String description) {

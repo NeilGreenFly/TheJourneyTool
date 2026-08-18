@@ -22,6 +22,7 @@ import mindustry.world.blocks.ItemSelection;
 import mindustry.world.meta.BlockGroup;
 
 import static mindustry.Vars.*;
+import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjTable.*;
 
 /** Stay tuned */
@@ -155,7 +156,7 @@ public class MultiSorter extends Block {
         }
 
         protected short[] configPack(Item item, boolean enabled) {
-            return new short[]{item != null ? item.id : -1, (short) (enabled ? 1 : 0)};
+            return new short[]{item != null ? item.id : -1, (short) byBool(enabled)};
         }
 
         @Override

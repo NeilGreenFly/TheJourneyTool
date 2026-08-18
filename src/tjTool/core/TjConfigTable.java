@@ -4,24 +4,22 @@ import arc.func.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Collapser;
-import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
-import arc.util.Scaling;
-import arc.util.Strings;
-import mindustry.core.UI;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
+import mindustry.type.LiquidStack;
 import mindustry.ui.Styles;
 import mindustry.world.Block;
 import mindustry.world.consumers.ConsumeItems;
 import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.world.consumers.ConsumeLiquids;
 
+import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjTable.*;
 
 @SuppressWarnings("unused")
@@ -47,7 +45,7 @@ public class TjConfigTable {
         }
 
         public int[] config() {
-            int i = prefix != null ? 1 : 0;
+            int i = byBool(prefix != null);
             var contents = this.contents.select(BaseContent::isEnabled);
             int[] items = new int[contents.size + i];
             if (prefix != null) items[0] = prefix.get();
@@ -114,18 +112,17 @@ public class TjConfigTable {
                     t.defaults().size(uiSize);
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
                     group.setMinCheckCount(0);
-                    for (int i = 0; i < buttonRegion.size; i += 1) {
-                        final int item = i;
+                    forRange(buttonRegion.size, i -> {
                         if (holder != null) {
-                            ImageButton button = t.button(buttonRegion.get(item), Styles.clearNoneTogglei, iconSize, () -> {
-                            }).tooltip(buttonTip.get(item), true).group(group).get();
-                            button.changed(() -> call(button.isChecked() ? item : -1));
-                            button.update(() -> button.setChecked(holder.get() == item));
+                            ImageButton button = t.button(buttonRegion.get(i), Styles.clearNoneTogglei, iconSize, () -> {
+                            }).tooltip(buttonTip.get(i), true).group(group).get();
+                            button.changed(() -> call(button.isChecked() ? i : -1));
+                            button.update(() -> button.setChecked(holder.get() == i));
                         } else {
-                            t.table(f -> f.image(buttonRegion.get(item)).tooltip(buttonTip.get(item), true).maxSize(iconSize).center());
+                            t.table(f -> f.image(buttonRegion.get(i)).tooltip(buttonTip.get(i), true).maxSize(iconSize).center());
                         }
                         if (i % 8 == 7) t.row();
-                    }
+                    });
                 }).left();
                 if (holder != null) {
                     table.button(Icon.undo, Styles.clearNonei, iconSize, () -> call(-1)).size(uiSize).tooltip("@table.reset", true).center();
@@ -265,55 +262,31 @@ public class TjConfigTable {
                             for (var c : block.get().consumers) if (item instanceof Item v && c instanceof ConsumeItems cItems) {
                                 for (var cItem : cItems.items) if (v == cItem.item) {
                                     b = true;
-                                    row.add(stack(v, cItem.amount));
+                                    stack(row, cItem).tooltip(cItem.item.localizedName, true);
                                     break;
                                 }
                                 if (b) break;
                             } else if (item instanceof Liquid v) {
                                 if (c instanceof ConsumeLiquid cLiquid && v == cLiquid.liquid) {
                                     b = true;
-                                    row.add(stack(v, cLiquid.amount));
+                                    stack(row, new LiquidStack(cLiquid.liquid, cLiquid.amount)).tooltip(cLiquid.liquid.localizedName);
                                     break;
                                 } else if (c instanceof ConsumeLiquids cLiquids) {
                                     for (var cLiquid : cLiquids.liquids) if (v == cLiquid.liquid) {
                                         b = true;
-                                        row.add(stack(v, cLiquid.amount));
+                                        stack(row, cLiquid).tooltip(cLiquid.liquid.localizedName);
                                         break;
                                     }
                                 }
                                 if (b) break;
                             }
-                            if (!b) row.add(stack(item));
+                            if (!b) stack(row, new Image(item.uiIcon), "").tooltip(item.localizedName);
                             if (i % 8 == 7) row.row();
                         });
                     }).left();
                 } else table.image(Icon.cancel).size(iconSize).center();
                 return table;
             };
-        }
-
-        protected Stack stack(UnlockableContent item) {
-            Stack stack = new Stack();
-            stack.add(new Table(o -> o.center().add(new Image(item.uiIcon)).size(iconSize).tooltip(item.localizedName, true).scaling(Scaling.fit)));
-            return stack;
-        }
-
-        protected Stack stack(Item item, int amount) {
-            Stack stack = stack(item);
-            if(amount != 0) stack.add(new Table(t -> {
-                t.left().bottom().add(amount >= 1000 ? UI.formatAmount(amount) : String.valueOf(amount)).style(Styles.outlineLabel);
-                t.pack();
-            }));
-            return stack;
-        }
-
-        protected Stack stack(Liquid liquid, float amount) {
-            Stack stack = stack(liquid);
-            if(amount != 0) stack.add(new Table(t -> {
-                t.left().bottom().add(Strings.autoFixed(amount * 60f, 3)).style(Styles.outlineLabel);
-                t.pack();
-            }));
-            return stack;
         }
 
         @Override

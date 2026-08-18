@@ -20,6 +20,7 @@ import mindustry.world.Block;
 import tjTool.core.*;
 
 import static mindustry.Vars.*;
+import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjTable.*;
 
 public class Beacon extends SandboxBlock {
@@ -64,8 +65,7 @@ public class Beacon extends SandboxBlock {
     @Override
     public void load() {
         super.load();
-        for (int i = 0; i < 4; i += 1)
-            teamIcons[i] = Core.atlas.find("team-" + Team.baseTeams[i]);
+        forRange(4, i -> teamIcons[i] = Core.atlas.find("team-" + Team.baseTeams[i]));
     }
 
     @SuppressWarnings("unused")

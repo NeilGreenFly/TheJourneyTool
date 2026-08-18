@@ -10,6 +10,7 @@ import static mindustry.Vars.world;
 import static mindustry.world.blocks.power.PowerNode.makeBatteryBalance;
 import static mindustry.world.blocks.power.PowerNode.makePowerBalance;
 import static tjTool.core.TjAutoTile.*;
+import static tjTool.core.TjFunc.*;
 
 public class SolarSource extends SolarGenerator {
     TextureRegion[] regions;
@@ -81,9 +82,9 @@ public class SolarSource extends SolarGenerator {
 
         public void proximityTileUpdate() {
             index = 0;
-            for (int i = 0; i < d8.length; i += 1)
-                if (checkBuild(world.build(tileX() + d8[i].x, tileY() + d8[i].y)))
-                    index |= 1 << i;
+            forEach(d8, (i, d8i) -> {
+                if (checkBuild(world.build(tileX() + d8i.x, tileY() + d8i.y))) index |= 1 << i;
+            });
         }
     }
 }
