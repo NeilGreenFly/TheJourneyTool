@@ -2,6 +2,7 @@
 
 - 📌[Mindustry](https://github.com/Anuken/Mindustry)
 - 📌[MindustryX](https://github.com/TinyLake/MindustryX)
+- 📌[mindustry-mod](https://github.com/topics/mindustry-mod)
 - Subscribe to [NeilGreenFly](https://space.bilibili.com/1649414414) !
 
 此模组是为解决在测试新版本建筑时频繁配置物品源等沙盒方块产生的繁琐操作，因此我们添加了无需配置的`AnySource`(任意源)， 它可以同时高速输出所有的物品种类、液体种类、载荷种类和相当于`heat-source`的热量，目前已几乎覆盖原版所有可能需要的消耗种类需求。

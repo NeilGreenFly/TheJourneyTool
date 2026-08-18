@@ -11,6 +11,7 @@ import arc.scene.ui.Button;
 import arc.scene.ui.Image;
 import arc.scene.ui.layout.Table;
 import arc.struct.EnumSet;
+import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
@@ -32,6 +33,7 @@ import tjTool.core.MultiConsumer;
 
 import static arc.util.Strings.*;
 import static mindustry.Vars.*;
+import static mindustry.world.blocks.power.PowerNode.makePowerBalance;
 import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjStat.multiConsumersConfig;
 import static tjTool.core.TjTable.*;
@@ -47,6 +49,7 @@ public class MultiCrafter extends Block {
     public float updateEffectSpread = 4f;
     public float warmupSpeed = 0.019f;
     public int[] capacities;
+    protected @Nullable Table consumption = null;
 
     public MultiCrafter(String name) {
         super(name);
@@ -111,6 +114,7 @@ public class MultiCrafter extends Block {
         super.setBars();
         removeBar("items");
         removeBar("liquid");
+        addBar("power", makePowerBalance());
         addBar("heat", (MultiCrafterBuild building) -> new Bar(() ->
                 Core.bundle.format("bar.heatpercent", (int) (building.heat + 0.01f), (int) (building.efficiencyScale() * 100 + 0.01f)),
                 () -> Pal.lightOrange,
@@ -270,6 +274,7 @@ public class MultiCrafter extends Block {
                         var button = new Button(style);
                         button.clicked(() -> {
                             if (currentConsumer != i) configure(i);
+                            if (consumption != null) displayConsumption(consumption);
                         });
                         button.update(() -> {
                             if (!(currentConsumer == i && image.c != i)) return;
@@ -303,6 +308,13 @@ public class MultiCrafter extends Block {
         public boolean onConfigureBuildTapped(Building other) {
             if (this == other) deselect();
             return this != other;
+        }
+
+        @Override
+        public void displayConsumption(Table table) {
+            consumption = table;
+            table.clear();
+            currentConsumer().buildBar(table.left(), this);
         }
 
         @Override

@@ -1,10 +1,13 @@
 package tjTool.core;
 
+import arc.scene.ui.layout.Table;
 import mindustry.gen.Building;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
+import mindustry.ui.ReqImage;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
+import static mindustry.world.meta.StatValues.stack;
 
 public class MultiConsumer {
     public float craftTime = 60;
@@ -68,6 +71,14 @@ public class MultiConsumer {
 
     public void trigger(Building building) {
         for (var v : input.items) building.items.remove(v.item, v.amount);
+    }
+
+    public void buildBar(Table table, Building building) {
+        table.table(c -> {
+            c.defaults().padRight(8);
+            for (var v : input.items) c.add(new ReqImage(stack(v.item, v.amount), () -> building.items.has(v.item, v.amount)));
+            for (var v : input.liquids) c.add(new ReqImage(v.liquid.uiIcon, () -> building.liquids.get(v.liquid) > 0)).size(iconMed);
+        });
     }
 
     public static class MultiStack {
