@@ -12,6 +12,7 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.defense.turrets.ReloadTurret;
 import mindustry.world.meta.*;
+import tjTool.world.consumers.MultiConsumer;
 
 import static arc.util.Strings.autoFixed;
 import static mindustry.gen.Tex.*;

@@ -5,7 +5,7 @@ description: "旅途有你,才叫旅途.\n添加了更多调试工具便于测�
 name: tj-tool
 author: NeilGreenFly
 
-main: tjTool.ThisMain
+main: tjTool.TheJourney
 
 version: 1.1.6
 minGameVersion: 159.2
