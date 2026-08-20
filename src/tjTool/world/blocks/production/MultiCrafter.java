@@ -29,11 +29,10 @@ import mindustry.world.blocks.heat.HeatConsumer;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawDefault;
 import mindustry.world.meta.BlockFlag;
-import tjTool.world.consumers.MultiConsumer;
+import tjTool.world.consumers.*;
 
 import static arc.util.Strings.*;
 import static mindustry.Vars.*;
-import static mindustry.world.blocks.power.PowerNode.makePowerBalance;
 import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjStat.multiConsumersConfig;
 import static tjTool.core.TjTable.*;
@@ -41,7 +40,7 @@ import static tjTool.core.TjTable.*;
 public class MultiCrafter extends Block {
     public DrawBlock drawer = new DrawDefault();
     public boolean buttonDrop = false;
-    public MultiConsumer[] multiConsumers;
+    public MultiConsumer multiConsumers;
     public boolean dumpExtraLiquid = true;
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
@@ -71,24 +70,17 @@ public class MultiCrafter extends Block {
     }
 
     protected int checkConsumer(int index) {
-        return 0 <= index && index < multiConsumers.length ? index : 0;
+        return 0 <= index && index < multiConsumers.consumers.length ? index : 0;
     }
 
     @Override
     public void init() {
         super.init();
-        capacities = new int[content.items().size];
-        itemCapacity = 0;
-        for (var c : multiConsumers) {
-            if (c.consPower()) hasPower = true;
-            for (var stack : c.input.liquids) liquidFilter[stack.liquid.id] = true;
-            for (var stack : c.input.items) {
-                itemFilter[stack.item.id] = true;
-                int amount = stack.amount * 4;
-                if (capacities[stack.item.id] < amount) capacities[stack.item.id] = amount;
-                if (itemCapacity < amount) itemCapacity = amount;
-            }
-        }
+        itemFilter = multiConsumers.itemFilter;
+        liquidFilter = multiConsumers.liquidFilter;
+        hasPower = multiConsumers.hasPower;
+        itemCapacity = multiConsumers.itemCapacity;
+        capacities = multiConsumers.capacities;
         if (hasPower) consumePowerDynamic((MultiCrafterBuild building) -> building.currentConsumer().usage);
     }
 
@@ -114,12 +106,16 @@ public class MultiCrafter extends Block {
         super.setBars();
         removeBar("items");
         removeBar("liquid");
-        addBar("power", makePowerBalance());
-        addBar("heat", (MultiCrafterBuild building) -> new Bar(() ->
-                Core.bundle.format("bar.heatpercent", (int) (building.heat + 0.01f), (int) (building.efficiencyScale() * 100 + 0.01f)),
+        if (multiConsumers.hasPower) addBar("power", entity -> new Bar(
+                () -> Core.bundle.get("bar.power"),
+                () -> Pal.powerBar,
+                () -> Mathf.zero(consPower.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status)
+        );
+        if (multiConsumers.hasHeat) addBar("heat", (MultiCrafterBuild building) -> new Bar(
+                () -> Core.bundle.format("bar.heatpercent", (int) (building.heat + 0.01f), (int) (building.efficiencyScale() * 100 + 0.01f)),
                 () -> Pal.lightOrange,
                 () -> building.currentConsumer().consHeat() ? building.heat / building.currentConsumer().heatRequirement : 1));
-        for (var c : multiConsumers) {
+        for (var c : multiConsumers.consumers) {
             for (var stack : c.input.liquids) addLiquidBar(stack.liquid);
             for (var stack : c.output.liquids) addLiquidBar(stack.liquid);
         }
@@ -134,8 +130,8 @@ public class MultiCrafter extends Block {
         public float totalProgress;
         public float warmup;
 
-        public MultiConsumer currentConsumer() {
-            return multiConsumers[currentConsumer];
+        public SingleConsumer currentConsumer() {
+            return multiConsumers.consumers[currentConsumer];
         }
 
         @Override
@@ -159,11 +155,10 @@ public class MultiCrafter extends Block {
         public void dumpOutputs() {
             var cc = currentConsumer();
             if (timer(timerDump, dumpTime / timeScale))
-                for (var c : multiConsumers) for (var v : c.output.items)
+                for (var c : multiConsumers.consumers) for (var v : c.output.items)
                     if (!cc.input.itemFilter[v.item.id]) dump(v.item);
-            for (var c : multiConsumers) for (var v : c.output.liquids)
+            for (var c : multiConsumers.consumers) for (var v : c.output.liquids)
                 if (!cc.input.liquidFilter[v.liquid.id]) dumpLiquid(v.liquid, 2f, -1);
-            // liquidOutputDirections.length > i ? liquidOutputDirections[i] : -1
         }
 
         @Override
@@ -255,7 +250,7 @@ public class MultiCrafter extends Block {
                     new Table(t -> t.add(image).growX().height(uiSize).padTop(!buttonDrop ? uiSize * currentConsumer : 0)).top(),
                     new Table(t -> {
                         t.marginLeft(10).marginRight(10);
-                        for (var consumer : multiConsumers) {
+                        for (var consumer : multiConsumers.consumers) {
                             t.table(input -> {
                                 input.left();
                                 for (var v : consumer.input.items) stack(input, v);
@@ -270,7 +265,7 @@ public class MultiCrafter extends Block {
                             }).growX().row();
                         }
                     }),
-                    new Table(t -> forEach(multiConsumers, (i, consumer) -> {
+                    new Table(t -> forEach(multiConsumers.consumers, (i, consumer) -> {
                         var button = new Button(style);
                         button.clicked(() -> {
                             if (currentConsumer != i) configure(i);
@@ -314,7 +309,7 @@ public class MultiCrafter extends Block {
         public void displayConsumption(Table table) {
             consumption = table;
             table.clear();
-            currentConsumer().buildBar(table.left(), this);
+            currentConsumer().displayConsumption(table.left(), this);
         }
 
         @Override
@@ -361,6 +356,13 @@ public class MultiCrafter extends Block {
         public double sense(LAccess sensor) {
             if (sensor == LAccess.heat) return heat;
             return super.sense(sensor);
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor) {
+            // TODO How to return a int number?
+            if (sensor == LAccess.config) return content.item(currentConsumer);
+            return super.senseObject(sensor);
         }
 
         @Override

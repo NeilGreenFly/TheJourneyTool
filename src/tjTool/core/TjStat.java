@@ -42,9 +42,9 @@ public class TjStat {
         };
     }
 
-    public static StatValue multiConsumersConfig(MultiConsumer[] multiConsumers) {
+    public static StatValue multiConsumersConfig(MultiConsumer multiConsumers) {
         return table -> table.row().table(paneLeft, multi -> {
-            for (var consumer : multiConsumers) {
+            for (var consumer : multiConsumers.consumers) {
                 multi.table(input -> {
                     input.left();
                     for (var v : consumer.input.items) withTooltip(stack(input, v, consumer.craftTime).get(), v.item, true);

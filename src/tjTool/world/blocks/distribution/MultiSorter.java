@@ -159,7 +159,7 @@ public class MultiSorter extends Block {
 
         @Override
         public void buildConfiguration(Table table) {
-            leftList(table, t -> t.button(Icon.wrench, Styles.clearNonei, () -> configure(configPack(sortItem, !enabled))).tooltip("...", true).size(uiSize));
+            leftList(table, t -> t.button(Icon.wrench, Styles.clearNonei, () -> configure(configPack(sortItem, !enabled))).tooltip("@table.toggle", true).size(uiSize));
             ItemSelection.buildTable(block, table, content.items(), () -> sortItem, item -> configure(configPack(item, enabled)), selectionRows, selectionColumns);
         }
 
