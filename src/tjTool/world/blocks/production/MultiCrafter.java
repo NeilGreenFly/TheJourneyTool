@@ -33,6 +33,7 @@ import tjTool.world.consumers.*;
 
 import static arc.util.Strings.*;
 import static mindustry.Vars.*;
+import static mindustry.world.meta.StatValues.withTooltip;
 import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjStat.multiConsumersConfig;
 import static tjTool.core.TjTable.*;
@@ -99,6 +100,14 @@ public class MultiCrafter extends Block {
     public void setStats() { // TODO 这部分 ui 过于紧凑了, 需要使用更合适的布局方式.
         super.setStats();
         stats.add(multiConsumersConfig, multiConsumersConfig(multiConsumers));
+        stats.add(multiConsumersConfig, table -> table.row().table(Tex.paneLeft, t -> {
+            for (var c : multiConsumers.optionalConsumers) {
+                for (var v : c.input.items) withTooltip(stack(t, v).get(), v.item, true);
+                for (var v : c.input.liquids) withTooltip(stack(t, v).get(), v.liquid, true);
+                t.add().growX();
+                t.add(autoFixed(c.efficiency * 100, 3) + "%").row();
+            }
+        }).marginLeft(30).growX().padTop(10));
     }
 
     @Override
@@ -119,11 +128,14 @@ public class MultiCrafter extends Block {
             for (var stack : c.input.liquids) addLiquidBar(stack.liquid);
             for (var stack : c.output.liquids) addLiquidBar(stack.liquid);
         }
+        if (multiConsumers.hasOption()) for (var c : multiConsumers.optionalConsumers)
+            for (var stack : c.input.liquids) addLiquidBar(stack.liquid);
     }
 
     @SuppressWarnings("unused")
     public class MultiCrafterBuild extends Building implements HeatConsumer {
         public int currentConsumer = 0;
+        public int option = -1;
         public float[] sideHeat = new float[4];
         public float heat = 0f;
         public float progress;
@@ -141,13 +153,12 @@ public class MultiCrafter extends Block {
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid) {
-            return super.acceptLiquid(source, liquid) && currentConsumer().input.liquidFilter[liquid.id];
+            return hasLiquids && multiConsumers.acceptLiquid(currentConsumer, liquid);
         }
 
         public void craft() {
-            var cc = currentConsumer();
-            cc.trigger(this);
-            for (var c : cc.output.items) forRange(c.amount, i -> offload(c.item));
+            multiConsumers.trigger(currentConsumer, option, this);
+            for (var c : currentConsumer().output.items) forRange(c.amount, i -> offload(c.item));
             if (wasVisible) craftEffect.at(x, y);
             progress %= 1f;
         }
@@ -208,15 +219,9 @@ public class MultiCrafter extends Block {
                 shouldConsumePower = false;
                 return;
             }
-            efficiency = optionalEfficiency = 1;
-            float e = cc.efficiency(this);
-            shouldConsumePower = e > 1e-7f;
-            efficiency = Math.min(cc.consPower() ? power.status : 1, e);
-            potentialEfficiency = efficiency;
-            boolean update = shouldConsume() && productionValid();
-            if (!update) efficiency = optionalEfficiency = 0;
+            multiConsumers.efficiency(this, currentConsumer, option -> this.option = option);
             updateEfficiencyMultiplier();
-            if (update && this.efficiency > 0) cc.update(this);
+            if (efficiency > 0) multiConsumers.update(currentConsumer, option, this);
         }
 
         @Override

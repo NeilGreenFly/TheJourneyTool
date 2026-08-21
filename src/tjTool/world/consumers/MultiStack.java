@@ -27,12 +27,12 @@ public class MultiStack {
         this(null, null);
     }
 
-    public static ItemStack[] with(Item v, Object... items) {
-        return ItemStack.with(withInit(v, items));
+    public static ItemStack[] with(Item v, Object... n) {
+        return ItemStack.with(withInit(v, n));
     }
 
-    public static LiquidStack[] with(Liquid v, Object... items) {
-        return LiquidStack.with(withInit(v, items));
+    public static LiquidStack[] with(Liquid v, Object... n) {
+        return LiquidStack.with(withInit(v, n));
     }
 
     protected static Object[] withInit(Object v, Object... items) {

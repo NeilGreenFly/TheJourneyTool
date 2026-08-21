@@ -9,9 +9,8 @@ import mindustry.ui.ReqImage;
 import static mindustry.Vars.*;
 import static mindustry.world.meta.StatValues.stack;
 
-public class SingleConsumer {
+public class SingleConsumer extends BaseConsumer {
     public float craftTime = 60;
-    public MultiStack input;
     public MultiStack output;
     public float usage = 0;
     public float heatRequirement = 0;
@@ -62,24 +61,6 @@ public class SingleConsumer {
 
     public boolean consHeat() {
         return heatRequirement > 0;
-    }
-
-    public float efficiency(Building building) {
-        if (!(building.consumeTriggerValid() || building.items.has(input.items, 1))) return 0;
-        float delta = building.edelta() * building.efficiencyScale();
-        if (delta <= 1e-8f) return 0f;
-        float min = 1f;
-        for (var stack : input.liquids)
-            min = Math.min(building.liquids.get(stack.liquid) / (stack.amount * delta), min);
-        return min;
-    }
-
-    public void update(Building building) {
-        for (var v : input.liquids) building.liquids.remove(v.liquid, v.amount * building.edelta());
-    }
-
-    public void trigger(Building building) {
-        for (var v : input.items) building.items.remove(v.item, v.amount);
     }
 
     public void displayConsumption(Table table, Building building) {

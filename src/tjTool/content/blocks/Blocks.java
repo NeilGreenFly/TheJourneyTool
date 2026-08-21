@@ -6,7 +6,7 @@ import tjTool.core.TjBundle;
 import tjTool.world.blocks.defense.*;
 import tjTool.world.blocks.distribution.*;
 import tjTool.world.blocks.production.*;
-import tjTool.world.consumers.MultiConsumer;
+import tjTool.world.consumers.*;
 
 import static mindustry.content.Items.*;
 import static mindustry.content.Liquids.*;
@@ -80,6 +80,8 @@ public class Blocks {
                     by(2)
                             .inputBy(null, with(cryofluid, 12 / 60f))
                             .outputBy(with(titanium, 1), with(water, 12 / 60f, nitrogen, 36 / 60f)) //.powerPerSec(60)
+            ).optional(
+                    OptionalConsumer.by(null, with(cyanogen, 2 / 60f))
             );
         }};
 
