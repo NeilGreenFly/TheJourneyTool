@@ -3,7 +3,6 @@ package tjTool.world.blocks.production;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.TextureRegion;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.scene.actions.Actions;
@@ -24,11 +23,9 @@ import mindustry.logic.LAccess;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
 import mindustry.ui.Bar;
-import mindustry.world.Block;
 import mindustry.world.blocks.heat.HeatConsumer;
-import mindustry.world.draw.DrawBlock;
-import mindustry.world.draw.DrawDefault;
 import mindustry.world.meta.BlockFlag;
+import tjTool.world.blocks.TjBlock;
 import tjTool.world.consumers.*;
 
 import static arc.util.Strings.*;
@@ -38,8 +35,7 @@ import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjStat.multiConsumersConfig;
 import static tjTool.core.TjTable.*;
 
-public class MultiCrafter extends Block {
-    public DrawBlock drawer = new DrawDefault();
+public class MultiCrafter extends TjBlock {
     public boolean buttonDrop = false;
     public MultiConsumer multiConsumers;
     public boolean dumpExtraLiquid = true;
@@ -59,11 +55,14 @@ public class MultiCrafter extends Block {
         hasLiquids = true;
         sync = true;
         drawArrow = false;
-        configurable = true;
         saveConfig = true;
         ambientSound = Sounds.loopMachine;
         ambientSoundVolume = 0.03f;
         flags = EnumSet.of(BlockFlag.factory);
+    }
+
+    @Override
+    protected void config() {
         config(Integer.class, (MultiCrafterBuild build, Integer v) -> {
             build.currentConsumer = checkConsumer(v);
             build.progress = 0;
@@ -77,23 +76,13 @@ public class MultiCrafter extends Block {
     @Override
     public void init() {
         super.init();
+        configurable = multiConsumers.consumers.length > 1;
         itemFilter = multiConsumers.itemFilter;
         liquidFilter = multiConsumers.liquidFilter;
         hasPower = multiConsumers.hasPower;
         itemCapacity = multiConsumers.itemCapacity;
         capacities = multiConsumers.capacities;
         if (hasPower) consumePowerDynamic((MultiCrafterBuild building) -> building.currentConsumer().usage);
-    }
-
-    @Override
-    public void load() {
-        super.load();
-        drawer.load(this);
-    }
-
-    @Override
-    protected TextureRegion[] icons() {
-        return drawer.finalIcons(this);
     }
 
     @Override
@@ -105,7 +94,7 @@ public class MultiCrafter extends Block {
                 for (var v : c.input.items) withTooltip(stack(t, v).get(), v.item, true);
                 for (var v : c.input.liquids) withTooltip(stack(t, v).get(), v.liquid, true);
                 t.add().growX();
-                t.add(autoFixed(c.efficiency * 100, 3) + "%").row();
+                t.add(Core.bundle.format("stat.efficiency", c.efficiency * 100)).row();
             }
         }).marginLeft(30).growX().padTop(10));
     }
@@ -133,7 +122,7 @@ public class MultiCrafter extends Block {
     }
 
     @SuppressWarnings("unused")
-    public class MultiCrafterBuild extends Building implements HeatConsumer {
+    public class MultiCrafterBuild extends TjBuilding implements HeatConsumer {
         public int currentConsumer = 0;
         public int option = -1;
         public float[] sideHeat = new float[4];
@@ -319,7 +308,7 @@ public class MultiCrafter extends Block {
 
         @Override
         public void draw() {
-            drawer.draw(this);
+            super.draw();
             if (renderer.drawStatus) drawStatus();
         }
 

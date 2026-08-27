@@ -10,6 +10,7 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.liquid.LiquidBlock;
 import mindustry.world.draw.*;
+import tjTool.world.draw.DrawBottom;
 import tjTool.world.blocks.sandbox.*;
 import tjTool.core.*;
 
@@ -103,7 +104,7 @@ public class SandboxBlocks {
                 healPercent = 4f / 60f;
                 Color col = Color.valueOf("8ca9e8");
                 drawer = new DrawMulti(
-                        new DrawRegion("-bottom"),
+                        new DrawBottom(),
                         new DrawLiquidTile(Liquids.hydrogen, 9f / 4f) {
                             @Override
                             public void draw(Building build) {

@@ -8,6 +8,7 @@ import mindustry.type.LiquidStack;
 import static mindustry.Vars.content;
 import static tjTool.core.TjFunc.forRange;
 
+@SuppressWarnings("unused")
 public class MultiStack {
     public ItemStack[] items;
     public LiquidStack[] liquids;
@@ -36,8 +37,9 @@ public class MultiStack {
     }
 
     protected static Object[] withInit(Object v, Object... items) {
-        Object[] with = new Object[items.length + 1];
+        Object[] with = new Object[(items.length + 2) & ~1];
         with[0] = v;
+        with[with.length - 1] = 1;
         forRange(items.length, i -> with[i + 1] = items[i]);
         return with;
     }

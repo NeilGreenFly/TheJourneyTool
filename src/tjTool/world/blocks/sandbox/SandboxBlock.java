@@ -3,31 +3,24 @@ package tjTool.world.blocks.sandbox;
 import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.util.Eachable;
 import mindustry.Vars;
-import mindustry.ctype.UnlockableContent;
-import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.graphics.*;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
-import mindustry.world.Block;
-import mindustry.world.draw.DrawBlock;
-import mindustry.world.draw.DrawDefault;
 import mindustry.world.meta.Env;
 import tjTool.core.*;
+import tjTool.world.blocks.TjBlock;
 
 import static mindustry.Vars.*;
 
-public abstract class SandboxBlock extends Block {
+public abstract class SandboxBlock extends TjBlock {
     public static Building input;
 
-    public DrawBlock drawer = new DrawDefault();
     public boolean drawProximity = false;
 
     public SandboxBlock(String name) {
         super(name);
-        config();
 
         hasPower =
         outputsPower =
@@ -35,31 +28,20 @@ public abstract class SandboxBlock extends Block {
         conductivePower =
         hasItems =
         hasLiquids =
-        unloadable =
+        unloadable = false;
 
-        rotateDraw = false;
-
-        noUpdateDisabled = true;
         update = true;
         solid = true;
 
         configurable = false;
         saveConfig = false;
         clearOnDoubleTap = false;
-        selectionRows = 5;
-        selectionColumns = 6;
 
         envEnabled = Env.any;
         schematicPriority = -9;
         canOverdrive = false;
         placeableLiquid = true;
         alwaysUnlocked = true;
-    }
-
-    protected void config() {}
-
-    protected static <T extends UnlockableContent> short w(T t) {
-        return t != null ? t.id : -1;
     }
 
     public TextureRegion atlasFind(String suffix) {
@@ -80,28 +62,11 @@ public abstract class SandboxBlock extends Block {
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
         super.drawPlace(x, y, rotation, valid);
-        if (!rotate)
-            TjDraw.drawPlace(this, x, y, valid);
-    }
-
-    @Override
-    public void load() {
-        super.load();
-        drawer.load(this);
-    }
-
-    @Override
-    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
-        drawer.drawPlan(this, plan, list);
-    }
-
-    @Override
-    protected TextureRegion[] icons() {
-        return drawer.finalIcons(this);
+        if (!rotate) TjDraw.drawPlace(this, x, y, valid);
     }
 
     @SuppressWarnings("unused")
-    public abstract class SandboxBuild extends Building {
+    public abstract class SandboxBuild extends TjBuilding {
         protected float selectingDrawRadius = 0f;
 
         public boolean checkBuild(Building other) {
@@ -117,19 +82,13 @@ public abstract class SandboxBlock extends Block {
 
         @Override
         public void draw() {
-            drawer.draw(this);
+            super.draw();
             drawSelecting();
         }
 
         @Override
         public void drawConfigure() {
             TjDraw.lightPoly(this, TjDraw.rainbow);
-        }
-
-        @Override
-        public void drawLight() {
-            super.drawLight();
-            drawer.drawLight(this);
         }
 
         @Override

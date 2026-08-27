@@ -3,6 +3,7 @@ package tjTool.content.blocks;
 import mindustry.world.Block;
 import mindustry.world.draw.*;
 import tjTool.core.TjBundle;
+import tjTool.world.blocks.liquid.*;
 import tjTool.world.blocks.defense.*;
 import tjTool.world.blocks.distribution.*;
 import tjTool.world.blocks.production.*;
@@ -20,6 +21,7 @@ public class Blocks {
 
     public static Block
             multiSorter,
+            liquidUnloader,
             mendWall, mendWallLarge,
             chargedLyreWall,
             multiCrafter;
@@ -29,6 +31,11 @@ public class Blocks {
         multiSorter = new MultiSorter("multi-sorter") {{
             staticInit(this);
             requirements(distribution, with(copper, 2, lead, 2));
+        }};
+
+        liquidUnloader = new LiquidUnloader("liquid-unloader") {{
+            staticInit(this);
+            requirements(liquid, with(metaglass, 10, titanium, 20, silicon, 30));
         }};
 
         mendWall = new MendWall("mend-wall") {{

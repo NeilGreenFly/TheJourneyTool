@@ -16,48 +16,51 @@ import mindustry.gen.Unit;
 import mindustry.logic.LAccess;
 import mindustry.type.Item;
 import mindustry.ui.Styles;
-import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.ItemSelection;
 import mindustry.world.meta.BlockGroup;
+import tjTool.world.blocks.TjBlock;
 
 import static mindustry.Vars.*;
 import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjTable.*;
 
-public class MultiSorter extends Block {
+public class MultiSorter extends TjBlock {
     public TextureRegion configRegion;
     public TextureRegion invertRegion;
 
     public MultiSorter(String name) {
         super(name);
         update = false;
+        noUpdateDisabled = false;
         autoResetEnabled = false;
         destructible = true;
         underBullets = true;
         instantTransfer = true;
         unloadable = false;
         configurable = true;
-        clearOnDoubleTap = true;
         saveConfig = true;
+        clearOnDoubleTap = true;
         drawDisabled = false;
         drawDynamic = true;
         drawCached = false;
         group = BlockGroup.transportation;
+    }
 
-        config(short[].class, (TjSorterBuild build, short[] v) -> {
+    @Override
+    protected void config() {
+        config(short[].class, (MultiSorterBuild build, short[] v) -> {
             if (build.enabled != (v[1] == 1)) placeEffect.at(build, size);
             build.sortItem = content.item(v[0]);
             build.enabled = v[1] == 1;
         });
-        config(Item.class, (TjSorterBuild build, Item v) -> build.sortItem = v);
-        config(Boolean.class, (TjSorterBuild build, Boolean v) -> build.enabled = v);
-        configClear((TjSorterBuild build) -> build.sortItem = null);
+        config(Item.class, (MultiSorterBuild build, Item v) -> build.sortItem = v);
+        config(Boolean.class, (MultiSorterBuild build, Boolean v) -> build.enabled = v);
+        configClear((MultiSorterBuild build) -> build.sortItem = null);
     }
 
     @Override
-    public void load() {
-        super.load();
+    public void loadDrawer() {
         configRegion = Core.atlas.find(name + "-item");
         invertRegion = Core.atlas.find(name + "-invert");
     }
@@ -79,8 +82,7 @@ public class MultiSorter extends Block {
 
     @Override
     public int minimapColor(Tile tile) {
-        var build = (TjSorterBuild) tile.build;
-        return build != null && build.sortItem != null ? build.sortItem.color.rgba() : 0;
+        return tile.build instanceof MultiSorterBuild build && build.sortItem != null ? build.sortItem.color.rgba() : 0;
     }
 
     @Override
@@ -89,7 +91,7 @@ public class MultiSorter extends Block {
     }
 
     @SuppressWarnings("unused")
-    public class TjSorterBuild extends Building {
+    public class MultiSorterBuild extends TjBuilding {
         public @Nullable Item sortItem;
 
         @Override
@@ -103,7 +105,7 @@ public class MultiSorter extends Block {
 
         @Override
         public void draw() {
-            Draw.rect(enabled ? region : invertRegion, x, y, drawrot());
+            Draw.rect(enabled ? region : invertRegion, x, y);
             if (sortItem != null) {
                 Draw.color(sortItem.color);
                 Draw.rect(configRegion, x, y);
@@ -177,7 +179,7 @@ public class MultiSorter extends Block {
         @Override
         public void write(Writes write) {
             super.write(write);
-            write.s(sortItem != null ? sortItem.id : -1);
+            write.s(w(sortItem));
             write.bool(enabled);
         }
 
