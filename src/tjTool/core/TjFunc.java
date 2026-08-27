@@ -50,7 +50,7 @@ public class TjFunc {
             pix.dispose();
         }
     }
-    private static PageType getPage(Fi file){
+    private static PageType getPage(Fi file) {
         String path = file.path();
         if (path.contains("sprites/blocks/environment") || path.contains("sprites-override/blocks/environment")) return environment;
         if (path.contains("sprites/rubble") || path.contains("sprites-override/rubble")) return rubble;

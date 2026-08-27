@@ -46,7 +46,7 @@ public class PowerWire extends PowerBlock {
     }
 
     @Override
-    public void setBars(){
+    public void setBars() {
         super.setBars();
         addBar("power", makePowerBalance());
         addBar("batteries", makeBatteryBalance());
@@ -60,7 +60,7 @@ public class PowerWire extends PowerBlock {
     }
 
     @Override
-    protected TextureRegion[] icons(){
+    protected TextureRegion[] icons() {
         return new TextureRegion[]{regions[0]};
     }
 

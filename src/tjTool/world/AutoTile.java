@@ -50,8 +50,8 @@ public interface AutoTile {
         TextureRegion[] regions = new TextureRegion[(width / tileWidth + 1) * (height / tileHeight + 1)];
         int idx = 0;
 
-        for(int arrY = y; arrY < heightTo; arrY += tileHeight)
-            for(int arrX = x; arrX < widthTo; arrX += tileWidth)
+        for (int arrY = y; arrY < heightTo; arrY += tileHeight)
+            for (int arrX = x; arrX < widthTo; arrX += tileWidth)
                 regions[idx++] = new TextureRegion(region.texture, arrX, arrY, tileWidth, tileHeight);
 
         return regions;

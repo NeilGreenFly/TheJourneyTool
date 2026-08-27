@@ -103,7 +103,7 @@ public class TjDraw {
             Lines.linePoint(
                     building.x + d4(i).x * r + d4(i).y * w,
                     building.y + d4(i).y * r - d4(i).x * w);
-            if(f < 0.5f) Lines.linePoint(
+            if (f < 0.5f) Lines.linePoint(
                     building.x + d4(i).x * r - d4(i).y * w,
                     building.y + d4(i).y * r + d4(i).x * w);
         }
