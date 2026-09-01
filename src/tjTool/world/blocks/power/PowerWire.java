@@ -15,10 +15,10 @@ import tjTool.world.AutoTile;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.graphics.g2d.Lines.stroke;
-import static mindustry.Vars.*;
 import static mindustry.world.blocks.power.PowerNode.makeBatteryBalance;
 import static mindustry.world.blocks.power.PowerNode.makePowerBalance;
 import static tjTool.core.TjFunc.forRange;
+import static tjTool.core.TjVars.halfSize;
 
 /** Stay tuned */
 @SuppressWarnings("unused")
@@ -41,7 +41,7 @@ public class PowerWire extends PowerBlock {
         placeEffect = new Effect(16, e -> {
             color(Color.valueOf(Tmp.c1.a(1), "#8CAAEB"));
             stroke(3f - e.fin() * 2f);
-            Lines.square(e.x, e.y, tilesize / 2f * e.rotation + e.fin() * 3f);
+            Lines.square(e.x, e.y, halfSize * e.rotation + e.fin() * 3f);
         });
     }
 

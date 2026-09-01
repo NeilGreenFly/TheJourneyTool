@@ -31,6 +31,7 @@ import tjTool.core.*;
 import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.*;
 import static tjTool.core.TjTable.*;
+import static tjTool.core.TjVars.halfSize;
 
 /**
  * 邻接源现已并入任意源, 原邻接源已被移除, 但可能会因其他测试重新加入, 不过这只会是暂时的.<p>
@@ -149,7 +150,7 @@ public class AnySource extends BaseSource {
         public void updateTile() {
             if (status == 1) super.updateTile();
             else if (status == 3 && Mathf.chanceDelta(0.03)) {
-                Fx.regenSuppressParticle.at(x + Mathf.range(block.size * tilesize / 2f - 1f), y + Mathf.range(block.size * tilesize / 2f - 1f), Pal.remove);
+                Fx.regenSuppressParticle.at(x + Mathf.range(block.size * halfSize - 1f), y + Mathf.range(block.size * tilesize / 2f - 1f), Pal.remove);
             }
         }
 

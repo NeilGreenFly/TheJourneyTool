@@ -38,6 +38,7 @@ public class MultiSorter extends TjBlock {
         underBullets = true;
         instantTransfer = true;
         unloadable = false;
+        canOverdrive = false;
         configurable = true;
         saveConfig = true;
         clearOnDoubleTap = true;

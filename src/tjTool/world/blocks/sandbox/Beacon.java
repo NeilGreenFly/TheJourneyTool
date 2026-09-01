@@ -22,6 +22,7 @@ import tjTool.core.*;
 import static mindustry.Vars.*;
 import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjTable.*;
+import static tjTool.core.TjVars.halfSize;
 
 public class Beacon extends SandboxBlock {
     public static final TextureRegion[] teamIcons = new TextureRegion[4];
@@ -89,7 +90,7 @@ public class Beacon extends SandboxBlock {
             super.draw();
             TjDraw.beacon(this, getColor(), icon != null ? icon : team.id < 4 ? teamIcons[team.id] : null);
             float f = (Time.time / 100f) % 1f;
-            TjDraw.beacon(x, y, (size * tilesize / 2f) * f, getColor(), 1f - f);
+            TjDraw.beacon(x, y, (size * halfSize) * f, getColor(), 1f - f);
         }
 
         @Override

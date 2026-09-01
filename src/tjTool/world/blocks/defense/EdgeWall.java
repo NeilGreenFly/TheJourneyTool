@@ -88,7 +88,7 @@ public class EdgeWall extends Wall {
             super.updateProximity();
             proximityTileUpdate();
             for (var point : d8)
-                if (world.build(tile.x + point.x, tile.y + point.y) instanceof EdgeWallBuild other && other.team == this.team)
+                if (world.build(tile.x + point.x, tile.y + point.y) instanceof EdgeWallBuild other && other.team == team)
                     other.proximityTileUpdate();
         }
 

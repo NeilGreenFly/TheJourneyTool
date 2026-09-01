@@ -3,11 +3,12 @@ package tjTool.content;
 import tjTool.content.blocks.*;
 
 /** Load */
-public class TjBlocks {
+public final class TjBlocks {
     public static void load() {
 
         SandboxBlocks.load();
         Blocks.load();
+        Anvils.load();
 
     }
 }

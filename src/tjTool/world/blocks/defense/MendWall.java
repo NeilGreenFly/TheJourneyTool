@@ -16,6 +16,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.*;
+import static tjTool.core.TjVars.halfSize;
 
 public class MendWall extends Wall {
     public Color baseColor = Color.valueOf("#8CAAEB");
@@ -95,7 +96,7 @@ public class MendWall extends Wall {
         public void draw() {
             super.draw();
             float f = 1f - (Time.time / 100f) % 1f;
-            float r = size * tilesize / 2f;
+            float r = size * halfSize;
             Draw.color(baseColor);
             Lines.stroke((2f * f + 0.2f) * smoothEfficiency);
             Lines.square(x, y, Math.min(1f + (1f - f) * r, r));

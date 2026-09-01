@@ -1,6 +1,5 @@
 package tjTool.world.draw;
 
-import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.Eachable;
@@ -9,12 +8,15 @@ import mindustry.gen.Building;
 import mindustry.world.Block;
 import mindustry.world.draw.DrawBlock;
 
+import static arc.Core.atlas;
+
+@SuppressWarnings("unused")
 public class DrawBottom extends DrawBlock {
     public TextureRegion region;
 
     @Override
     public void load(Block block) {
-        region = Core.atlas.find(block.name + "-bottom");
+        region = atlas.find(block.name + "-bottom");
     }
 
     @Override

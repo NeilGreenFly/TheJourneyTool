@@ -13,6 +13,7 @@ import mindustry.world.Block;
 import static arc.Core.camera;
 import static arc.math.geom.Geometry.*;
 import static mindustry.Vars.tilesize;
+import static tjTool.core.TjVars.halfSize;
 
 @SuppressWarnings("unused")
 public class TjDraw {
@@ -90,7 +91,7 @@ public class TjDraw {
 
     public static void overdrive(Building building, String hex, String hexTo, float heat) {
         float f = 1f - (Time.time / 100f) % 1f;
-        float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * building.block.size * tilesize / 2f - f - 0.2f);
+        float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * building.block.size * halfSize - f - 0.2f);
         float w = Mathf.clamp(0.5f - f) * building.block.size * tilesize;
 
         Draw.color(Color.valueOf(c1, hexTo), Color.valueOf(c2, hex), f);
@@ -168,7 +169,7 @@ public class TjDraw {
     }
 
     public static void drawPlace(Block block, int x, int y) {
-        float[] r = new float[]{block.size * tilesize / 2f, tilesize * 16};
+        float[] r = new float[]{block.size * halfSize, tilesize * 16};
         float cx = x * tilesize + block.offset;
         float cy = y * tilesize + block.offset;
         Color color = rainbow;
@@ -182,6 +183,18 @@ public class TjDraw {
                     cx + r[(i + 1) % 2] * d8edge(i).x, cy + r[i % 2] * d8edge(i).y, to);
     }
 
+    public static void drawSelected(Building building) {
+        drawSelected(building.x, building.y, building.block.size * halfSize);
+    }
+
+    public static void drawSelected(float x, float y, float r) {
+        r -= halfSize;
+        for (int i = 0; i < 4; i += 1) Draw.rect("block-select",
+                x - r * d8edge[i].x,
+                y - r * d8edge[i].y,
+                i * 90);
+    }
+
     public static void beacon(Building building, Color color, TextureRegion icon) {
         Boolf3<Float, Float, Integer> b = (x, y, i) -> {
             // Building building = world.buildWorld(x, y);
@@ -191,7 +204,7 @@ public class TjDraw {
                     building.x + building.block.size * tilesize * d4x[i] == other.x &&
                     building.y + building.block.size * tilesize * d4y[i] == other.y));
         };
-        beacon(building.x, building.y, building.block.size * tilesize / 2f, color, 0.7f, b, icon);
+        beacon(building.x, building.y, building.block.size * halfSize, color, 0.7f, b, icon);
     }
 
     public static void beacon(float x, float y, float r, Color color, Float alpha) {
@@ -207,7 +220,7 @@ public class TjDraw {
      *     public void draw() {
      *         super.draw();
      *         float r = size * tilesize / 2f;
-     *         beacon(x, y, r, c1.set(team.color), 0.7f, null, null);
+     *         beacon(x, y, r, Tmp.c1.set(team.color), 0.7f, null, null);
      *     }
      * </pre></blockquote>
      * @param x     中心坐标 x

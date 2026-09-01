@@ -1,10 +1,12 @@
 package tjTool.world.blocks;
 
+import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.Eachable;
 import mindustry.ctype.UnlockableContent;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
+import mindustry.graphics.Pal;
 import mindustry.world.Block;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawDefault;
@@ -12,9 +14,14 @@ import mindustry.world.draw.DrawDefault;
 public abstract class TjBlock extends Block {
     public DrawBlock drawer = new DrawDefault();
 
+    public static Color validColor(boolean valid) {
+        return valid ? Pal.accent : Pal.remove;
+    }
+
     public TjBlock(String name) {
         super(name);
         config();
+        destructible = true;
         rotateDraw = false;
         noUpdateDisabled = true;
         selectionRows = 5;

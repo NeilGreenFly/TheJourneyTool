@@ -3,6 +3,9 @@ package tjTool.core;
 import arc.Core;
 import arc.func.*;
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
+import arc.scene.Element;
 import arc.scene.style.Drawable;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
@@ -26,8 +29,10 @@ import mindustry.world.blocks.ItemSelection;
 
 import static arc.util.Strings.autoFixed;
 import static mindustry.Vars.control;
+import static mindustry.Vars.ui;
 import static mindustry.ui.Styles.none;
 import static mindustry.ui.Styles.outlineLabel;
+import static tjTool.core.TjDraw.rainbow;
 import static tjTool.core.TjFunc.*;
 
 /**
@@ -284,6 +289,27 @@ public class TjTable {
                 });
             };
         }
+    }
+
+    public static void init() {
+        ui.hudGroup.addChild(new Element() {
+            @Override
+            public void draw() {
+                float w = Core.graphics.getWidth();
+                float h = Core.graphics.getHeight();
+                float x = control.input.getMouseX();
+                float y = control.input.getMouseY();
+                Draw.color(rainbow);
+                Draw.alpha(0.25f);
+                Lines.stroke(10);
+                Lines.square(x, y, 50);
+                Lines.line(x + 50 + 5, y, w, y);
+                Lines.line(x - 50 - 5, y, 0, y);
+                Lines.line(x, y + 50 + 5, x, h);
+                Lines.line(x, y - 50 - 5, x, 0);
+                Draw.reset();
+            }
+        });
     }
 
 }
