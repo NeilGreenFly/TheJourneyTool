@@ -44,7 +44,6 @@ public class MultiCrafter extends TjBlock {
     public float updateEffectChance = 0.04f;
     public float updateEffectSpread = 4f;
     public float warmupSpeed = 0.019f;
-    public int[] capacities;
     protected @Nullable Table consumption = null;
 
     public MultiCrafter(String name) {
@@ -81,7 +80,6 @@ public class MultiCrafter extends TjBlock {
         liquidFilter = multiConsumers.liquidFilter;
         hasPower = multiConsumers.hasPower;
         itemCapacity = multiConsumers.itemCapacity;
-        capacities = multiConsumers.capacities;
         if (hasPower) consumePowerDynamic((MultiCrafterBuild building) -> building.currentConsumer().usage);
     }
 
@@ -137,7 +135,7 @@ public class MultiCrafter extends TjBlock {
 
         @Override
         public int getMaximumAccepted(Item item) {
-            return currentConsumer().input.itemFilter[item.id] ? capacities[item.id] : 0;
+            return currentConsumer().input.itemFilter[item.id] ? multiConsumers.capacities[item.id] : 0;
         }
 
         @Override

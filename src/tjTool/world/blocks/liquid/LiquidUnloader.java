@@ -89,7 +89,7 @@ public class LiquidUnloader extends TjBlock {
                 int out = 0;
                 for (var building : proximity) {
                     var destination = building.getLiquidDestination(this, liquid);
-                    if (!destination.block.hasLiquids) continue;
+                    if (!(destination != null && destination.block.hasLiquids)) continue;
                     if (destination.acceptLiquid(this, liquid)) in += 1;
                     if (destination.liquids.get(liquid) > 0) out += 1;
                 }
