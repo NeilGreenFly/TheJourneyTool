@@ -3,10 +3,12 @@ package tjTool.world.blocks.sandbox;
 import arc.func.Boolf;
 import arc.util.Log;
 import mindustry.game.Team;
+import mindustry.gen.Building;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.blocks.heat.HeatBlock;
 import mindustry.world.blocks.payloads.BuildPayload;
+import mindustry.world.blocks.payloads.Payload;
 import mindustry.world.blocks.payloads.UnitPayload;
 import mindustry.world.meta.BlockGroup;
 
@@ -53,6 +55,14 @@ public abstract class BaseSource extends SandboxBlock {
 
     protected static boolean canProduce(UnitType unit) {
         return !unit.isHidden() && !unit.isBanned() && unit.supportsEnv(state.rules.env);
+    }
+
+    protected static <T extends Payload> Boolf<T> dumpPayload(Building self, Building dumpTo) {
+        return payload -> {
+            boolean accept = dumpTo.acceptPayload(self, payload);
+            if (accept) dumpTo.handlePayload(self, payload);
+            return accept;
+        };
     }
 
     @SuppressWarnings("unused")

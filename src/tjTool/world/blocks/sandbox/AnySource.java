@@ -109,6 +109,11 @@ public class AnySource extends BaseSource {
         };
     }
 
+    @Override
+    public boolean outputsItems() {
+        return true;
+    }
+
     @SuppressWarnings("unused")
     public class AnySourceBuild extends BaseSourceBuild {
         public @Nullable Vec2 commandPos;
@@ -156,37 +161,28 @@ public class AnySource extends BaseSource {
 
         @Override
         public void tryUpdateTile() {
-            proximity.each(this::checkBuild, other -> {
-                if (other.block.hasItems)
-                    content.items().each(item -> other.handleStack(item, other.acceptStack(item, 1000000, this), this));
-                // 这部分通常是不安全的, 以及液体的交互方式与物品略有不同, 因此这个在这里不那么重要
-                // if (other.block.hasLiquids)
-                //     content.liquids().each(
-                //             liquid -> other.acceptLiquid(this, liquid),
-                //             liquid -> other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid))));
-                if (other.block.acceptsPayload)
-                    content.blocks().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
-                        boolean b = other.acceptPayload(this, payload);
-                        if (b) other.handlePayload(this, payload);
-                        return b;
-                    }));
-                if (other.block.acceptsUnitPayloads)
-                    content.units().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
-                        boolean b = other.acceptPayload(this, payload);
-                        if (b) other.handlePayload(this, payload);
-                        return b;
-                    }));
-            });
             content.items().each(item -> {
                 handle = true;
-                for (int i = 10; i-- > 0 && handle; )
-                    offload(item);
+                for (int i = 10; i-- > 0 && handle;) offload(item);
             });
             content.liquids().each(liquid -> {
                 liquids.set(liquid, 1000000f);
                 dumpLiquid(liquid);
             });
             liquids.clear();
+            proximity.each(this::checkBuild, other -> {
+                if (other.block.hasItems) content.items().each(
+                        item -> other.acceptItem(this, item),
+                        item -> other.handleStack(item, other.acceptStack(item, 1000000, this), this));
+                // 这部分通常是不安全的, 以及液体的交互方式与物品略有不同, 因此这个处理并不重要.
+                // if (other.block.hasLiquids) content.liquids().each(
+                //         liquid -> other.acceptLiquid(this, liquid),
+                //         liquid -> other.liquids.set(liquid, Math.max(other.block.liquidCapacity, other.liquids.get(liquid))));
+                if (other.block.acceptsPayload) content.blocks().each(BaseSource::canProduce,
+                        v -> payloadPool(v, team, BaseSource.dumpPayload(this, other)));
+                if (other.block.acceptsUnitPayloads) content.units().each(BaseSource::canProduce,
+                        v -> payloadPool(v, team, BaseSource.dumpPayload(this, other)));
+            });
         }
 
         @Override

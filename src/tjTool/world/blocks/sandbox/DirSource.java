@@ -195,6 +195,7 @@ public class DirSource extends BaseSource {
             coolants.clear();
             if (!checkBuild(targetBuild = front())) {
                 deselect();
+                targetBuild = null;
                 target = null;
                 ammo = null;
                 coolant = null;
@@ -228,21 +229,13 @@ public class DirSource extends BaseSource {
             heat = Mathf.lerpDelta(heat, overdrive > -1 ? 1f : 0f, 0.08f);
             if (targetBuild == null) return;
 
-            items.each(item -> targetBuild.handleStack(item, targetBuild.acceptStack(item, 1000000, this), this));
-            liquids.each(liquid -> targetBuild.liquids.set(liquid, Math.max(targetBuild.block.liquidCapacity, targetBuild.liquids.get(liquid))));
-            if (overdrive > -1) targetBuild.applyBoost(overdrives[overdrive], 61.0f);
-            if (targetBuild.block.acceptsPayload)
-                content.blocks().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
-                    boolean b = targetBuild.acceptPayload(this, payload);
-                    if (b) targetBuild.handlePayload(this, payload);
-                    return b;
-                }));
-            if (targetBuild.block.acceptsUnitPayloads)
-                content.units().each(BaseSource::canProduce, v -> payloadPool(v, team, payload -> {
-                    boolean b = targetBuild.acceptPayload(this, payload);
-                    if (b) targetBuild.handlePayload(this, payload);
-                    return b;
-                }));
+            items.each(v -> targetBuild.acceptItem(this, v), v -> targetBuild.handleStack(v, targetBuild.acceptStack(v, 1000000, this), this));
+            liquids.each(v -> targetBuild.acceptLiquid(this, v), v -> targetBuild.liquids.set(v, Math.max(targetBuild.block.liquidCapacity, targetBuild.liquids.get(v))));
+            if (overdrive > -1) targetBuild.applyBoost(overdrives[overdrive], 61);
+            if (targetBuild.block.acceptsPayload) content.blocks().each(BaseSource::canProduce,
+                    v -> payloadPool(v, team, BaseSource.dumpPayload(this, targetBuild)));
+            if (targetBuild.block.acceptsUnitPayloads) content.units().each(BaseSource::canProduce,
+                    v -> payloadPool(v, team, BaseSource.dumpPayload(this, targetBuild)));
 
             if (target instanceof BaseTurret) {
                 if (targetBuild instanceof ItemTurret.ItemTurretBuild build) {
@@ -256,14 +249,14 @@ public class DirSource extends BaseSource {
                     } else {
                         build.ammo.clear();
                         build.totalAmmo = 0;
-                        build.reloadCounter = 0f;
+                        build.reloadCounter = 0;
                     }
                 } else {
                     if (ammo instanceof Liquid liquid) targetBuild.liquids.set(liquid, targetBuild.block.liquidCapacity);
-                    else ammoTypes.each(Liquid.class::isInstance, (Liquid liquid) -> targetBuild.liquids.set(liquid, 0f));
+                    else ammoTypes.each(Liquid.class::isInstance, (Liquid liquid) -> targetBuild.liquids.set(liquid, 0));
                 }
                 if (coolant != null) targetBuild.liquids.set(coolant, targetBuild.block.liquidCapacity);
-                else coolants.each(liquid -> targetBuild.liquids.set(liquid, 0f));
+                else coolants.each(liquid -> targetBuild.liquids.set(liquid, 0));
             }
             if (tap) targetBuild.configTapped();
         }
@@ -327,7 +320,7 @@ public class DirSource extends BaseSource {
         @Override
         public void write(Writes write) {
             super.write(write);
-            write.b(ammo instanceof Item ? 0 : 1);
+            write.bool(ammo instanceof Liquid);
             write.s(w(ammo));
             write.s(w(coolant));
             write.b(overdrive);
@@ -336,9 +329,9 @@ public class DirSource extends BaseSource {
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
-            var b = read.b();
-            var id = read.s();
-            ammo = b == 0 ? content.item(id) : content.liquid(id);
+            ammo = !read.bool()
+                    ? content.item(read.s())
+                    : content.liquid(read.s());
             coolant = content.liquid(read.s());
             overdrive = read.b();
         }
