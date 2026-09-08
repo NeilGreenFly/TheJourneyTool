@@ -21,6 +21,7 @@ public abstract class TjBlock extends Block {
     public TjBlock(String name) {
         super(name);
         config();
+        solid = true;
         destructible = true;
         rotateDraw = false;
         noUpdateDisabled = true;

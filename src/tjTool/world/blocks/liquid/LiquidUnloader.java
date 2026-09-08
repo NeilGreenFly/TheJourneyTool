@@ -27,13 +27,11 @@ public class LiquidUnloader extends TjBlock {
 
     public LiquidUnloader(String name) {
         super(name);
-        solid = true;
         unloadable = false;
         hasLiquids = true;
         outputsLiquid = true;
         liquidCapacity = 0;
         update = true;
-        noUpdateDisabled = true;
         configurable = true;
         saveConfig = true;
         clearOnDoubleTap = true;
@@ -110,6 +108,7 @@ public class LiquidUnloader extends TjBlock {
             proximityBuilding.clear();
             outBuilding.clear();
             inBuilding.clear();
+            // TODO Maybe should check if it can unload? Although `unloadable` only works on the original version of the `Item`.
             for (var building : proximity) {
                 Building destination = building.getLiquidDestination(this, liquid);
                 if (!destination.block.hasLiquids) continue;

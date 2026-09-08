@@ -31,6 +31,7 @@ public class MultiSorter extends TjBlock {
 
     public MultiSorter(String name) {
         super(name);
+        solid = false;
         update = false;
         noUpdateDisabled = false;
         autoResetEnabled = false;

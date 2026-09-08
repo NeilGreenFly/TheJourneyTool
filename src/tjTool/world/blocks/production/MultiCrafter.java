@@ -1,13 +1,17 @@
 package tjTool.world.blocks.production;
 
 import arc.Core;
+import arc.Events;
+import arc.func.Boolc;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.scene.actions.Actions;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.Button;
 import arc.scene.ui.Image;
+import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
 import arc.struct.EnumSet;
 import arc.util.Nullable;
@@ -16,6 +20,7 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
+import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.Lod;
 import mindustry.graphics.Pal;
@@ -23,6 +28,7 @@ import mindustry.logic.LAccess;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
 import mindustry.ui.Bar;
+import mindustry.ui.Styles;
 import mindustry.world.blocks.heat.HeatConsumer;
 import mindustry.world.meta.BlockFlag;
 import tjTool.world.blocks.TjBlock;
@@ -34,6 +40,7 @@ import static mindustry.world.meta.StatValues.withTooltip;
 import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjStat.multiConsumersConfig;
 import static tjTool.core.TjTable.*;
+import static tjTool.core.TjVars.*;
 
 public class MultiCrafter extends TjBlock {
     public boolean buttonDrop = false;
@@ -49,7 +56,6 @@ public class MultiCrafter extends TjBlock {
     public MultiCrafter(String name) {
         super(name);
         update = true;
-        solid = true;
         hasItems = true;
         hasLiquids = true;
         sync = true;
@@ -234,10 +240,33 @@ public class MultiCrafter extends TjBlock {
             dumpOutputs();
         }
 
+        protected void addButton(Table root, Table table, TextureRegionDrawable icon, boolean setChecked, Boolc isChecked) {
+            table.add(new ImageButton(icon, Styles.clearNoneTogglei) {{
+                resizeImage(iconSize);
+                update(() -> setChecked(setChecked));
+                changed(() -> {
+                    isChecked.get(isChecked());
+                    root.clear();
+                    buildConfiguration(root);
+                    root.pack();
+                });
+            }});
+        }
+
         @Override
         public void buildConfiguration(Table table) {
             var image = new Image(Tex.pane) { int c; };
             table.background(Tex.paneLeft);
+            table.table(info -> {
+                info.left().defaults().size(uiSize);
+                info.button(Icon.info, Styles.clearNonei, iconSize, () -> {
+                    ui.content.show(block);
+                    Events.fire(new EventType.BlockInfoEvent());
+                });
+                addButton(table, info, Icon.power, showConsPower, v -> showConsPower = v);
+                addButton(table, info, Icon.waves, showConsHeat, v -> showConsHeat = v);
+                addButton(table, info, Icon.rightOpen, showCraftTime, v -> showCraftTime = v);
+            }).growX().padBottom(10).row();
             table.stack(
                     new Table(t -> t.add(image).growX().height(uiSize).padTop(!buttonDrop ? uiSize * currentConsumer : 0)).top(),
                     new Table(t -> {
@@ -247,9 +276,14 @@ public class MultiCrafter extends TjBlock {
                                 input.left();
                                 for (var v : consumer.input.items) stack(input, v);
                                 for (var v : consumer.input.liquids) stack(input, v);
-                                if (consumer.consHeat()) stack(input, new Image(Icon.waves), String.valueOf((int) consumer.heatRequirement), Pal.remove);
+                                if (showConsPower && consumer.consPower()) stack(input, new Image(Icon.power), autoFixed(consumer.usage * 60f, 3) + "[gray]/s[]", Pal.accent);
+                                if (showConsHeat && consumer.consHeat()) stack(input, new Image(Icon.waves), String.valueOf((int) consumer.heatRequirement), Pal.remove);
                             }).growX();
                             t.image(Icon.rightOpen).padLeft(10).padRight(10);
+                            if (showCraftTime) {
+                                t.add(autoFixed(consumer.craftTime / 60f, 3) + "[gray]s[]");
+                                t.image(Icon.rightOpen).padLeft(10).padRight(10);
+                            }
                             t.table(output -> {
                                 output.right();
                                 for (var v : consumer.output.items) stack(output, v);

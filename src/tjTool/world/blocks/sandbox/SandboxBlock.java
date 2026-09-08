@@ -31,7 +31,6 @@ public abstract class SandboxBlock extends TjBlock {
         unloadable = false;
 
         update = true;
-        solid = true;
 
         configurable = false;
         saveConfig = false;
