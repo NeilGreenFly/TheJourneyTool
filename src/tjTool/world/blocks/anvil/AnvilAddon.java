@@ -4,6 +4,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.TextureRegion;
+import arc.math.geom.Point2;
 import arc.util.Nullable;
 import mindustry.entities.Effect;
 import mindustry.game.Team;
@@ -36,11 +37,16 @@ public abstract class AnvilAddon extends TjBlock {
         customShadow = true;
         rotate = true;
         quickRotate = false;
+        update = true;
     }
 
     @Override
     protected TextureRegion[] icons() {
         return new TextureRegion[]{region};
+    }
+
+    public @Nullable Tile tileNearby(Tile tile, Point2[] geometry, int rotation) {
+        return tile.nearby((size / 2 + 1) * geometry[rotation].x, (size / 2 + 1) * geometry[rotation].y);
     }
 
     public AnvilBuild checkCore(Tile tile, Team team, int rotation) {
@@ -62,6 +68,13 @@ public abstract class AnvilAddon extends TjBlock {
 
     public abstract class AnvilAddonBuild extends TjBuilding {
         public @Nullable AnvilBuild anvil;
+
+        public void anvilUpdateTile() {}
+
+        @Override
+        public void updateTile() {
+            if (anvil != null) anvilUpdateTile();
+        }
 
         @Override
         public void onProximityUpdate() {

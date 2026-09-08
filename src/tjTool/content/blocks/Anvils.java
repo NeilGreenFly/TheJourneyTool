@@ -17,16 +17,19 @@ public class Anvils {
         anvil = new Anvil("anvil") {{
             staticInit(this);
             requirements(effect, with(surgeAlloy, 300));
+            health = 8000;
         }};
 
         anvilEdge = new AnvilEdge("anvil-edge") {{
             staticInit(this);
             requirements(effect, with(surgeAlloy, 300));
+            health = 4000;
         }};
 
         anvilAmplifier = new AnvilAmplifier("anvil-amplifier") {{
             staticInit(this);
             requirements(effect, with(surgeAlloy, 300));
+            health = 4000;
         }};
 
     }

@@ -14,10 +14,14 @@ import tjTool.world.draw.DrawRotation;
 import static arc.math.geom.Geometry.d4;
 
 public class AnvilEdge extends AnvilAddon {
+    public float outEnergy = 1;
+
     public AnvilEdge(String name) {
         super(name);
         size = 3;
         update = true;
+        hasPower = true;
+        consumePower(0.5f);
         drawer = new DrawMulti(new DrawRotation(), new DrawRotation("-interface") {
             @Override
             public void draw(Building build) {
@@ -31,18 +35,24 @@ public class AnvilEdge extends AnvilAddon {
 
     @Override
     public AnvilBuild checkCore(Tile tile, Team team, int rotation) {
-        var t = tile.nearby(
-                (size / 2 + 1) * d4[rotation].x,
-                (size / 2 + 1) * d4[rotation].y);
-        if (t.build != null && (rotation % 2 != 0 ? tile.x - t.build.tile.x : tile.y - t.build.tile.y) % size != 0) return null;
-        return super.checkCore(t, team, 0);
+        var t = tileNearby(tile, d4, rotation);
+        return t != null && t.build != null && (rotation % 2 != 0 ? tile.x - t.build.tile.x : tile.y - t.build.tile.y) % size == 0 ? super.checkCore(t, team, 0) : null;
     }
 
     @SuppressWarnings("unused")
     public class AnvilEdgeBuild extends AnvilAddonBuild {
         @Override
-        public void updateTile() {
-            if (anvil != null && Mathf.chanceDelta(0.005)) anvilEffect.at(x, y, 0, color, anvil);
+        public boolean shouldConsume() {
+            return enabled && anvil != null && anvil.acceptEnergy() > 0;
         }
+
+        @Override
+        public void anvilUpdateTile() {
+            if (Mathf.chanceDelta(0.005)) anvilEffect.at(x, y, 0, color, anvil);
+            if (efficiency > 0) anvil.handleEnergy(Math.min(outEnergy * getProgressIncrease(1), anvil.acceptEnergy()));
+        }
+
+        @Override
+        public void drawStatus() {}
     }
 }

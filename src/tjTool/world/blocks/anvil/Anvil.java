@@ -2,6 +2,7 @@ package tjTool.world.blocks.anvil;
 
 import arc.graphics.Color;
 import mindustry.graphics.Layer;
+import mindustry.ui.Bar;
 import mindustry.world.draw.DrawDefault;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawRegion;
@@ -13,10 +14,12 @@ import static arc.math.geom.Geometry.d8edge;
 import static mindustry.Vars.world;
 import static tjTool.core.TjDraw.beacon;
 
+// 困困...睡觉觉喵...
 public class Anvil extends TjBlock {
     protected static final int coreSize = 9;
 
     public Color color = Color.valueOf("#FFBFFF");
+    public float energyCapacity = 100;
 
     public Anvil(String name) {
         super(name);
@@ -24,8 +27,28 @@ public class Anvil extends TjBlock {
         drawer = new DrawMulti(new DrawBottom(), new DrawZ(Layer.blockOver), new DrawRegion("-pillar"), new DrawDefault());
     }
 
+    @Override
+    public void setBars() {
+        super.setBars();
+        addBar("E", (AnvilBuild build) -> new Bar(
+                () -> "EE",
+                () -> color,
+                () -> build.energy / energyCapacity
+        ));
+    }
+
     @SuppressWarnings("unused")
     public class AnvilBuild extends TjBuilding {
+        public float energy = 0;
+
+        public float acceptEnergy() {
+            return energyCapacity - energy;
+        }
+
+        public void handleEnergy(float amount) {
+            energy += amount;
+        }
+
         @Override
         public void draw() {
             super.draw();

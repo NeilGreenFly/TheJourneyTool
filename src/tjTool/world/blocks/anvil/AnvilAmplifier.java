@@ -33,12 +33,9 @@ public class AnvilAmplifier extends AnvilAddon {
 
     @Override
     public AnvilBuild checkCore(Tile tile, Team team, int rotation) {
-        var t = tile.nearby(
-                (size / 2 + 1) * d8edge[rotation].x,
-                (size / 2 + 1) * d8edge[rotation].y);
         int d = (size + coreSize) / 2;
-        if (t.build != null && !(Math.abs(tile.x - t.build.tile.x) == d && Math.abs(tile.y - t.build.tile.y) == d)) return null;
-        return super.checkCore(t, team, 0);
+        var t = tileNearby(tile, d8edge, rotation);
+        return t != null && t.build != null && Math.abs(tile.x - t.build.tile.x) == d && Math.abs(tile.y - t.build.tile.y) == d ? super.checkCore(t, team, 0) : null;
     }
 
     @Override
