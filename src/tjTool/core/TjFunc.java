@@ -39,23 +39,30 @@ public class TjFunc {
     }
     public static void sprites(MultiPacker packer) {
         boolean bleed = Core.settings.getBool("linear", true);
-        var sprites = theJourney.root.child("sprites").findAll(f -> f.extension().equals("tj"));
+        sprites(packer, bleed, "sprites", true);
+        sprites(packer, bleed, "sprites-override", false);
+    }
+    public static void sprites(MultiPacker packer, boolean bleed, String path, boolean prefix) {
+        var sprites = theJourney.root.child(path).findAll(f -> f.extension().equals("tj"));
         for (var sprite : sprites) {
             var name = sprite.nameWithoutExtension();
             var pix = new Pixmap(b(sprite.readBytes()));
             if (bleed) Pixmaps.bleed(pix, 2);
             int hyphen = name.indexOf('-');
-            var fullName = hyphen != -1 && name.substring(hyphen + 1).startsWith(theJourney.name + "-") ? name : theJourney.name + "-" + name;
+            var fullName = prefix && !(hyphen != -1 && name.substring(hyphen + 1).startsWith(theJourney.name + "-")) ? theJourney.name + "-" + name : name;
             packer.add(getPage(sprite), fullName, new PixmapRegion(pix));
             pix.dispose();
         }
     }
     private static PageType getPage(Fi file) {
         String path = file.path();
-        if (path.contains("sprites/blocks/environment") || path.contains("sprites-override/blocks/environment")) return environment;
-        if (path.contains("sprites/rubble") || path.contains("sprites-override/rubble")) return rubble;
-        if (path.contains("sprites/ui") || path.contains("sprites-override/ui")) return ui;
+        if (getPage(path, "blocks/environment")) return environment;
+        if (getPage(path, "rubble")) return rubble;
+        if (getPage(path, "ui")) return ui;
         return main;
+    }
+    private static boolean getPage(String path, String contains) {
+        return (path.contains("sprites/" + contains) || path.contains("sprites-override/" + contains));
     }
 
     // String version = mods.getMod(ThisMain.class).meta.minGameVersion;
