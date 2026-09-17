@@ -12,15 +12,17 @@ import mindustry.gen.Building;
 import mindustry.type.Liquid;
 import mindustry.world.Block;
 import mindustry.world.blocks.ItemSelection;
+import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawLiquidTile;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawRegion;
 import mindustry.world.meta.BlockGroup;
-import tjTool.world.draw.DrawBottom;
 import tjTool.world.blocks.TjBlock;
+import tjTool.world.draw.DrawBottom;
 
 import static mindustry.Vars.content;
 import static mindustry.world.blocks.liquid.LiquidBlock.*;
+import static tjTool.world.LazyGetter.*;
 
 public class LiquidUnloader extends TjBlock {
     public static Liquid[] allLiquids;
@@ -37,7 +39,11 @@ public class LiquidUnloader extends TjBlock {
         clearOnDoubleTap = true;
         squareSprite = false;
         group = BlockGroup.liquids;
-        drawer = new DrawMulti(new DrawBottom(), new DrawLiquidTile() {
+    }
+
+    @Override
+    protected DrawBlock defaultDrawer() {
+        return new DrawMulti(new DrawBottom(), new DrawLiquidTile() {
             @Override
             public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list) {
                 if (plan.config instanceof Liquid liquid)
@@ -114,7 +120,7 @@ public class LiquidUnloader extends TjBlock {
                 if (!destination.block.hasLiquids) continue;
                 if (!destination.acceptLiquid(this, liquid)) {
                     float get = destination.liquids.get(liquid);
-                    if (get == 0) continue;
+                    if (get == 0 || destination != building) continue;
                     outLiquid += get;
                     outBuilding.add(destination);
                 } else if (destination == building) {

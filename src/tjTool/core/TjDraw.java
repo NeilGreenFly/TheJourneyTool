@@ -24,6 +24,10 @@ public class TjDraw {
     public static float z = 2f;
     public static final Color rainbow = new Color();
 
+    public static Color validColor(boolean valid) {
+        return valid ? Pal.accent : Pal.remove;
+    }
+
     public static void update() {
         rainbow.set(rainbow(25f, 100f));
     }
@@ -72,13 +76,9 @@ public class TjDraw {
     }
 
     public static void lightPoly(float x, float y, int sides, float radius, Color color) {
-        Fill.lightInner(x, y, sides,
-                Math.max(0f, radius * 0.6f),
-                radius,
-                0f,
-                c1.set(color).a(0f),
-                c2.set(color).a(0.7f)
-        );
+        Fill.lightInner(x, y, sides, Math.max(0, radius * 0.6f), radius, 0,
+                c1.set(color).a(0),
+                c2.set(color).a(0.7f));
         Lines.stroke(1f);
         Draw.color(color);
         Lines.poly(x, y, sides, radius + 0.5f);
@@ -91,14 +91,10 @@ public class TjDraw {
 
     public static void overdrive(Building building, String hex, String hexTo, float heat) {
         float f = 1f - (Time.time / 100f) % 1f;
-        float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * building.block.size * halfSize - f - 0.2f);
+        float r = Math.max(0, Mathf.clamp(2f - f * 2f) * building.block.size * halfSize - f - 0.2f);
         float w = Mathf.clamp(0.5f - f) * building.block.size * tilesize;
-
         Draw.color(Color.valueOf(c1, hexTo), Color.valueOf(c2, hex), f);
-        Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
-        Draw.alpha(1f);
         Lines.stroke((2f * f + 0.1f) * heat);
-
         Lines.beginLine();
         for (int i = 0; i < 4; ++i) {
             Lines.linePoint(
@@ -109,7 +105,6 @@ public class TjDraw {
                     building.y + d4(i).y * r + d4(i).x * w);
         }
         Lines.endLine(true);
-
         Draw.reset();
     }
 
@@ -242,7 +237,7 @@ public class TjDraw {
         float len = (Mathf.len(dx, dy) - tilesize * 16) / 128f;
         float a = Math.min(len, alpha);
         float from = color.a(Mathf.clamp(a)).toFloatBits();
-        float to = color.a(0f).toFloatBits();
+        float to = color.a(0).toFloatBits();
         if (a <= 0.01f) return;
         Draw.z(Layer.effect - 1); // Layer.flyingUnit + 1   Layer.blockOver
         for (int i = 0; i < 4; i += 1) {
@@ -264,12 +259,12 @@ public class TjDraw {
             float d = z * 0.95f;
             Draw.z(Layer.effect);
             Lines.stroke(32);
-            Draw.color(color.a(Mathf.clamp(a, 0f, 0.3f)));
+            Draw.color(color.a(Mathf.clamp(a, 0, 0.3f)));
             Lines.circle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize);
-            Draw.color(color.a(Mathf.clamp(a, 0f, 0.5f)));
+            Draw.color(color.a(Mathf.clamp(a, 0, 0.5f)));
             arcCircle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize + 64, 6, 0.1f, 0.5f);
             d = z * 0.9f;
-            Draw.color(color.a(Mathf.clamp(a, 0f, 0.25f)));
+            Draw.color(color.a(Mathf.clamp(a, 0, 0.25f)));
             arcCircle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize / 2, 3, 0.16f, -0.5f);
             Draw.color();
             Draw.alpha(len);
@@ -278,8 +273,7 @@ public class TjDraw {
     }
 
     public static void drawProximity(int x, int y, int size, Color color) {
-        Draw.color(color);
-        Draw.alpha(0.5f);
+        Draw.color(color, 0.5f);
         Fill.square((x - 1) * tilesize, y * tilesize, 2 * size);
         Fill.square((x + 1) * tilesize, y * tilesize, 2 * size);
         Fill.square(x * tilesize, (y - 1) * tilesize, 2 * size);

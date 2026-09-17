@@ -1,22 +1,15 @@
 package tjTool.world.blocks;
 
-import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.Eachable;
-import mindustry.ctype.UnlockableContent;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
-import mindustry.graphics.Pal;
 import mindustry.world.Block;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawDefault;
 
 public abstract class TjBlock extends Block {
-    public DrawBlock drawer = new DrawDefault();
-
-    public static Color validColor(boolean valid) {
-        return valid ? Pal.accent : Pal.remove;
-    }
+    public DrawBlock drawer;
 
     public TjBlock(String name) {
         super(name);
@@ -31,14 +24,15 @@ public abstract class TjBlock extends Block {
 
     protected void config() {}
 
-    protected void loadDrawer() {
-        drawer.load(this);
+    protected DrawBlock defaultDrawer() {
+        return new DrawDefault();
     }
 
     @Override
     public void load() {
         super.load();
-        loadDrawer();
+        if (drawer == null) drawer = defaultDrawer();
+        drawer.load(this);
     }
 
     @Override
@@ -51,11 +45,8 @@ public abstract class TjBlock extends Block {
         return drawer.finalIcons(this);
     }
 
+    @SuppressWarnings("unused")
     public abstract class TjBuilding extends Building {
-        public static <T extends UnlockableContent> short w(T t) {
-            return t != null ? t.id : -1;
-        }
-
         @Override
         public void draw() {
             drawer.draw(this);

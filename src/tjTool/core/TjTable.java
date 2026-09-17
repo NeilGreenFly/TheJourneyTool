@@ -299,8 +299,7 @@ public class TjTable {
                 float h = Core.graphics.getHeight();
                 float x = control.input.getMouseX();
                 float y = control.input.getMouseY();
-                Draw.color(rainbow);
-                Draw.alpha(0.25f);
+                Draw.color(rainbow, 0.25f);
                 Lines.stroke(10);
                 Lines.square(x, y, 50);
                 Lines.line(x + 50 + 5, y, w, y);

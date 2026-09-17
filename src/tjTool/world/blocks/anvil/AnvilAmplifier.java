@@ -6,6 +6,7 @@ import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
+import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawMulti;
 import tjTool.world.blocks.anvil.Anvil.AnvilBuild;
 import tjTool.world.draw.DrawRotationAtlas;
@@ -13,6 +14,7 @@ import tjTool.world.draw.DrawRotationAtlas;
 import static arc.math.geom.Geometry.d8edge;
 import static mindustry.Vars.control;
 import static mindustry.Vars.tilesize;
+import static tjTool.core.TjDraw.validColor;
 import static tjTool.world.blocks.anvil.Anvil.coreSize;
 
 public class AnvilAmplifier extends AnvilAddon {
@@ -20,7 +22,11 @@ public class AnvilAmplifier extends AnvilAddon {
         super(name);
         size = 5;
         drawArrow = false;
-        drawer = new DrawMulti(new DrawRotationAtlas("-atlas"), new DrawRotationAtlas("-interface") {
+    }
+
+    @Override
+    protected DrawBlock defaultDrawer() {
+        return new DrawMulti(new DrawRotationAtlas("-atlas"), new DrawRotationAtlas("-interface") {
             @Override
             public void draw(Building build) {
                 if (((AnvilAmplifierBuild) build).anvil != null) {

@@ -58,6 +58,10 @@ public class MultiConsumer {
         }
     }
 
+    public boolean hasConsumers() {
+        return consumers.length > 0;
+    }
+
     public boolean hasOption() {
         return optionalConsumers.length > 0;
     }

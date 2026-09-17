@@ -6,6 +6,7 @@ import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
+import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawRegion;
 import tjTool.world.blocks.anvil.Anvil.AnvilBuild;
@@ -22,7 +23,11 @@ public class AnvilEdge extends AnvilAddon {
         update = true;
         hasPower = true;
         consumePower(0.5f);
-        drawer = new DrawMulti(new DrawRotation(), new DrawRotation("-interface") {
+    }
+
+    @Override
+    protected DrawBlock defaultDrawer() {
+        return new DrawMulti(new DrawRotation(), new DrawRotation("-interface") {
             @Override
             public void draw(Building build) {
                 if (((AnvilEdgeBuild) build).anvil != null) {

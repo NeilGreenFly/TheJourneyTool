@@ -24,6 +24,7 @@ import tjTool.world.blocks.TjBlock;
 import static mindustry.Vars.*;
 import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjTable.*;
+import static tjTool.world.LazyGetter.*;
 
 public class MultiSorter extends TjBlock {
     public TextureRegion configRegion;
@@ -51,7 +52,7 @@ public class MultiSorter extends TjBlock {
 
     @Override
     protected void config() {
-        config(short[].class, (MultiSorterBuild build, short[] v) -> {
+        config(byte[].class, (MultiSorterBuild build, byte[] v) -> {
             if (build.enabled != (v[1] == 1)) placeEffect.at(build, size);
             build.sortItem = content.item(v[0]);
             build.enabled = v[1] == 1;
@@ -62,7 +63,8 @@ public class MultiSorter extends TjBlock {
     }
 
     @Override
-    public void loadDrawer() {
+    public void load() {
+        super.load();
         configRegion = Core.atlas.find(name + "-item");
         invertRegion = Core.atlas.find(name + "-invert");
     }
@@ -74,7 +76,7 @@ public class MultiSorter extends TjBlock {
 
     @Override
     public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list) {
-        if (!(plan.config instanceof short[] v)) return;
+        if (!(plan.config instanceof byte[] v)) return;
         if (v[1] == 0) Draw.rect(invertRegion, plan.drawx(), plan.drawy());
         if (v[0] < 0) return;
         Draw.color(content.item(v[0]).color, Draw.getColorAlpha());
@@ -84,7 +86,7 @@ public class MultiSorter extends TjBlock {
 
     @Override
     public int minimapColor(Tile tile) {
-        return tile.build instanceof MultiSorterBuild build && build.sortItem != null ? build.sortItem.color.rgba() : 0;
+        return c(((MultiSorterBuild) tile.build).sortItem).rgba();
     }
 
     @Override
@@ -135,30 +137,25 @@ public class MultiSorter extends TjBlock {
             return other != null && other.block.instantTransfer;
         }
 
+        @Nullable
         protected Building getTileTarget(Item item, Building source, boolean flip) {
             int dir = source.relativeTo(tile.x, tile.y);
             if (dir == -1) return null;
-            if ((item == sortItem) == enabled) { // prevent 3-chains
-                if (isSame(source) && isSame(nearby(dir))) return null;
-                return nearby(dir);
-            } else {
-                Building a = nearby(Mathf.mod(dir - 1, 4));
-                Building b = nearby(Mathf.mod(dir + 1, 4));
-                boolean ac = a != null && !(a.block.instantTransfer && source.block.instantTransfer) && a.acceptItem(this, item);
-                boolean bc = b != null && !(b.block.instantTransfer && source.block.instantTransfer) && b.acceptItem(this, item);
-                if (ac && !bc) return a;
-                else if (bc && !ac) return b;
-                else if (!bc) return null;
-                else {
-                    Building to = (rotation & (1 << dir)) == 0 ? a : b;
-                    if (flip) rotation ^= (1 << dir);
-                    return to;
-                }
-            }
+            if ((item == sortItem) == enabled) return isSame(source) && isSame(nearby(dir)) ? null : nearby(dir); // prevent 3-chains
+            Building a = nearby(Mathf.mod(dir - 1, 4));
+            Building b = nearby(Mathf.mod(dir + 1, 4));
+            boolean ac = a != null && !(a.block.instantTransfer && source.block.instantTransfer) && a.acceptItem(this, item);
+            boolean bc = b != null && !(b.block.instantTransfer && source.block.instantTransfer) && b.acceptItem(this, item);
+            if (ac && !bc) return a;
+            else if (bc && !ac) return b;
+            else if (!bc) return null;
+            Building to = (rotation & (1 << dir)) == 0 ? a : b;
+            if (flip) rotation ^= (1 << dir);
+            return to;
         }
 
-        protected short[] configPack(Item item, boolean enabled) {
-            return new short[]{item != null ? item.id : -1, (short) byBool(enabled)};
+        protected byte[] configPack(Item item, boolean enabled) { // Maybe we should use int[].
+            return new byte[]{(byte) w(item), (byte) byBool(enabled)};
         }
 
         @Override

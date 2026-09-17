@@ -21,7 +21,7 @@ public class Blocks {
 
     public static Block
             multiSorter,
-            liquidUnloader,
+            liquidUnloader, dirLiquidUnloader, multiConduit,
             mendWall, mendWallLarge,
             chargedLyreWall,
             multiCrafter;
@@ -36,6 +36,16 @@ public class Blocks {
         liquidUnloader = new LiquidUnloader("liquid-unloader") {{
             staticInit(this);
             requirements(liquid, with(metaglass, 10, titanium, 20, silicon, 30));
+        }};
+
+        dirLiquidUnloader = new DirLiquidUnloader("dir-liquid-unloader") {{
+            staticInit(this);
+            requirements(liquid, with(metaglass, 10, titanium, 20, silicon, 30));
+        }};
+
+        multiConduit = new MultiConduit("multi-conduit") {{
+            staticInit(this);
+            requirements(liquid, with(beryllium, 16));
         }};
 
         mendWall = new MendWall("mend-wall") {{

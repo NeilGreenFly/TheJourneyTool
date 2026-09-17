@@ -4,6 +4,7 @@ import arc.Core;
 import arc.func.Func;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.util.Nullable;
 import arc.util.io.Reads;
@@ -20,12 +21,18 @@ import tjTool.world.blocks.TjBlock;
 import static arc.math.geom.Geometry.d4;
 import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
-import static tjTool.core.TjDraw.drawSelected;
+import static tjTool.core.TjDraw.*;
 import static tjTool.core.TjVars.halfSize;
+import static tjTool.world.AutoTile.atlasRegions;
 
 // TODO Maybe we need MultiLiquidModule.
 @SuppressWarnings("unused")
 public class MultiConduit extends TjBlock {
+    protected static byte[] status = new byte[]{-1, -1, -1, 6, -1, -1, 8, 7, -1, 0, -1, 3, 2, 1, 5, 4};
+    public TextureRegion[] regions;
+    public TextureRegion dr;
+    public TextureRegion top;
+
     public MultiConduit(String name) {
         super(name);
         size = 2;
@@ -38,12 +45,15 @@ public class MultiConduit extends TjBlock {
         placeableLiquid = true;
         rotateDraw = true;
         displayFlow = false;
-        // drawer = new DrawMulti(new DrawDefault());
     }
 
     @Override
-    protected void loadDrawer() {
-        super.loadDrawer();
+    public void load() {
+        super.load();
+        var atlas = Core.atlas.find(name + "-atlas");
+        regions = atlasRegions(atlas, 64, 64, 64);
+        dr = new TextureRegion(atlas.texture, atlas.getX(), atlas.getY(), 64, 64);
+        top = new TextureRegion(atlas.texture, atlas.getX(), atlas.getY() + 64, 64, 64);
     }
 
     public <T extends Building> void addLiquidBar(int i, Func<T, LiquidModule> liquid){
@@ -75,6 +85,7 @@ public class MultiConduit extends TjBlock {
         public LiquidModule liquidsMiddle = new LiquidModule();
         public @Nullable MultiConduitBuild next;
         private boolean side = false;
+        protected int index = 0;
 
         protected Building getBuilding(int rotationOffset, boolean front) {
             return getBuilding(front ? this.rotation : this.rotation ^ 2, rotationOffset);
@@ -130,29 +141,34 @@ public class MultiConduit extends TjBlock {
 
         @Override
         public void draw() {
-            super.draw();
             LiquidBlock.drawTiledFrames(size, x, y,
-                    rotation % 2 == 0 ? 0 : 4,
-                    rotation % 2 == 0 ? 0 : 4,
-                    rotation % 2 == 1 ? 0 : 4,
-                    rotation % 2 == 1 ? 0 : 4,
+                    rotation % 2 == 0 ? 0 : 5,
+                    rotation % 2 == 0 ? 0 : 5,
+                    rotation % 2 == 1 ? 0 : 5,
+                    rotation % 2 == 1 ? 0 : 5,
                     liquidsMiddle.current(), liquidsMiddle.currentAmount() / liquidCapacity);
             LiquidBlock.drawTiledFrames(size,
-                    x + d4(rotation + 1).x * 6,
-                    y + d4(rotation + 1).y * 6,
+                    x + d4(rotation + 1).x * 5,
+                    y + d4(rotation + 1).y * 5,
                     rotation % 2 == 0 ? 0 : 6,
                     rotation % 2 == 0 ? 0 : 6,
                     rotation % 2 == 1 ? 0 : 6,
                     rotation % 2 == 1 ? 0 : 6,
                     liquidsLeft.current(), liquidsLeft.currentAmount() / liquidCapacity);
             LiquidBlock.drawTiledFrames(size,
-                    x + d4(rotation - 1).x * 6,
-                    y + d4(rotation - 1).y * 6,
+                    x + d4(rotation - 1).x * 5,
+                    y + d4(rotation - 1).y * 5,
                     rotation % 2 == 0 ? 0 : 6,
                     rotation % 2 == 0 ? 0 : 6,
                     rotation % 2 == 1 ? 0 : 6,
                     rotation % 2 == 1 ? 0 : 6,
                     liquidsRight.current(), liquidsRight.currentAmount() / liquidCapacity);
+            if (status[index] == -1) {
+                Draw.yscl = rotation % 2 == 0 ? 1 : -1;
+                Draw.rect(dr, x, y, rotation % 2 * 90);
+                Draw.scl();
+            } else Draw.rect(regions[status[index]], x, y);
+            Draw.rect(top, x, y, rotdeg());
         }
 
         public void moveLiquid(LiquidModule out, LiquidModule in) {
@@ -198,6 +214,13 @@ public class MultiConduit extends TjBlock {
                     build.team == team && build.block.size == size &&
                     (build.tile.x - size * d4[rotation].x == tile.x && build.tile.y - size * d4[rotation].y == tile.y)
                     ? build : null;
+            index = 0;
+            for (int i = 0; i < d4.length; i++) {
+                var other = world.build(tile.x + d4[i].x * size, tile.y + d4[i].y * size);
+                if (rotation == i || other != null && other.block == block && other.team == team && other.tile.x - tile.x == d4[i].x * size && other.tile.y - tile.y == d4[i].y * size && (other.rotation ^ i) == 2) {
+                    index |= 1 << i;
+                }
+            }
         }
 
         @Override

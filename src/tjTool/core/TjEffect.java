@@ -21,8 +21,7 @@ public class TjEffect {
     place = new Effect(120, e -> {
         Tile tile = world.tile((int) (e.x / tilesize), (int) (e.y / tilesize));
         if (tile.build != null) {
-            Draw.color(tile.team().color.cpy());
-            Draw.alpha(e.fout() * 2);
+            Draw.color(tile.team().color.cpy(), e.fout() * 2);
             Lines.stroke(e.fout() * 4);
             Lines.square(
                     e.x + (e.x - camera.position.x) * (z - 1) * e.fin(),
@@ -32,8 +31,7 @@ public class TjEffect {
     }),
 
     rising = new Effect(120, e -> randLenVectors(e.id, 1, e.finpow() * e.rotation * tilesize, (x, y) -> {
-        Draw.color(e.color);
-        Draw.alpha(e.fout() * 2);
+        Draw.color(e.color, e.fout() * 2);
         Fill.circle(
                 e.x + x + (e.x - camera.position.x) * (z - 1) * e.fin(),
                 e.y + y + (e.y - camera.position.y) * (z - 1) * e.fin(),

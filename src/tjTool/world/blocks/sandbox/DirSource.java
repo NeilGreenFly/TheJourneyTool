@@ -37,6 +37,7 @@ import static mindustry.Vars.*;
 import static tjTool.core.TjBundle.*;
 import static tjTool.core.TjConfigTable.*;
 import static tjTool.core.TjTable.*;
+import static tjTool.world.LazyGetter.*;
 
 public class DirSource extends BaseSource {
     public static boolean shown = true;
@@ -49,10 +50,11 @@ public class DirSource extends BaseSource {
         configurable = true;
         saveConfig = true;
         clearOnDoubleTap = true;
-        drawer = new DrawMulti(
-                new DrawDefault(),
-                new DrawHeatOutput()
-        );
+    }
+
+    @Override
+    protected DrawBlock defaultDrawer() {
+        return new DrawMulti(new DrawDefault(), new DrawHeatOutput());
     }
 
     @Override
@@ -308,7 +310,7 @@ public class DirSource extends BaseSource {
         }
 
         @Override
-        public int[] config() {
+        public Object config() {
             return pack.config();
         }
 

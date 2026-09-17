@@ -81,6 +81,7 @@ public class MultiCrafter extends TjBlock {
     @Override
     public void init() {
         super.init();
+        hasConsumers = multiConsumers.hasConsumers();
         configurable = multiConsumers.consumers.length > 1;
         itemFilter = multiConsumers.itemFilter;
         liquidFilter = multiConsumers.liquidFilter;
@@ -336,12 +337,6 @@ public class MultiCrafter extends TjBlock {
             consumption = table;
             table.clear();
             currentConsumer().displayConsumption(table.left(), this);
-        }
-
-        @Override
-        public void draw() {
-            super.draw();
-            if (renderer.drawStatus) drawStatus();
         }
 
         @Override
