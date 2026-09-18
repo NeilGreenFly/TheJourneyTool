@@ -81,6 +81,7 @@ public class MultiCrafter extends TjBlock {
     @Override
     public void init() {
         super.init();
+        multiConsumers.init();
         hasConsumers = multiConsumers.hasConsumers();
         configurable = multiConsumers.consumers.length > 1;
         itemFilter = multiConsumers.itemFilter;

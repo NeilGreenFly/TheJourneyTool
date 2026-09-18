@@ -5,6 +5,10 @@ import mindustry.gen.Building;
 public class BaseConsumer {
     public MultiStack input;
 
+    public void init() {
+        input.init();
+    }
+
     public float efficiency(Building building) {
         if (!(building.consumeTriggerValid() || building.items.has(input.items))) return 0;
         if (!(building.shouldConsume() && building.productionValid())) return 0;

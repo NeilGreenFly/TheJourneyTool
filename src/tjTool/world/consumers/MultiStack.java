@@ -18,14 +18,17 @@ public class MultiStack {
     public MultiStack(ItemStack[] items, LiquidStack[] liquids) {
         this.items = items != null ? items : ItemStack.empty;
         this.liquids = liquids != null ? liquids : LiquidStack.empty;
-        this.itemFilter = new boolean[content.items().size];
-        this.liquidFilter = new boolean[content.liquids().size];
-        for (var v : this.items) this.itemFilter[v.item.id] = true;
-        for (var v : this.liquids) this.liquidFilter[v.liquid.id] = true;
     }
 
     public MultiStack() {
         this(null, null);
+    }
+
+    public void init() {
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+        for (var v : this.items) itemFilter[v.item.id] = true;
+        for (var v : this.liquids) liquidFilter[v.liquid.id] = true;
     }
 
     public static ItemStack[] with(Item v, Object... n) {

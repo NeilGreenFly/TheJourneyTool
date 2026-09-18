@@ -21,6 +21,12 @@ public class SingleConsumer extends BaseConsumer {
         this.output = output;
     }
 
+    @Override
+    public void init() {
+        super.init();
+        output.init();
+    }
+
     public static SingleConsumer by(float sec) {
         return byTick(sec * 60f);
     }

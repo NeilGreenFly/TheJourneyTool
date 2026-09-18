@@ -22,20 +22,10 @@ public class MultiConsumer {
     public MultiConsumer(SingleConsumer... consumers) {
         this.consumers = consumers;
         this.optionalConsumers = new OptionalConsumer[0];
-        this.itemFilter = new boolean[content.items().size];
-        this.liquidFilter = new boolean[content.liquids().size];
-        this.optionalItemFilter = new boolean[content.items().size];
-        this.optionalLiquidFilter = new boolean[content.liquids().size];
-        this.capacities = new int[content.items().size];
-        init();
     }
 
     public MultiConsumer optional(OptionalConsumer... consumers) {
         this.optionalConsumers = consumers;
-        for (var consumer : optionalConsumers) {
-            for (var stack : consumer.input.liquids) optionalLiquidFilter[stack.liquid.id] = true;
-            for (var stack : consumer.input.items) optionalItemFilter[stack.item.id] = true;
-        }
         return this;
     }
 
@@ -44,7 +34,18 @@ public class MultiConsumer {
         this.multiplier = multiplier;
     }
 
-    protected void init() {
+    public void init() {
+        for (var consumer : consumers) consumer.init();
+        for (var consumer : optionalConsumers) consumer.init();
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+        optionalItemFilter = new boolean[content.items().size];
+        optionalLiquidFilter = new boolean[content.liquids().size];
+        capacities = new int[content.items().size];
+        for (var consumer : optionalConsumers) {
+            for (var stack : consumer.input.items) optionalItemFilter[stack.item.id] = true;
+            for (var stack : consumer.input.liquids) optionalLiquidFilter[stack.liquid.id] = true;
+        }
         for (var consumer : consumers) {
             if (consumer.consPower()) hasPower = true;
             if (consumer.consHeat()) hasHeat = true;
