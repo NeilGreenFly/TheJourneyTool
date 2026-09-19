@@ -4,14 +4,19 @@ import arc.func.Boolf3;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
+import arc.scene.ui.layout.Scl;
+import arc.util.Align;
 import arc.util.Time;
+import arc.util.pooling.Pools;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.ui.Fonts;
 import mindustry.world.Block;
 
 import static arc.Core.camera;
 import static arc.math.geom.Geometry.*;
+import static mindustry.Vars.renderer;
 import static mindustry.Vars.tilesize;
 import static tjTool.core.TjVars.halfSize;
 
@@ -278,6 +283,22 @@ public class TjDraw {
         Fill.square((x + 1) * tilesize, y * tilesize, 2 * size);
         Fill.square(x * tilesize, (y - 1) * tilesize, 2 * size);
         Fill.square(x * tilesize, (y + 1) * tilesize, 2 * size);
+    }
+
+    public static void drawPlaceText(String text, float x, float y, Color color) {
+        if(renderer.pixelate) return;
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        Font font = Fonts.outline;
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(1f / 4f / Scl.scl(1f));
+        font.setColor(color);
+        layout.setText(font, text);
+        font.draw(text, x, y + layout.height + 1, Align.center);
+        font.setUseIntegerPositions(ints);
+        font.getData().setScale(1f);
+        Draw.reset();
+        Pools.free(layout);
     }
 
 }

@@ -142,7 +142,7 @@ public class AnySource extends BaseSource {
             drawSelecting();
             if (warning) {
                 Draw.z(overlayUI);
-                drawPlaceText(TjBundle.getBlock(name, "warning"), tile.x, tile.y, false);
+                drawPlaceText(TjBundle.getBlock(name, "warning"), tile, false);
             }
         }
 

@@ -5,6 +5,7 @@ import arc.util.Eachable;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.world.Block;
+import mindustry.world.Tile;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawDefault;
 
@@ -43,6 +44,10 @@ public abstract class TjBlock extends Block {
     @Override
     protected TextureRegion[] icons() {
         return drawer.finalIcons(this);
+    }
+
+    public void drawPlaceText(String text, Tile tile, boolean valid) { // @return float
+        drawPlaceText(text, tile.x, tile.y, valid);
     }
 
     @SuppressWarnings("unused")

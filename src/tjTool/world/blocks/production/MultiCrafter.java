@@ -293,37 +293,35 @@ public class MultiCrafter extends TjBlock {
                             }).growX().row();
                         }
                     }),
-                    new Table(t -> forEach(multiConsumers.consumers, (i, consumer) -> {
-                        var button = new Button(style);
-                        button.clicked(() -> {
+                    new Table(t -> forEach(multiConsumers.consumers, (i, consumer) -> t.add(new Button(style) {{
+                        clicked(() -> {
                             if (currentConsumer != i) configure(i);
                             if (consumption != null) displayConsumption(consumption);
                         });
-                        button.update(() -> {
+                        update(() -> {
                             if (!(currentConsumer == i && image.c != i)) return;
                             image.c = i;
                             image.clearActions();
-                            image.actions(Actions.moveTo(button.x, button.y, 0.2f, Interp.fastSlow));
+                            image.actions(Actions.moveTo(x, y, 0.2f, Interp.fastSlow));
                         });
-                        t.add(button).tooltip(tip -> {
-                            tip.background(Tex.paneLeft).marginLeft(20);
-                            tip.table(input -> {
-                                input.left();
-                                for (var v : consumer.input.items) stack(input, v);
-                                for (var v : consumer.input.liquids) stack(input, v);
-                                if (consumer.consPower()) stack(input, new Image(Icon.power), autoFixed(consumer.usage * 60f, 3) + "[gray]/s[]", Pal.accent);
-                                if (consumer.consHeat()) stack(input, new Image(Icon.waves), String.valueOf((int) consumer.heatRequirement), Pal.remove);
-                            }).growX();
-                            tip.image(Icon.rightOpen).padLeft(10).padRight(10);
-                            tip.add(autoFixed(consumer.craftTime / 60f, 3) + "[gray]s[]");
-                            tip.image(Icon.rightOpen).padLeft(10).padRight(10);
-                            tip.table(output -> {
-                                output.right();
-                                for (var v : consumer.output.items) stack(output, v);
-                                for (var v : consumer.output.liquids) stack(output, v);
-                            }).growX();
-                        }).growX().height(uiSize).row();
-                    }))
+                    }}).tooltip(tip -> {
+                        tip.background(Tex.paneLeft).marginLeft(20);
+                        tip.table(input -> {
+                            input.left();
+                            for (var v : consumer.input.items) stack(input, v);
+                            for (var v : consumer.input.liquids) stack(input, v);
+                            if (consumer.consPower()) stack(input, new Image(Icon.power), autoFixed(consumer.usage * 60f, 3) + "[gray]/s[]", Pal.accent);
+                            if (consumer.consHeat()) stack(input, new Image(Icon.waves), String.valueOf((int) consumer.heatRequirement), Pal.remove);
+                        }).growX();
+                        tip.image(Icon.rightOpen).padLeft(10).padRight(10);
+                        tip.add(autoFixed(consumer.craftTime / 60f, 3) + "[gray]s[]");
+                        tip.image(Icon.rightOpen).padLeft(10).padRight(10);
+                        tip.table(output -> {
+                            output.right();
+                            for (var v : consumer.output.items) stack(output, v);
+                            for (var v : consumer.output.liquids) stack(output, v);
+                        }).growX();
+                    }).growX().height(uiSize).row()))
             );
         }
 
