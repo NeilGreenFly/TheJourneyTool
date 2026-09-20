@@ -2,6 +2,7 @@ package tjTool.core;
 
 import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.graphics.g2d.TextureRegion;
@@ -24,17 +25,33 @@ public class TjCube {
     protected static float from = -20;
     protected static float to = 10;
 
+    public static Vec2 position = new Vec2();
     public static boolean drawFront = true;
     public static float multiplier = 1;
     public static float alpha = 1;
     public static float z = 1.1f;
 
-    public Vec2 position = new Vec2();
+    public static int[][] cubeArea = new int[][]{
+            new int[]{6, 4, 0, 2},
+            new int[]{1, 5, 7, 3},
+            new int[]{5, 1, 0, 4},
+            new int[]{2, 3, 7, 6},
+            new int[]{3, 2, 0, 1},
+            new int[]{4, 6, 7, 5}
+    };
+
+    public static int[][] cubeAreaWithoutZ = new int[][]{
+            cubeArea[2],
+            cubeArea[3],
+            cubeArea[4],
+            cubeArea[5]
+    };
+
     public Vec3 rotation = new Vec3();
     public Vec3 rotationSpeed = new Vec3();
     public float scale;
     public float focalLength;
-    public Seq<Vertices> vertices = new Seq<>();
+    public Seq<Vertices> vertices = new Seq<>(Vertices.class);
     public Seq<int[]> edges = new Seq<>();
     public Seq<int[]> areas = new Seq<>();
 
@@ -43,14 +60,12 @@ public class TjCube {
         focalLength = 100f;
     }
 
-    public TjCube at(float x, float y) {
+    public static void at(float x, float y) {
         position.set(x, y);
-        return this;
     }
 
-    public TjCube at(Position v) {
+    public static void at(Position v) {
         position.set(v);
-        return this;
     }
 
     public TjCube setScale(float scale) {
@@ -58,8 +73,9 @@ public class TjCube {
         return this;
     }
 
-    public void add(float x, float y, float z) {
+    public TjCube add(float x, float y, float z) {
         vertices.add(new Vertices(x, y, z));
+        return this;
     }
 
     public void update() {
@@ -69,18 +85,18 @@ public class TjCube {
         for (var v : vertices) v.project3DTo2D();
     }
 
-    public void drawEdge() {
-        Vertices v0, v1;
+    public void drawEdge(Color color) {
+        var h = getOffsetByHeight(position.x, position.y, z);
+        Draw.color(color);
         Lines.stroke(3f);
         for (var edge : edges) {
-            v0 = vertices.get(edge[0]);
-            v1 = vertices.get(edge[1]);
+            var v0 = vertices.get(edge[0]);
+            var v1 = vertices.get(edge[1]);
             Lines.line(
-                    v0.projectTo.x + position.x,
-                    v0.projectTo.y + position.y,
-                    v1.projectTo.x + position.x,
-                    v1.projectTo.y + position.y
-            );
+                    v0.projectTo.x * multiplier + h.x,
+                    v0.projectTo.y * multiplier + h.y,
+                    v1.projectTo.x * multiplier + h.x,
+                    v1.projectTo.y * multiplier + h.y);
         }
     }
 
@@ -109,7 +125,7 @@ public class TjCube {
         drawArea(region);
     }
 
-    public void drawArea(TextureRegion region) {
+    protected void drawArea(TextureRegion region) {
         var h = getOffsetByHeight(position.x, position.y, z);
         for (var v : areas) {
             var v0 = vertices.get(v[0]);
@@ -169,15 +185,19 @@ public class TjCube {
         }
 
         public static boolean shouldDraw(Vertices v0, Vertices v1, Vertices v2) {
+            return shouldDraw(v0, v1, v1, v2);
+        }
+
+        public static boolean shouldDraw(Vertices v0, Vertices v1, Vertices v2, Vertices v3) {
             return drawFront == Tmp.v31.set(
                     v1.projectTo.x - v0.projectTo.x,
                     v1.projectTo.y - v0.projectTo.y,
                     v1.projectTo.z - v0.projectTo.z
             ).crs(
-                    v2.projectTo.x - v1.projectTo.x,
-                    v2.projectTo.y - v1.projectTo.y,
-                    v2.projectTo.z - v1.projectTo.z
-            ).nor().dot(Vec3.Z) < 0;
+                    v3.projectTo.x - v2.projectTo.x,
+                    v3.projectTo.y - v2.projectTo.y,
+                    v3.projectTo.z - v2.projectTo.z
+            ).dot(Vec3.Z) < 0;
         }
     }
 }
