@@ -22,7 +22,6 @@ import static mindustry.Vars.content;
 import static mindustry.world.blocks.liquid.LiquidBlock.drawTiledFrames;
 import static tjTool.world.LazyGetter.*;
 
-@SuppressWarnings("unused")
 public class DirLiquidUnloader extends TjBlock {
     public static Liquid[] allLiquids;
 

@@ -5,13 +5,14 @@ import arc.util.Align;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Drawf;
-import mindustry.graphics.Pal;
 import mindustry.world.blocks.defense.BaseShield;
 import tjTool.core.TjBar;
 import tjTool.core.TjDraw;
 import tjTool.core.TjStat;
 
 import static mindustry.Vars.tilesize;
+import static tjTool.core.TjDraw.validColor;
+import static tjTool.core.TjTable.iconSize;
 
 public class ShieldSource extends BaseShield {
     public ShieldSource(String name) {
@@ -48,12 +49,11 @@ public class ShieldSource extends BaseShield {
     public class ShieldSourceBuild extends BaseShieldBuild {
         @Override
         public void buildConfiguration(Table table) {
-            float iconSize = 32f;
             table.background(Tex.pane).left();
             table.image(region).tooltip(localizedName, true).size(iconSize).pad(10);
             table.slider(0, 1, 0.05f, optionalEfficiency, this::configure).width(200).row();
             table.image(Icon.resize).tooltip("Range", true).size(iconSize).pad(10);
-            table.label(() -> String.format("%.2f / %.2f", optionalEfficiency * radius / 8, radius / 8)).color(enabled ? Pal.accent : Pal.remove).growX().labelAlign(Align.right);
+            table.label(() -> String.format("%.2f / %.2f", optionalEfficiency * radius / 8, radius / 8)).color(validColor(enabled)).growX().labelAlign(Align.right);
         }
 
         @Override

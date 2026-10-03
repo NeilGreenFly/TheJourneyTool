@@ -84,8 +84,8 @@ public class TjDraw {
         Fill.lightInner(x, y, sides, Math.max(0, radius * 0.6f), radius, 0,
                 c1.set(color).a(0),
                 c2.set(color).a(0.7f));
-        Lines.stroke(1f);
         Draw.color(color);
+        Lines.stroke(1);
         Lines.poly(x, y, sides, radius + 0.5f);
         Draw.reset();
     }
@@ -175,12 +175,11 @@ public class TjDraw {
         Color color = rainbow;
         float from = color.a(0.25f).toFloatBits();
         float to = color.a(0).toFloatBits();
-        for (int i = 0; i < 4; ++i)
-            Fill.quad(
-                    cx + r[0] * d8edge(i).x, cy + r[0] * d8edge(i).y, from,
-                    cx + r[0] * d8edge(i - 1).x, cy + r[0] * d8edge(i - 1).y, from,
-                    cx + r[(i + 1) % 2] * d8edge(i - 1).x, cy + r[i % 2] * d8edge(i - 1).y, to,
-                    cx + r[(i + 1) % 2] * d8edge(i).x, cy + r[i % 2] * d8edge(i).y, to);
+        for (int i = 0; i < 4; ++i) Fill.quad(
+                cx + r[0] * d8edge(i).x, cy + r[0] * d8edge(i).y, from,
+                cx + r[0] * d8edge(i - 1).x, cy + r[0] * d8edge(i - 1).y, from,
+                cx + r[(i + 1) % 2] * d8edge(i - 1).x, cy + r[i % 2] * d8edge(i - 1).y, to,
+                cx + r[(i + 1) % 2] * d8edge(i).x, cy + r[i % 2] * d8edge(i).y, to);
     }
 
     public static void drawSelected(Building building) {
@@ -212,8 +211,7 @@ public class TjDraw {
     }
 
     /**
-     * 绘制一个信标.
-     * <p>
+     * 绘制一个信标.<p>
      * 您可以像这样绘制一个信标 :
      * <blockquote><pre>
      *     {@code @Override}

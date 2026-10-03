@@ -17,11 +17,14 @@ import static mindustry.world.meta.BuildVisibility.*;
 import static tjTool.world.consumers.MultiStack.with;
 import static tjTool.world.consumers.SingleConsumer.by;
 
+/**
+ * @see mindustry.content.Blocks
+ */
 public class Blocks {
 
     public static Block
             multiSorter,
-            liquidUnloader, dirLiquidUnloader, multiConduit,
+            dirLiquidRouter, liquidUnloader, dirLiquidUnloader, multiConduit,
             mendWall, mendWallLarge,
             chargedLyreWall,
             multiCrafter;
@@ -31,6 +34,11 @@ public class Blocks {
         multiSorter = new MultiSorter("multi-sorter") {{
             staticInit(this);
             requirements(distribution, with(copper, 2, lead, 2));
+        }};
+
+        dirLiquidRouter = new DirLiquidRouter("dir-liquid-router") {{
+            staticInit(this);
+            requirements(liquid, with(beryllium, 4, graphite, 10));
         }};
 
         liquidUnloader = new LiquidUnloader("liquid-unloader") {{
