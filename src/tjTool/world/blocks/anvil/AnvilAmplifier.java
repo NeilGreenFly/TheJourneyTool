@@ -22,6 +22,7 @@ public class AnvilAmplifier extends AnvilAddon {
         super(name);
         size = 5;
         drawArrow = false;
+        configurable = false;
     }
 
     @Override

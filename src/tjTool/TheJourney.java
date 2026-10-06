@@ -8,6 +8,7 @@ import mindustry.graphics.MultiPacker;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.BaseDialog;
 import tjTool.content.*;
+import tjTool.world.graphics.*;
 
 import static mindustry.Vars.*;
 import static tjTool.core.TjFunc.*;
@@ -32,6 +33,7 @@ public final class TheJourney extends Mod {
         theJourney = mods.getMod(this.getClass());
         // theJourney.meta.displayName = Core.bundle.get("mod-name"); // 真没想到可以替换成本地化名称
         try {
+            MultiModel.load();
             TjBlocks.load();
             TjOverride.load();
             TjEvents.load();
