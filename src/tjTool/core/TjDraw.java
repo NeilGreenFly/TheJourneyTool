@@ -284,7 +284,7 @@ public class TjDraw {
     }
 
     public static void drawPlaceText(String text, float x, float y, Color color) {
-        if(renderer.pixelate) return;
+        if (renderer.pixelate) return;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         Font font = Fonts.outline;
         boolean ints = font.usesIntegerPositions();

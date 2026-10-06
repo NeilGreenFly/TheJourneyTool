@@ -10,7 +10,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import tjTool.content.*;
 
 import static mindustry.Vars.*;
-import static tjTool.core.TjFunc.sprites;
+import static tjTool.core.TjFunc.*;
 
 @SuppressWarnings("unused")
 public final class TheJourney extends Mod {
@@ -30,6 +30,7 @@ public final class TheJourney extends Mod {
     @Override
     public void loadContent() {
         theJourney = mods.getMod(this.getClass());
+        // theJourney.meta.displayName = Core.bundle.get("mod-name"); // 真没想到可以替换成本地化名称
         try {
             TjBlocks.load();
             TjOverride.load();

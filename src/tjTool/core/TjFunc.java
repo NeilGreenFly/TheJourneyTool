@@ -37,16 +37,19 @@ public class TjFunc {
         for (int i = 0; i < array.length; i++) array[i] ^= key;
         return array;
     }
+    public static Pixmap pixmap(Fi file) {
+        return new Pixmap(b(file.readBytes()));
+    }
     public static void sprites(MultiPacker packer) {
         boolean bleed = Core.settings.getBool("linear", true);
         sprites(packer, bleed, "sprites", true);
         sprites(packer, bleed, "sprites-override", false);
     }
-    public static void sprites(MultiPacker packer, boolean bleed, String path, boolean prefix) {
+    private static void sprites(MultiPacker packer, boolean bleed, String path, boolean prefix) {
         var sprites = theJourney.root.child(path).findAll(f -> f.extension().equals("tj"));
         for (var sprite : sprites) {
             var name = sprite.nameWithoutExtension();
-            var pix = new Pixmap(b(sprite.readBytes()));
+            var pix = pixmap(sprite);
             if (bleed) Pixmaps.bleed(pix, 2);
             int hyphen = name.indexOf('-');
             var fullName = prefix && !(hyphen != -1 && name.substring(hyphen + 1).startsWith(theJourney.name + "-")) ? theJourney.name + "-" + name : name;

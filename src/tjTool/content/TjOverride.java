@@ -1,8 +1,10 @@
 package tjTool.content;
 
 import arc.graphics.Color;
+import mindustry.content.Planets;
 import mindustry.content.StatusEffects;
 import mindustry.entities.part.DrawPart;
+import mindustry.ui.dialogs.PlanetDialog;
 import tjTool.core.*;
 
 import static mindustry.content.UnitTypes.emanate;
@@ -111,6 +113,12 @@ public class TjOverride {
                 }}
         });
 
+    }
+
+    @SuppressWarnings("unused")
+    public static void debug() {
+        Planets.tantros.visible = true;
+        PlanetDialog.debugSelect = true;
     }
 
 }
