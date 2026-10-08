@@ -29,6 +29,7 @@ public abstract class AnvilAddon extends TjBlock {
         var r = 2 * e.fin();
         Draw.color(e.color, a * 2);
         Fill.poly(cx, cy, 4, r);
+        beacon(2);
         beacon(cx, cy, r, e.color, 0.3f * f);
     }));
 

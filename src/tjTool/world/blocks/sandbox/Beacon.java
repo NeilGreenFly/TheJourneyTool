@@ -88,6 +88,7 @@ public class Beacon extends SandboxBlock {
         @Override
         public void draw() {
             super.draw();
+            TjDraw.beacon(2);
             TjDraw.beacon(this, getColor(), icon != null ? icon : team.id < 4 ? teamIcons[team.id] : null);
             float f = (Time.time / 100f) % 1f;
             TjDraw.beacon(x, y, (size * halfSize) * f, getColor(), 1f - f);

@@ -52,14 +52,14 @@ public class TjDraw {
     public static String rainbowStream(String string) {
         StringBuilder rainbowString = new StringBuilder();
         for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(TjDraw.colorToString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f, c1.a(1)))).append(string.charAt(i));
+            rainbowString.append(colorToString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f, c1.a(1)))).append(string.charAt(i));
         return rainbowString.toString();
     }
 
     public static String flashingStream(String string, Color color, Color colorTo) {
         StringBuilder rainbowString = new StringBuilder();
         for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(TjDraw.colorToString(c1.set(color).lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
+            rainbowString.append(colorToString(c1.set(color).lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
         return rainbowString.toString();
     }
 
@@ -138,7 +138,7 @@ public class TjDraw {
         float cx = tilesize * x + block.offset;
         float cy = tilesize * y + block.offset;
         Color color = c1.set(valid ? rainbow : Pal.remove);
-        float[] c = {
+        float[] c = new float[]{
                 color.a(0.5f).toFloatBits(),
                 color.a(0.25f).toFloatBits(),
                 color.a(0).toFloatBits()};
@@ -194,6 +194,10 @@ public class TjDraw {
                 i * 90);
     }
 
+    public static void beacon(float height) {
+        z = height;
+    }
+
     public static void beacon(Building building, Color color, TextureRegion icon) {
         Boolf3<Float, Float, Integer> b = (x, y, i) -> {
             // Building building = world.buildWorld(x, y);
@@ -218,6 +222,7 @@ public class TjDraw {
      *     public void draw() {
      *         super.draw();
      *         float r = size * tilesize / 2f;
+     *         beacon(2f);
      *         beacon(x, y, r, Tmp.c1.set(team.color), 0.7f, null, null);
      *     }
      * </pre></blockquote>

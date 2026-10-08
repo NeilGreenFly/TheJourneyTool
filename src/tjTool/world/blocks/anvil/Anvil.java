@@ -4,11 +4,13 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
+import arc.math.Mathf;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
+import arc.util.Nullable;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.content.Planets;
+import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Layer;
@@ -53,6 +55,7 @@ public class Anvil extends TjBlock {
     @Override
     protected void config() {
         config(Planet.class, (AnvilBuild build, Planet v) -> build.planet = v);
+        configClear((AnvilBuild build) -> build.planet = null);
     }
 
     @Override
@@ -78,7 +81,8 @@ public class Anvil extends TjBlock {
 
     @SuppressWarnings("unused")
     public class AnvilBuild extends TjBuilding {
-        Planet planet = Planets.serpulo;
+        public @Nullable Planet planet;
+        public float delta = 0;
         public float energy = 0;
 
         public float acceptEnergy() {
@@ -92,10 +96,11 @@ public class Anvil extends TjBlock {
         @Override
         public void draw() {
             super.draw();
+            beacon(1.2f);
             beacon(x, y, 11 / 4f, color, 0.3f);
             beacon(x, y, 25 / 4f, color, 0.3f);
             beacon(x, y, 39 / 4f, color, 0.3f);
-            Draw.draw(Layer.flyingUnit - 2, () -> AnvilRingRender.render(x, y, planet));
+            if (delta > 0) Draw.draw(Layer.flyingUnit - 2, () -> AnvilRingRender.render(x, y, planet, delta));
         }
 
         @Override
@@ -106,6 +111,11 @@ public class Anvil extends TjBlock {
         }
 
         @Override
+        public void updateTile() {
+            delta = Mathf.lerp(delta, Mathf.num(planet != null), 0.1f);
+        }
+
+        @Override
         public void buildConfiguration(Table table) {
             table.background(Tex.paneLeft).table(t -> {
                 for (var v : content.planets()) {
@@ -113,12 +123,19 @@ public class Anvil extends TjBlock {
                     button.getStyle().imageUpColor = v.iconColor;
                     button.update(() -> button.setChecked(v == planet));
                     button.changed(() -> {
-                        if (button.isChecked()) configure(v);
+                        configure(button.isChecked() ? v : null);
+                        deselect();
                     });
                     t.add(button).size(uiSize).color(v.iconColor).tooltip(v.localizedName);
                 }
             }).row();
             table.slider(0, 10, 0.01f, z, v -> z = v).growX().padTop(10).row();
+        }
+
+        @Override
+        public boolean onConfigureBuildTapped(Building other) {
+            if (this == other) deselect();
+            return this != other;
         }
 
         @Override
@@ -143,7 +160,7 @@ public class Anvil extends TjBlock {
         public void read(Reads read, byte revision) {
             super.read(read, revision);
             var v = read.s();
-            if (v < content.planets().size) planet = content.planets().get(v);
+            if (-1 < v && v < content.planets().size) planet = content.planets().get(v);
         }
     }
 }

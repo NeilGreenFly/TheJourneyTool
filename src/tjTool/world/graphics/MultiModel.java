@@ -3,6 +3,7 @@ package tjTool.world.graphics;
 import arc.graphics.Mesh;
 import arc.graphics.Texture;
 import arc.graphics.VertexAttribute;
+import arc.util.Tmp;
 
 import static tjTool.TheJourney.theJourney;
 import static tjTool.core.TjFunc.*;
@@ -12,25 +13,44 @@ public class MultiModel {
         if (vertices == null) return;
         ring = new Texture(pixmap(theJourney.root.child("texture").child("anvil-ring.tj")));
         final int r = 4;
-        setVertices = new float[vertices.length * r];
-        setIndices = new short[setVertices.length / 5 / 4 * 6];
-        final int area = vertices.length / 20;
-        forRange(r, dir -> forRange(area, idx -> {
+        final int verSize = 8; // position3 + texCoords + normal
+        final int areaSize = verSize * 4;
+        final int areaCount = vertices.length / 20;
+        final int singleSize = areaSize * areaCount;
+        setVertices = new float[singleSize * r];
+        setIndices = new short[setVertices.length / areaSize * 6];
+        forRange(r, dir -> forRange(areaCount, areaIndex -> {
+            int baseIndex = singleSize * dir + areaSize * areaIndex;
             forRange(4, i -> {
-                int c = idx * 20 + i * 5;
-                int cc = vertices.length * dir + c;
-                setVertices[cc] = vertices[c] * multi;
-                setVertices[cc + 1] = vertices[c + 1] * multi;
-                setVertices[cc + 2] = vertices[c + 2] * multi;
-                setVertices[cc + 3] = vertices[c + 3] / (float) ring.width;
-                setVertices[cc + 4] = vertices[c + 4] / (float) ring.height;
+                int source = 20 * areaIndex + 5 * i;
+                int c = baseIndex + verSize * i;
+                setVertices[c] = vertices[source] * multi;
+                setVertices[c + 1] = vertices[source + 1] * multi;
+                setVertices[c + 2] = vertices[source + 2] * multi;
+                setVertices[c + 3] = vertices[source + 3] / (float) ring.width;
+                setVertices[c + 4] = vertices[source + 4] / (float) ring.height;
                 if (dir > 0) {
-                    setVertices[cc] = -setVertices[cc + 1 - vertices.length];
-                    setVertices[cc + 1] = setVertices[cc - vertices.length];
+                    setVertices[c] = -setVertices[c + 1 - singleSize];
+                    setVertices[c + 1] = setVertices[c - singleSize];
                 }
             });
-            int i = (area * dir + idx) * 6;
-            int v = (area * dir + idx) * 4;
+            var nor = Tmp.v31.set(
+                    setVertices[baseIndex + verSize] - setVertices[baseIndex],
+                    setVertices[baseIndex + verSize + 1] - setVertices[baseIndex + 1],
+                    setVertices[baseIndex + verSize + 2] - setVertices[baseIndex + 2]
+            ).crs(
+                    setVertices[baseIndex + verSize * 2] - setVertices[baseIndex + verSize],
+                    setVertices[baseIndex + verSize * 2 + 1] - setVertices[baseIndex + verSize + 1],
+                    setVertices[baseIndex + verSize * 2 + 2] - setVertices[baseIndex + verSize + 2]
+            ).nor();
+            forRange(4, i -> {
+                int c = baseIndex + verSize * i;
+                setVertices[c + 5] = nor.x;
+                setVertices[c + 6] = nor.y;
+                setVertices[c + 7] = nor.z;
+            });
+            int i = (areaCount * dir + areaIndex) * 6;
+            int v = (areaCount * dir + areaIndex) * 4;
             setIndices[i] = (short) v;
             setIndices[i + 1] = (short) (v + 1);
             setIndices[i + 2] = (short) (v + 2);
@@ -38,9 +58,10 @@ public class MultiModel {
             setIndices[i + 4] = (short) (v + 2);
             setIndices[i + 5] = (short) (v + 3);
         }));
-        ringMesh = new Mesh(true, setVertices.length / 5, setIndices.length,
+        ringMesh = new Mesh(true, setVertices.length / verSize, setIndices.length,
                 VertexAttribute.position3,
-                VertexAttribute.texCoords
+                VertexAttribute.texCoords,
+                VertexAttribute.normal
         ).setVertices(setVertices).setIndices(setIndices);
         vertices = null;
     }

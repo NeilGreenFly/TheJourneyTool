@@ -49,6 +49,7 @@ public class AnvilCubeTest extends Anvil {
         @Override
         public void draw() {
             drawer.draw(this);
+            beacon(2);
             beacon(x, y, 11 / 4f, color, 0.3f);
             beacon(x, y, 25 / 4f, color, 0.3f);
             beacon(x, y, 39 / 4f, color, 0.3f);

@@ -8,6 +8,7 @@ import arc.graphics.g2d.Bloom;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g3d.Camera3D;
 import arc.graphics.gl.FrameBuffer;
+import arc.math.Mathf;
 import arc.math.geom.Mat3D;
 import arc.math.geom.Vec3;
 import arc.util.Time;
@@ -34,6 +35,8 @@ public class AnvilRingRender {
         setThreshold(0.8f);
         setBloomIntensity(0.2f);
     }};
+    protected static float actualZ;
+    protected static float delta;
     public static float z = 2;
     public static float v = 0;
 
@@ -57,6 +60,14 @@ public class AnvilRingRender {
         buffer.blit(screenspace);
     }
 
+    private static float delta(float value) {
+        return value * delta;
+    }
+
+    private static float deltaOut(float value) {
+        return value * (1 - delta);
+    }
+
     private static void init() {
         graphicsWidth = graphics.getWidth();
         graphicsHeight = graphics.getHeight();
@@ -71,7 +82,7 @@ public class AnvilRingRender {
         return camera.position.set(
                 (Core.camera.position.x - x) / 20,
                 (Core.camera.position.y - y) / 20,
-                50 / Vars.renderer.camerascale - z);
+                50 / Vars.renderer.camerascale - actualZ);
     }
 
     private static void initCamera(float x, float y) {
@@ -81,6 +92,7 @@ public class AnvilRingRender {
     }
 
     private static void initPlanet(float x, float y, Planet planet) {
+        if (planet == null) return;
         params.viewW = graphicsWidth;
         params.viewH = graphicsHeight;
         params.planet = planet;
@@ -91,7 +103,7 @@ public class AnvilRingRender {
             setCamera(planetCamera, x, y).add(planet.position);
         } else {
             planetCamera.direction.set(planet.position).sub(planet.parent.position).rotate(Vec3.Y, Time.time * v)
-                    .nor().scl(50 / Vars.renderer.camerascale - z);
+                    .nor().scl(50 / Vars.renderer.camerascale - actualZ);
             Tmp.v31.set(planetCamera.direction).crs(Vec3.Y).nor();
             Tmp.v32.set(Tmp.v31).crs(planetCamera.direction).nor();
             planetCamera.position.set(planet.position).sub(planetCamera.direction)
@@ -100,20 +112,22 @@ public class AnvilRingRender {
         }
     }
 
-    public static void render(float x, float y, Planet planet) {
+    public static void render(float x, float y, Planet planet, float progress) {
         init();
+        delta = progress;
+        actualZ = z + Mathf.absin(Time.time + x + y, 40, 0.5f);
         initCamera(x, y);
         initPlanet(x, y, planet);
         planetCamera.update();
 
 //        gl(() -> fbo(() -> {
-//            camera.near = camera.position.z - z;
+//            camera.near = camera.position.z - 1;
 //            camera.far = 100;
 //            camera.update();
 //            renderRing();
 //            renderPlanet(planet);
 //            camera.near = 1;
-//            camera.far = camera.position.z - z;
+//            camera.far = camera.position.z;
 //            camera.update();
 //            renderRing();
 //        }));
@@ -123,9 +137,9 @@ public class AnvilRingRender {
         camera.update();
         gl(() -> {
             fbo(AnvilRingRender::renderRing);
-            planet.draw(params, planetCamera.combined, planet.getTransform(model));
+            if (planet != null) planet.draw(params, planetCamera.combined, planet.getTransform(model));
         });
-        gl(() -> fbo(() -> renderPlanet(planet)));
+        if (planet != null) gl(() -> fbo(() -> renderPlanet(planet)));
         camera.near = 1;
         camera.far = camera.position.z;
         camera.update();
@@ -137,15 +151,15 @@ public class AnvilRingRender {
         ring.bind();
         shader.camera = camera.combined;
 
-        shader.model = model.idt().scale(2, 2, 2)
-                .rotate(Vec3.X, Time.time * 0.25f)
-                .rotate(Vec3.Y, Time.time * 0.5f);
+        shader.model = model.idt().scale(delta(2), delta(2), delta(2))
+                .rotate(Vec3.X, (Time.time - deltaOut(300)) * 0.25f)
+                .rotate(Vec3.Y, (Time.time - deltaOut(300)) * 0.5f);
         shader.apply();
         ringMesh.render(shader, Gl.triangles);
 
-        shader.model = model.idt().scale(3.2f, 3.2f, 3)
-                .rotate(Vec3.X, Time.time * 0.25f)
-                .rotate(Vec3.Y, Time.time * 0.25f);
+        shader.model = model.idt().scale(delta(3.2f), delta(3.2f), delta(3))
+                .rotate(Vec3.X, (Time.time - deltaOut(301)) * 0.25f)
+                .rotate(Vec3.Y, (Time.time - deltaOut(301)) * 0.25f);
         shader.apply();
         ringMesh.render(shader, Gl.triangles);
     }

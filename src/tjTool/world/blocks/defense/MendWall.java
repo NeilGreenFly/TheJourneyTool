@@ -33,6 +33,13 @@ public class MendWall extends Wall {
     }
 
     @Override
+    public void load() {
+        super.load();
+        drawDynamic = true;
+        drawCached = false;
+    }
+
+    @Override
     public void setStats() {
         super.setStats();
         stats.add(Stat.repairTime, (int) (100f / healPercent * reload / 60f), StatUnit.seconds);
@@ -56,9 +63,9 @@ public class MendWall extends Wall {
 
     @SuppressWarnings("unused")
     public class MendWallBuild extends Building implements Ranged {
-        public float heat = 0f;
+        public float heat = 0;
         public float charge = Mathf.random(reload);
-        public float smoothEfficiency = 0f;
+        public float smoothEfficiency = 0;
         public boolean anyTargets = false;
 
         @Override
@@ -69,16 +76,16 @@ public class MendWall extends Wall {
         @Override
         public void updateTile() {
             boolean canHeal = !checkSuppression();
-            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, anyTargets ? efficiency : 0f, 0.08f);
-            heat = Mathf.lerpDelta(heat, efficiency > 0 && canHeal ? 1f : 0f, 0.08f);
+            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, anyTargets ? efficiency : 0, 0.08f);
+            heat = Mathf.lerpDelta(heat, efficiency > 0 && canHeal ? 1 : 0, 0.08f);
             charge += heat * delta();
             if (charge >= reload && canHeal) {
-                charge = 0f;
+                charge = 0;
                 anyTargets = false;
                 indexer.eachBlock(this, range,
-                        b -> b.damaged() && !b.isHealSuppressed() && (b.block.category == Category.defense),
+                        b -> selectBy(b) && b.damaged() && !b.isHealSuppressed(),
                         other -> {
-                            other.heal(Math.max(other.maxHealth() * healPercent / 100f, 10f));
+                            other.heal(Math.max(other.maxHealth() * healPercent / 100, 10));
                             other.recentlyHealed();
                             Fx.healBlockFull.at(other.x, other.y, other.block.size, baseColor, other.block);
                             anyTargets = true;
