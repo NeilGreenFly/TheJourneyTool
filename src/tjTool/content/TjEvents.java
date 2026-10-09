@@ -1,13 +1,16 @@
 package tjTool.content;
 
 import arc.Events;
+import arc.graphics.g2d.Draw;
 import arc.struct.Seq;
+import mindustry.ui.Fonts;
 import tjTool.world.blocks.sandbox.*;
 import tjTool.core.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.Trigger.*;
+import static tjTool.core.TjVars.*;
 
 public final class TjEvents {
 
@@ -27,6 +30,13 @@ public final class TjEvents {
         });
 
         Events.run(beforeGameUpdate, () -> updates.each(Runnable::run));
+
+        if (alwaysShowFPS) Events.run(uiDrawEnd, () -> {
+            Fonts.outline.draw("FPS: [cyan]" + graphics.getFramesPerSecond(),
+                    graphics.getWidth() / 4f,
+                    graphics.getHeight() / 4f * 3);
+            Draw.flush();
+        });
 
     }
 

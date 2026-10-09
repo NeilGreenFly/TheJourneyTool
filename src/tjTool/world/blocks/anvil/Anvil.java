@@ -54,7 +54,7 @@ public class Anvil extends TjBlock {
 
     @Override
     protected void config() {
-        config(Planet.class, (AnvilBuild build, Planet v) -> build.planet = v);
+        config(Byte.class, (AnvilBuild build, Byte v) -> build.planet = content.planets().get(v));
         configClear((AnvilBuild build) -> build.planet = null);
     }
 
@@ -123,7 +123,7 @@ public class Anvil extends TjBlock {
                     button.getStyle().imageUpColor = v.iconColor;
                     button.update(() -> button.setChecked(v == planet));
                     button.changed(() -> {
-                        configure(button.isChecked() ? v : null);
+                        configure(button.isChecked() ? (byte) v.id : null);
                         deselect();
                     });
                     t.add(button).size(uiSize).color(v.iconColor).tooltip(v.localizedName);
@@ -147,7 +147,7 @@ public class Anvil extends TjBlock {
 
         @Override
         public Object config() {
-            return planet;
+            return (byte) planet.id;
         }
 
         @Override
@@ -161,6 +161,7 @@ public class Anvil extends TjBlock {
             super.read(read, revision);
             var v = read.s();
             if (-1 < v && v < content.planets().size) planet = content.planets().get(v);
+            delta = Mathf.num(planet != null);
         }
     }
 }

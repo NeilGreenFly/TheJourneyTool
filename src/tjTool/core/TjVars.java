@@ -14,6 +14,8 @@ public final class TjVars {
     public static boolean showConsHeat = true;
     public static boolean showCraftTime = false;
 
+    public static boolean alwaysShowFPS = false;
+
     public static Drawable frame = atlas.drawable(theJourney.name + "-frame");
 
 }
