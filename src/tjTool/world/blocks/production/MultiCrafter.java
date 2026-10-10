@@ -258,6 +258,7 @@ public class MultiCrafter extends TjBlock {
         @Override
         public void buildConfiguration(Table table) {
             var image = new Image(Tex.pane) { int c; };
+            table.reset(); // 部分其他模组会调用 table.defaults() 导致这个 table 也跟着改, 不清楚原版重置为什么不顺便 .reset()
             table.background(Tex.paneLeft);
             table.table(info -> {
                 info.left().defaults().size(uiSize);

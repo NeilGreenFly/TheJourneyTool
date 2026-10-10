@@ -114,7 +114,7 @@ public class Blocks {
 
     public static void staticInit(Block block) {
         block.alwaysUnlocked = true;
-        block.buildVisibility = sandboxOnly;
+        block.buildVisibility = debugOnly;
         block.details = TjBundle.details(block, "test");
     }
 
