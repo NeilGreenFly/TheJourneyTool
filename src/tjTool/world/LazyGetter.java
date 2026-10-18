@@ -13,7 +13,7 @@ public class LazyGetter {
 
     public static final Vec2 v = new Vec2();
 
-    public static <T extends UnlockableContent> short w(T t) {
+    public static <T extends UnlockableContent> int w(T t) {
         return t != null ? t.id : -1;
     }
 

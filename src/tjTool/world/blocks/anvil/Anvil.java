@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 import static tjTool.core.TjDraw.beacon;
 import static tjTool.core.TjTable.uiSize;
 import static tjTool.world.LazyGetter.w;
-import static tjTool.world.graphics.AnvilRingRender.z;
+import static tjTool.world.graphics.AnvilRingRender.*;
 
 // 困困...睡觉觉喵...
 public class Anvil extends TjBlock {
@@ -147,7 +147,7 @@ public class Anvil extends TjBlock {
 
         @Override
         public Object config() {
-            return (byte) planet.id;
+            return (byte) w(planet);
         }
 
         @Override

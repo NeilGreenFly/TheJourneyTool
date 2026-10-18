@@ -32,6 +32,7 @@ public final class TjEvents {
         Events.run(beforeGameUpdate, () -> updates.each(Runnable::run));
 
         if (alwaysShowFPS) Events.run(uiDrawEnd, () -> {
+            if (!ui.hudfrag.shown) return;
             Fonts.outline.draw("FPS: [cyan]" + graphics.getFramesPerSecond(),
                     graphics.getWidth() / 4f,
                     graphics.getHeight() / 4f * 3);
