@@ -15,15 +15,17 @@ import static mindustry.type.Category.*;
 import static mindustry.type.ItemStack.mult;
 import static mindustry.world.meta.BuildVisibility.*;
 import static tjTool.world.consumers.MultiStack.with;
+import static tjTool.world.consumers.OptionalConsumer.by;
 import static tjTool.world.consumers.SingleConsumer.by;
 
 /**
  * @see mindustry.content.Blocks
  */
+@SuppressWarnings("SpellCheckingInspection")
 public class Blocks {
 
     public static Block
-            multiSorter,
+            multiSorter, plastaniumJunction,
             dirLiquidRouter, liquidUnloader, dirLiquidUnloader, multiConduit,
             mendWall, mendWallLarge,
             chargedLyreWall,
@@ -34,6 +36,14 @@ public class Blocks {
         multiSorter = new MultiSorter("multi-sorter") {{
             staticInit(this);
             requirements(distribution, with(copper, 2, lead, 2));
+        }};
+
+        plastaniumJunction = new StackJunction("plastanium-junction") {{
+            staticInit(this);
+            requirements(distribution, with(graphite, 4, silicon, 2, plastanium, 2));
+            health = 160;
+            speed = 4f / 60f;
+            itemCapacity = 10;
         }};
 
         dirLiquidRouter = new DirLiquidRouter("dir-liquid-router") {{
@@ -106,7 +116,7 @@ public class Blocks {
                             .inputBy(null, with(cryofluid, 12 / 60f))
                             .outputBy(with(titanium, 1), with(water, 12 / 60f, nitrogen, 36 / 60f)) //.powerPerSec(60)
             ).optional(
-                    OptionalConsumer.by(null, with(cyanogen, 2 / 60f))
+                    by(null, with(cyanogen, 2 / 60f))
             );
         }};
 

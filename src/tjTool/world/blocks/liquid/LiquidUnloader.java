@@ -117,7 +117,7 @@ public class LiquidUnloader extends TjBlock {
             // TODO Maybe should check if it can unload? Although `unloadable` only works on the original version of the `Item`.
             for (var building : proximity) {
                 Building destination = building.getLiquidDestination(this, liquid);
-                if (!destination.block.hasLiquids) continue;
+                if (!destination.block.hasLiquids || destination.team != team) continue;
                 if (!destination.acceptLiquid(this, liquid)) {
                     float get = destination.liquids.get(liquid);
                     if (get == 0 || destination != building) continue;

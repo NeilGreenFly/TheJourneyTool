@@ -16,6 +16,10 @@ public final class TjVars {
 
     public static boolean alwaysShowFPS = false;
 
-    public static Drawable frame = atlas.drawable(theJourney.name + "-frame");
+    public static Drawable frame;
+
+    public static void load() {
+        frame = atlas.drawable(theJourney.name + "-frame");
+    }
 
 }

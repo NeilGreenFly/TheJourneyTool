@@ -100,8 +100,8 @@ public class DirLiquidUnloader extends TjBlock {
             currentId = liquid.id;
             Building outBuilding = back.getLiquidDestination(this, liquid);
             Building inBuilding = front.getLiquidDestination(this, liquid);
-            if (!(outBuilding == back && outBuilding.block.hasLiquids && outBuilding.liquids.get(liquid) > 0 &&
-                    inBuilding != null && inBuilding.block.hasLiquids && inBuilding.acceptLiquid(this, liquid))) return;
+            if (!(outBuilding == back && outBuilding.block.hasLiquids && outBuilding.liquids.get(liquid) > 0 && outBuilding.team == team &&
+                    inBuilding != null && inBuilding.block.hasLiquids && inBuilding.acceptLiquid(this, liquid) && inBuilding.team == team)) return;
             float amount = Math.min(outBuilding.liquids.get(liquid), inBuilding.block.liquidCapacity - inBuilding.liquids.get(liquid));
             outBuilding.liquids.remove(liquid, amount);
             inBuilding.handleLiquid(this, liquid, amount);

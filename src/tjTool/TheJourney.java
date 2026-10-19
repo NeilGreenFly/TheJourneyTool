@@ -8,6 +8,7 @@ import mindustry.graphics.MultiPacker;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.BaseDialog;
 import tjTool.content.*;
+import tjTool.core.*;
 import tjTool.world.graphics.*;
 
 import static mindustry.Vars.*;
@@ -26,6 +27,11 @@ public final class TheJourney extends Mod {
             dialog.cont.button("Sure", dialog::hide).size(100f, 50f);
             dialog.show();
         });
+    }
+
+    @Override
+    public void init() {
+        TjVars.load();
     }
 
     @Override
