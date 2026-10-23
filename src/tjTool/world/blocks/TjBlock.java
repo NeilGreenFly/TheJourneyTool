@@ -23,6 +23,9 @@ public abstract class TjBlock extends Block {
         selectionColumns = 6;
     }
 
+    /**
+     * @see mindustry.io.TypeIO
+     */
     protected void config() {}
 
     protected DrawBlock defaultDrawer() {

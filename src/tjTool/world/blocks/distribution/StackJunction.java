@@ -25,8 +25,6 @@ public class StackJunction extends StackConveyor {
         super(name);
         rotate = false;
         unloadable = false;
-        hasItems = true;
-        itemCapacity = 10;
         drawCached = false;
     }
 

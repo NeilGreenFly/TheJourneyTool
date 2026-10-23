@@ -19,6 +19,7 @@ public class TjOverride {
         // tileLogicDisplay.allowRectanglePlacement = true;
 
         StatusEffects.none.color = Color.green;
+        StatusEffects.invincible.color = Color.red;
 
         final float haloY = -16f;
         emanate.parts.add(new DrawPart[]{

@@ -106,7 +106,7 @@ public class DirSource extends BaseSource {
         public boolean tap = false;
 
         public Pack pack = new Pack(this).prefix(() -> w(target)).with(
-                TypeContent.unlockableContent(() -> new Image(target.uiIcon), () -> target.localizedName, () -> ammoTypes, () -> ammo).setAlwaysBuild(true).setLock(() -> target instanceof BaseTurret),
+                TypeContent.unlockableContent(() -> new Image(target.uiIcon), () -> target.localizedName, () -> ammoTypes, v -> v.emoji() + v.localizedName, () -> ammo).setAlwaysBuild(true).setLock(() -> target instanceof BaseTurret),
                 TypeContent.unlockableContent(() -> new Image(Icon.star), () -> getBlock(name, "config-boost"), coolants::as, v -> target instanceof ReloadTurret reloadTurret ? v.emoji() + v.localizedName + "\n" + TjStat.boosters(reloadTurret, true, (Liquid) v) : v.localizedName, () -> coolant).setFavorite(v -> ((Liquid) v).heatCapacity),
                 new StackContent(() -> new Image(Icon.download), () -> getBlock(name, "config-consumes"), () -> new Seq<UnlockableContent>(items).add(liquids), () -> target),
                 new IntContent(() -> new Image(Icon.effect), () -> getBlock(name, "config-overdrive"), () -> overdrive)

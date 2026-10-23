@@ -3,6 +3,7 @@ package tjTool.world.blocks.production;
 import arc.Core;
 import arc.Events;
 import arc.func.Boolc;
+import arc.func.Boolp;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Interp;
@@ -242,12 +243,12 @@ public class MultiCrafter extends TjBlock {
             dumpOutputs();
         }
 
-        protected void addButton(Table root, Table table, TextureRegionDrawable icon, boolean setChecked, Boolc isChecked) {
+        protected void addButton(Table root, Table table, TextureRegionDrawable icon, Boolp isChecked, Boolc setChecked) {
             table.add(new ImageButton(icon, Styles.clearNoneTogglei) {{
                 resizeImage(iconSize);
-                update(() -> setChecked(setChecked));
+                update(() -> setChecked(isChecked.get()));
                 changed(() -> {
-                    isChecked.get(isChecked());
+                    setChecked.get(isChecked());
                     root.clear();
                     buildConfiguration(root);
                     root.pack();
@@ -266,9 +267,9 @@ public class MultiCrafter extends TjBlock {
                     ui.content.show(block);
                     Events.fire(new EventType.BlockInfoEvent());
                 });
-                addButton(table, info, Icon.power, showConsPower, v -> showConsPower = v);
-                addButton(table, info, Icon.waves, showConsHeat, v -> showConsHeat = v);
-                addButton(table, info, Icon.rightOpen, showCraftTime, v -> showCraftTime = v);
+                addButton(table, info, Icon.power, () -> showConsPower, v -> showConsPower = v);
+                addButton(table, info, Icon.waves, () -> showConsHeat, v -> showConsHeat = v);
+                addButton(table, info, Icon.rightOpen, () -> showCraftTime, v -> showCraftTime = v);
             }).growX().padBottom(10).row();
             table.stack(
                     new Table(t -> t.add(image).growX().height(uiSize).padTop(!buttonDrop ? uiSize * currentConsumer : 0)).top(),

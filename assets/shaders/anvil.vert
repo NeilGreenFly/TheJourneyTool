@@ -10,6 +10,6 @@ uniform mat4 u_trans;
 
 void main() {
     v_texCoord = a_texCoord0;
-    v_bright = dot(normalize(mat3(u_trans) * a_normal), vec3(0, 0, 1)) / 4 + 0.75;
+    v_bright = dot(normalize(mat3(u_trans) * a_normal), vec3(0.0, 0.0, 1.0)) / 4.0 + 0.75;
     gl_Position = u_proj * u_trans * a_position;
 }

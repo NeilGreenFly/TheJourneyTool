@@ -25,6 +25,10 @@ import static tjTool.world.graphics.MultiModel.ringMesh;
 import static tjTool.world.graphics.Shaders.shader;
 
 // TODO bloom
+
+/**
+ * 感谢 @星躔-Stellarcus 的帮助和指导
+ */
 public class AnvilRingRender {
     public static final Mat3D model = new Mat3D();
     public static final Camera3D camera = new Camera3D();

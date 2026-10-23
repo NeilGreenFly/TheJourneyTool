@@ -126,7 +126,7 @@ public class Anvil extends TjBlock {
                         configure(button.isChecked() ? (byte) v.id : null);
                         deselect();
                     });
-                    t.add(button).size(uiSize).color(v.iconColor).tooltip(v.localizedName);
+                    t.add(button).size(uiSize).color(v.iconColor).tooltip(v.localizedName, true);
                 }
             }).row();
             table.slider(0, 10, 0.01f, z, v -> z = v).growX().padTop(10).row();

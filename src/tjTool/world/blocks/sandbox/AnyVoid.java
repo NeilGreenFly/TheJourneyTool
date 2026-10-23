@@ -17,6 +17,13 @@ public class AnyVoid extends SandboxBlock {
         group = BlockGroup.transportation;
     }
 
+    @Override
+    public boolean canReplace(Block other) {
+        return other.alwaysReplace || !other.privileged && other.replaceable && (other != this || (rotate && quickRotate)) &&
+                ((group != BlockGroup.none && (other.group == BlockGroup.transportation || other.group == BlockGroup.liquids)) || other == this) &&
+                (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
+    }
+
     @SuppressWarnings("unused")
     public class AnyVoidBuild extends SandboxBuild {
 

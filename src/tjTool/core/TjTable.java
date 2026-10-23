@@ -170,7 +170,7 @@ public class TjTable {
                 ButtonGroup<ImageButton> listGroup = new ButtonGroup<>();
                 pages.each(page -> list.button(page.icon, Styles.clearNoneTogglei, iconSize, () -> {
                     frame.clearChildren();
-                    page.contents.each(content -> frame.table(content.build(closeSelect)));
+                    page.contents.each(content -> frame.table(content.build(closeSelect)).growX().row());
                 }).size(uiSize).group(listGroup).row());
                 list.getChildren().get(0).fireClick();
             }).top();
@@ -280,7 +280,7 @@ public class TjTable {
                 forEach(items.get(), (idx, item) -> {
                     ImageButton button = table.button(buttonRegion.get(item), Styles.clearNoneTogglei, iconSize, () -> {
                         if (closeSelect) control.input.config.hideConfig();
-                    }).tooltip(buttonTip.get(item)).group(group).get();
+                    }).tooltip(buttonTip.get(item), true).group(group).get();
                     button.changed(configure != null ? () -> configure.get(item) : (value == null
                             ? () -> layout.building.configure(button.isChecked() ? item : null)
                             : () -> call(button.isChecked() ? value.get(item) : -1)));
