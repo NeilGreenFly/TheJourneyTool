@@ -9,7 +9,6 @@ import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.scene.style.TextureRegionDrawable;
-import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Eachable;
 import arc.util.Nullable;
@@ -33,6 +32,7 @@ import mindustry.world.blocks.defense.BuildTurret;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.meta.BlockGroup;
 import tjTool.core.*;
+import tjTool.world.LazyButton;
 
 import java.util.Arrays;
 
@@ -67,17 +67,17 @@ public class AnySource extends BaseSource {
 
     @Override
     protected void config() {
-        config(boolean[].class, (AnySourceBuild build, boolean[] v) -> {
+        config(boolean[].class, (BuildType build, boolean[] v) -> {
             build.outputItem = v[0];
             build.outputLiquid = v[1];
             build.outputPower = v[2];
             build.outputHeat = v[3];
             build.outputPayload = v[4];
         });
-        config(Integer.class, (AnySourceBuild build, Integer v) -> {
+        config(Integer.class, (BuildType build, Integer v) -> {
             if (v == 2) build.commandPos = null;
         });
-        config(UnitType.class, (AnySourceBuild build, UnitType v) -> {
+        config(UnitType.class, (BuildType build, UnitType v) -> {
             lastConfig = null;
             if (v.useUnitCap && build.team.data().countType(v) >= Units.getCap(build.team)) {
                 Fx.unitCapKill.at(build);
@@ -121,14 +121,13 @@ public class AnySource extends BaseSource {
                 (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
-    @SuppressWarnings("unused")
-    public class AnySourceBuild extends BaseSourceBuild {
+    public class BuildType extends BaseSource.BuildType {
         public boolean outputItem = true;
         public boolean outputLiquid = true;
         public boolean outputPower = true;
         public boolean outputPayload = true;
         public boolean outputHeat = true;
-        public float outputOverdrive;
+        // public float outputOverdrive;
 
         public @Nullable Vec2 commandPos;
         private boolean handle;
@@ -146,6 +145,7 @@ public class AnySource extends BaseSource {
                 """;
         public Layout layout = new Layout(this).with(
                 new Page(Icon.wrench).with(new EmptyContent<>(table -> {
+                    table.defaults().pad(5);
                     addButton(table, Icon.box, () -> outputItem, v -> outputItem = v, Blocks.itemSource);
                     addButton(table, Icon.liquid, () -> outputLiquid, v -> outputLiquid = v, Blocks.liquidSource);
                     addButton(table, Icon.power, () -> outputPower, v -> outputPower = v, Blocks.powerSource);
@@ -155,7 +155,7 @@ public class AnySource extends BaseSource {
                         boolean[] config = (boolean[]) config();
                         Arrays.fill(config, !getStatus());
                         configure(config);
-                    }).size(uiSize).tooltip("@addall", true).pad(5);
+                    }).size(uiSize).tooltip("@addall", true);
                     table.row();
                     table.button(Icon.trash, iconSize, () -> configure(2)).size(uiSize).tooltip("@stance.stop", true).padTop(100);
                 })),
@@ -165,17 +165,10 @@ public class AnySource extends BaseSource {
         );
 
         private void addButton(Table table, TextureRegionDrawable icon, Boolp isChecked, Boolc setChecked, Block block) {
-            table.add(new ImageButton(icon, Styles.clearNoneTogglei) {{
-                resizeImage(iconSize);
-                update(() -> setChecked(isChecked.get()));
-                changed(() -> {
-                    setChecked.get(isChecked());
-                    configure(config());
-                });
-            }}).size(uiSize).tooltip(tip -> {
+            LazyButton.add(this, table, icon, isChecked, setChecked, this::config).tooltip(tip -> {
                 tip.background(Tex.paneLeft).image(block.uiIcon).size(iconSize).padLeft(5).padRight(10);
                 tip.label(() -> block.localizedName + "    " + Core.bundle.get(isChecked.get() ? "mod.enabled" : "mod.disabled") + "[]\n" + block.description);
-            }).pad(5);
+            });
         }
 
         public boolean getStatus() {

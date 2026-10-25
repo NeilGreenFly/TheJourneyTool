@@ -9,7 +9,6 @@ import mindustry.world.Tile;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawRegion;
-import tjTool.world.blocks.anvil.Anvil.AnvilBuild;
 import tjTool.world.draw.DrawRotation;
 
 import static arc.math.geom.Geometry.d4;
@@ -30,7 +29,7 @@ public class AnvilEdge extends AnvilAddon {
         return new DrawMulti(new DrawRotation(), new DrawRotation("-interface") {
             @Override
             public void draw(Building build) {
-                if (((AnvilEdgeBuild) build).anvil != null) {
+                if (((BuildType) build).anvil != null) {
                     Draw.z(Layer.blockOver - .1f);
                     super.draw(build);
                 }
@@ -39,13 +38,12 @@ public class AnvilEdge extends AnvilAddon {
     }
 
     @Override
-    public AnvilBuild checkCore(Tile tile, Team team, int rotation) {
+    public Anvil.BuildType checkCore(Tile tile, Team team, int rotation) {
         var t = tileNearby(tile, d4, rotation);
         return t != null && t.build != null && (rotation % 2 != 0 ? tile.x - t.build.tile.x : tile.y - t.build.tile.y) % size == 0 ? super.checkCore(t, team, 0) : null;
     }
 
-    @SuppressWarnings("unused")
-    public class AnvilEdgeBuild extends AnvilAddonBuild {
+    public class BuildType extends AnvilAddon.BuildType {
         @Override
         public boolean shouldConsume() {
             return enabled && anvil != null && anvil.acceptEnergy() > 0;

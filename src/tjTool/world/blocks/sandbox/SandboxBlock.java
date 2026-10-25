@@ -64,8 +64,7 @@ public abstract class SandboxBlock extends TjBlock {
         if (!rotate) TjDraw.drawPlace(this, x, y, valid);
     }
 
-    @SuppressWarnings("unused")
-    public abstract class SandboxBuild extends TjBuilding {
+    public abstract class BuildType extends TjBlock.BuildType {
         protected float selectingDrawRadius = 0f;
 
         public boolean checkBuild(Building other) {

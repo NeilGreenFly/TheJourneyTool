@@ -12,7 +12,6 @@ import mindustry.game.Team;
 import mindustry.graphics.BlockRenderer;
 import mindustry.world.Tile;
 import tjTool.world.blocks.TjBlock;
-import tjTool.world.blocks.anvil.Anvil.AnvilBuild;
 
 import static arc.math.Angles.randLenVectors;
 import static mindustry.Vars.state;
@@ -21,7 +20,7 @@ import static tjTool.core.TjVars.frame;
 
 public abstract class AnvilAddon extends TjBlock {
     public static Effect anvilEffect = new Effect(240, e -> randLenVectors(e.id, 2, e.finpow() * 20, (x, y) -> {
-        var build = (AnvilBuild) e.data;
+        var build = (Anvil.BuildType) e.data;
         var f = e.finpowdown();
         var a = e.foutpowdown();
         var cx = e.x + x + (build.x - e.x - x) * f;
@@ -54,8 +53,8 @@ public abstract class AnvilAddon extends TjBlock {
         return tile.nearby((size / 2 + 1) * geometry[rotation].x, (size / 2 + 1) * geometry[rotation].y);
     }
 
-    public AnvilBuild checkCore(Tile tile, Team team, int rotation) {
-        return tile.build instanceof AnvilBuild build && build.team == team ? build : null;
+    public Anvil.BuildType checkCore(Tile tile, Team team, int rotation) {
+        return tile.build instanceof Anvil.BuildType build && build.team == team ? build : null;
     }
 
     @Override
@@ -71,8 +70,8 @@ public abstract class AnvilAddon extends TjBlock {
         Draw.color();
     }
 
-    public abstract class AnvilAddonBuild extends TjBuilding {
-        public @Nullable AnvilBuild anvil;
+    public abstract class BuildType extends TjBlock.BuildType {
+        public @Nullable Anvil.BuildType anvil;
 
         public void anvilUpdateTile() {}
 

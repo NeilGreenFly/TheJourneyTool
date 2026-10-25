@@ -6,25 +6,32 @@ import arc.graphics.g2d.Fill;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.content.Fx;
+import mindustry.entities.TargetPriority;
 import mindustry.entities.effect.MultiEffect;
-import mindustry.gen.Building;
 import mindustry.graphics.Layer;
-import mindustry.world.blocks.defense.Wall;
+import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.Env;
 import tjTool.core.*;
+import tjTool.world.blocks.TjBlock;
 
 import static mindustry.Vars.tilesize;
 
-public class Bedrock extends Wall {
+public class Bedrock extends TjBlock {
     public Bedrock(String name) {
         super(name);
         size = 2;
         health = Integer.MAX_VALUE;
         update = true;
+        canOverdrive = false;
+        drawDisabled = false;
         placeEffect = new MultiEffect(placeEffect, Fx.drillSteam.startDelay(0f));
         breakEffect = new MultiEffect(breakEffect, Fx.mineImpact, TjEffect.blockBecomeSmaller(this));
         allowRectanglePlacement = true;
         placeableLiquid = true;
         alwaysUnlocked = true;
+        group = BlockGroup.walls;
+        priority = TargetPriority.wall;
+        envEnabled = Env.any;
     }
 
     @Override
@@ -45,15 +52,7 @@ public class Bedrock extends Wall {
         TjDraw.drawPlace(this, x, y, valid);
     }
 
-    @Override
-    public void init() {
-        super.init();
-        drawDynamic = true;
-        drawCached = false;
-    }
-
-    @SuppressWarnings("unused")
-    public class BedrockBuild extends Building {
+    public class BuildType extends TjBlock.BuildType {
         @Override
         public float handleDamage(float amount) {
             return 0f;
@@ -68,8 +67,8 @@ public class Bedrock extends Wall {
         @Override
         public void draw() {
             super.draw();
-            Draw.color(Color.HSVtoRGB((Time.time + x + y) % 360.0F, 25.0F, 100.0F, Tmp.c1.a(1f)));
             Draw.z(Layer.shields);
+            Draw.color(Color.HSVtoRGB((Time.time + x + y) % 360, 25, 100, Tmp.c1.a(1)));
             Fill.rect(x, y, size * tilesize, size * tilesize);
             Draw.reset();
         }

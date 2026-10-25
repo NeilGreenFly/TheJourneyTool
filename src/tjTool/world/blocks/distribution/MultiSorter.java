@@ -52,14 +52,14 @@ public class MultiSorter extends TjBlock {
 
     @Override
     protected void config() {
-        config(byte[].class, (MultiSorterBuild build, byte[] v) -> {
+        config(byte[].class, (BuildType build, byte[] v) -> {
             if (build.enabled != (v[1] == 1)) placeEffect.at(build, size);
             build.sortItem = content.item(v[0]);
             build.enabled = v[1] == 1;
         });
-        config(Item.class, (MultiSorterBuild build, Item v) -> build.sortItem = v);
-        config(Boolean.class, (MultiSorterBuild build, Boolean v) -> build.enabled = v);
-        configClear((MultiSorterBuild build) -> build.sortItem = null);
+        config(Item.class, (BuildType build, Item v) -> build.sortItem = v);
+        config(Boolean.class, (BuildType build, Boolean v) -> build.enabled = v);
+        configClear((BuildType build) -> build.sortItem = null);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class MultiSorter extends TjBlock {
 
     @Override
     public int minimapColor(Tile tile) {
-        return c(((MultiSorterBuild) tile.build).sortItem).rgba();
+        return c(((BuildType) tile.build).sortItem).rgba();
     }
 
     @Override
@@ -94,8 +94,7 @@ public class MultiSorter extends TjBlock {
         return true;
     }
 
-    @SuppressWarnings("unused")
-    public class MultiSorterBuild extends TjBuilding {
+    public class BuildType extends TjBlock.BuildType {
         public @Nullable Item sortItem;
 
         @Override

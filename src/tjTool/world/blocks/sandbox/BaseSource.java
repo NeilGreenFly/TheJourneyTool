@@ -65,8 +65,7 @@ public abstract class BaseSource extends SandboxBlock {
         };
     }
 
-    @SuppressWarnings("unused")
-    public abstract class BaseSourceBuild extends SandboxBuild implements HeatBlock {
+    public abstract class BuildType extends SandboxBlock.BuildType implements HeatBlock {
 
         protected void tryUpdateTile() {}
 

@@ -59,13 +59,13 @@ public class DirSource extends BaseSource {
 
     @Override
     protected void config() {
-        config(int[].class, (DirSourceBuild build, int[] v) -> {
+        config(int[].class, (BuildType build, int[] v) -> {
             if (build.target != content.block(v[0])) return;
             build.ammo = build.target instanceof ItemTurret ? content.item(v[1]) : content.liquid(v[1]);
             build.coolant = content.liquid(v[2]);
             build.overdrive = v[3];
         });
-        config(Block.class, (DirSourceBuild build, Block v) -> {
+        config(Block.class, (BuildType build, Block v) -> {
             lastConfig = null;
             if (!(build.targetBuild instanceof BaseTurret.BaseTurretBuild turret)) return;
             InputHandler.unitClear(turret instanceof ControlBlock controlBlock ? controlBlock.unit().getPlayer() : null);
@@ -75,7 +75,7 @@ public class DirSource extends BaseSource {
             turret.rotation = rotation;
             turret.block.placeEffect.at(turret, turret.block.size);
         });
-        config(Boolean.class, (DirSourceBuild build, Boolean v) -> build.tap = v);
+        config(Boolean.class, (BuildType build, Boolean v) -> build.tap = v);
     }
 
     @Override
@@ -90,8 +90,7 @@ public class DirSource extends BaseSource {
         });
     }
 
-    @SuppressWarnings("unused")
-    public class DirSourceBuild extends BaseSourceBuild {
+    public class BuildType extends BaseSource.BuildType {
         public @Nullable Building targetBuild = null;
         public @Nullable Block target = null;
         public @Nullable UnlockableContent ammo = null;

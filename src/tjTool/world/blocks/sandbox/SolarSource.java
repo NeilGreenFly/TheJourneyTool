@@ -55,12 +55,12 @@ public class SolarSource extends SolarGenerator {
     }
 
     @SuppressWarnings("unused")
-    public class SolarSourceBuild extends GeneratorBuild implements AutoTile {
+    public class BuildingType extends GeneratorBuild implements AutoTile {
         protected int index = 0;
 
         @Override
         public boolean checkBuild(Building other) {
-            return other instanceof SolarSourceBuild && other.block == block && other.team == team;
+            return other instanceof BuildingType && other.block == block && other.team == team;
         }
 
         @Override
@@ -78,7 +78,7 @@ public class SolarSource extends SolarGenerator {
             super.updateProximity();
             proximityTileUpdate();
             for (var point : d8)
-                if (world.build(tileX() + point.x, tileY() + point.y) instanceof SolarSourceBuild other && other.team == this.team)
+                if (world.build(tileX() + point.x, tileY() + point.y) instanceof BuildingType other && other.team == this.team)
                     other.proximityTileUpdate();
         }
 

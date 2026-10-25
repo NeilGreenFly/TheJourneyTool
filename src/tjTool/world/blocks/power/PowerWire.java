@@ -65,12 +65,12 @@ public class PowerWire extends PowerBlock {
     }
 
     @SuppressWarnings("unused")
-    public class PowerWireBuild extends Building implements AutoTile {
+    public class BuildingType extends Building implements AutoTile {
         public int bits;
 
         @Override
         public boolean checkBuild(Building other) {
-            return other instanceof PowerWireBuild && other.block == block && other.team == team;
+            return other instanceof BuildingType && other.block == block && other.team == team;
         }
 
         @Override

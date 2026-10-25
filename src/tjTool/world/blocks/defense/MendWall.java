@@ -62,7 +62,7 @@ public class MendWall extends Wall {
     }
 
     @SuppressWarnings("unused")
-    public class MendWallBuild extends Building implements Ranged {
+    public class BuildingType extends Building implements Ranged {
         public float heat = 0;
         public float charge = Mathf.random(reload);
         public float smoothEfficiency = 0;

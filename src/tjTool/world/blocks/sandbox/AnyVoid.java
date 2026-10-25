@@ -24,8 +24,7 @@ public class AnyVoid extends SandboxBlock {
                 (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
-    @SuppressWarnings("unused")
-    public class AnyVoidBuild extends SandboxBuild {
+    public class BuildType extends SandboxBlock.BuildType {
 
         @Override
         public Building create(Block block, Team team) {

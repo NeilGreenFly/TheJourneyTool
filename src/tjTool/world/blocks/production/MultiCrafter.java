@@ -69,7 +69,7 @@ public class MultiCrafter extends TjBlock {
 
     @Override
     protected void config() {
-        config(Integer.class, (MultiCrafterBuild build, Integer v) -> {
+        config(Integer.class, (BuildType build, Integer v) -> {
             build.currentConsumer = checkConsumer(v);
             build.progress = 0;
         });
@@ -89,7 +89,7 @@ public class MultiCrafter extends TjBlock {
         liquidFilter = multiConsumers.liquidFilter;
         hasPower = multiConsumers.hasPower;
         itemCapacity = multiConsumers.itemCapacity;
-        if (hasPower) consumePowerDynamic((MultiCrafterBuild building) -> building.currentConsumer().usage);
+        if (hasPower) consumePowerDynamic((BuildType building) -> building.currentConsumer().usage);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class MultiCrafter extends TjBlock {
                 () -> Pal.powerBar,
                 () -> Mathf.zero(consPower.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status)
         );
-        if (multiConsumers.hasHeat) addBar("heat", (MultiCrafterBuild building) -> new Bar(
+        if (multiConsumers.hasHeat) addBar("heat", (BuildType building) -> new Bar(
                 () -> Core.bundle.format("bar.heatpercent", (int) (building.heat + 0.01f), (int) (building.efficiencyScale() * 100 + 0.01f)),
                 () -> Pal.lightOrange,
                 () -> building.currentConsumer().consHeat() ? building.heat / building.currentConsumer().heatRequirement : 1));
@@ -128,8 +128,7 @@ public class MultiCrafter extends TjBlock {
             for (var stack : c.input.liquids) addLiquidBar(stack.liquid);
     }
 
-    @SuppressWarnings("unused")
-    public class MultiCrafterBuild extends TjBuilding implements HeatConsumer {
+    public class BuildType extends TjBlock.BuildType implements HeatConsumer {
         public int currentConsumer = 0;
         public int option = -1;
         public float[] sideHeat = new float[4];
@@ -202,7 +201,6 @@ public class MultiCrafter extends TjBlock {
 
         @Override
         public void updateConsumption() {
-            var cc = currentConsumer();
             if (cheating()) {
                 potentialEfficiency = enabled && productionValid() ? 1 : 0;
                 efficiency = optionalEfficiency = shouldConsume() ? potentialEfficiency : 0;

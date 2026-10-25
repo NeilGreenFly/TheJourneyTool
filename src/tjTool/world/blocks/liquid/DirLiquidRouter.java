@@ -33,11 +33,10 @@ public class DirLiquidRouter extends TjBlock {
 
     @Override
     public boolean rotatedOutput(int fromX, int fromY, Tile destination) {
-        return destination.build instanceof Conduit.ConduitBuild && world.build(fromX, fromY) instanceof DirLiquidRouterBuild self && destination.relativeTo(fromX, fromY) == self.rotation;
+        return destination.build instanceof Conduit.ConduitBuild && world.build(fromX, fromY) instanceof BuildType self && destination.relativeTo(fromX, fromY) == self.rotation;
     }
 
-    @SuppressWarnings("unused")
-    public class DirLiquidRouterBuild extends TjBuilding {
+    public class BuildType extends TjBlock.BuildType {
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid) {
             return source.relativeTo(this) == rotation && (liquids.current() == liquid || liquids.currentAmount() < 0.2f);

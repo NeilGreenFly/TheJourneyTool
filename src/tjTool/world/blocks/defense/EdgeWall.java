@@ -55,14 +55,14 @@ public class EdgeWall extends Wall {
     }
 
     @SuppressWarnings("unused")
-    public class EdgeWallBuild extends WallBuild implements AutoTile {
+    public class BuildingType extends WallBuild implements AutoTile {
         protected int index = 0;
         protected boolean isLarge = false;
         protected boolean alignedLarge = false;
 
         @Override
         public boolean checkBuild(Building other) {
-            return other instanceof EdgeWallBuild && other.block == block && other.team == team;
+            return other instanceof BuildingType && other.block == block && other.team == team;
         }
 
         @Override
@@ -88,7 +88,7 @@ public class EdgeWall extends Wall {
             super.updateProximity();
             proximityTileUpdate();
             for (var point : d8)
-                if (world.build(tile.x + point.x, tile.y + point.y) instanceof EdgeWallBuild other && other.team == team)
+                if (world.build(tile.x + point.x, tile.y + point.y) instanceof BuildingType other && other.team == team)
                     other.proximityTileUpdate();
         }
 

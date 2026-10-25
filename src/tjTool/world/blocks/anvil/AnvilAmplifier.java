@@ -8,7 +8,6 @@ import mindustry.graphics.Layer;
 import mindustry.world.Tile;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawMulti;
-import tjTool.world.blocks.anvil.Anvil.AnvilBuild;
 import tjTool.world.draw.DrawRotationAtlas;
 
 import static arc.math.geom.Geometry.d8edge;
@@ -30,7 +29,7 @@ public class AnvilAmplifier extends AnvilAddon {
         return new DrawMulti(new DrawRotationAtlas("-atlas"), new DrawRotationAtlas("-interface") {
             @Override
             public void draw(Building build) {
-                if (((AnvilAmplifierBuild) build).anvil != null) {
+                if (((BuildType) build).anvil != null) {
                     Draw.z(Layer.blockOver - .2f);
                     super.draw(build);
                 }
@@ -39,7 +38,7 @@ public class AnvilAmplifier extends AnvilAddon {
     }
 
     @Override
-    public AnvilBuild checkCore(Tile tile, Team team, int rotation) {
+    public Anvil.BuildType checkCore(Tile tile, Team team, int rotation) {
         int d = (size + coreSize) / 2;
         var t = tileNearby(tile, d8edge, rotation);
         return t != null && t.build != null && Math.abs(tile.x - t.build.tile.x) == d && Math.abs(tile.y - t.build.tile.y) == d ? super.checkCore(t, team, 0) : null;
@@ -55,6 +54,5 @@ public class AnvilAmplifier extends AnvilAddon {
         control.input.drawArrow(this, x, y, rotation + 1, valid);
     }
 
-    @SuppressWarnings("unused")
-    public class AnvilAmplifierBuild extends AnvilAddonBuild {}
+    public class BuildType extends AnvilAddon.BuildType {}
 }

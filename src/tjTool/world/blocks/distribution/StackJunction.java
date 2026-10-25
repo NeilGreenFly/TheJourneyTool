@@ -99,7 +99,7 @@ public class StackJunction extends StackConveyor {
     }
 
     @SuppressWarnings("unused")
-    public class StackJunctionBuild extends StackConveyorBuild {
+    public class BuildingType extends StackConveyorBuild {
         public StackBuffer[] buffers = new StackBuffer[]{new StackBuffer(), new StackBuffer()};
 
         // 暂时用不到 (我也不知道我当时为什么要写这个)
@@ -108,7 +108,7 @@ public class StackJunction extends StackConveyor {
             int dir = (source.relativeTo(this.tile.x, this.tile.y) + 4) % 4;
             Building next = this.nearby(dir);
             if (next != null)
-                if (next instanceof StackJunctionBuild junction) return junction.getItemDestination(this, item);
+                if (next instanceof BuildingType junction) return junction.getItemDestination(this, item);
                 else if (next.acceptItem(this, item)) return next;
             return this;
         }
@@ -130,7 +130,7 @@ public class StackJunction extends StackConveyor {
             for (int i = 0; i < 4; i++) {
                 int b = i % 2;
                 if (nearby(i) instanceof StackConveyorBuild build && build.team == team) {
-                    if (build instanceof StackJunctionBuild) continue;
+                    if (build instanceof BuildingType) continue;
                     if (build.relativeTo(this) != build.rotation)
                         buffers[b].out = buffers[b].out == null ? build : null;
                     else buffers[b].in = buffers[b].in == null ? build : null;

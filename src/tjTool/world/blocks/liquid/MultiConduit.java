@@ -67,22 +67,21 @@ public class MultiConduit extends TjBlock {
     public void setBars() {
         super.setBars();
         removeBar("liquid");
-        addLiquidBar(0, (MultiConduitBuild b) -> b.liquidsLeft);
-        addLiquidBar(1, (MultiConduitBuild b) -> b.liquidsMiddle);
-        addLiquidBar(2, (MultiConduitBuild b) -> b.liquidsRight);
+        addLiquidBar(0, (BuildType b) -> b.liquidsLeft);
+        addLiquidBar(1, (BuildType b) -> b.liquidsMiddle);
+        addLiquidBar(2, (BuildType b) -> b.liquidsRight);
     }
 
     @Override
     public boolean rotatedOutput(int fromX, int fromY, Tile destination) {
-        return destination.build instanceof Conduit.ConduitBuild && world.build(fromX, fromY) instanceof MultiConduitBuild self && self.getLiquidsTo(destination.build) != null;
+        return destination.build instanceof Conduit.ConduitBuild && world.build(fromX, fromY) instanceof BuildType self && self.getLiquidsTo(destination.build) != null;
     }
 
-    @SuppressWarnings("unused")
-    public class MultiConduitBuild extends TjBuilding {
+    public class BuildType extends TjBlock.BuildType {
         public LiquidModule liquidsLeft = new LiquidModule();
         public LiquidModule liquidsRight = new LiquidModule();
         public LiquidModule liquidsMiddle = new LiquidModule();
-        public @Nullable MultiConduitBuild next;
+        public @Nullable BuildType next;
         private boolean side = false;
         protected int index = 0;
 
@@ -209,7 +208,7 @@ public class MultiConduit extends TjBlock {
 
         @Override
         public void onProximityUpdate() {
-            next = nearby(size * d4[rotation].x, size * d4[rotation].y) instanceof MultiConduitBuild build &&
+            next = nearby(size * d4[rotation].x, size * d4[rotation].y) instanceof BuildType build &&
                     build.team == team && build.block.size == size &&
                     (build.tile.x - size * d4[rotation].x == tile.x && build.tile.y - size * d4[rotation].y == tile.y)
                     ? build : null;

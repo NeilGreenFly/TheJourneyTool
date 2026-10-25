@@ -13,11 +13,12 @@ import arc.math.geom.Vec3;
 import arc.struct.Seq;
 import arc.util.Tmp;
 
+import static arc.Core.camera;
 import static tjTool.core.TjCube.Vertices.*;
-import static tjTool.world.LazyGetter.*;
 
 @SuppressWarnings("unused")
 public class TjCube {
+    protected static final Vec2 v = new Vec2();
     protected static final Vec3 cos = new Vec3();
     protected static final Vec3 sin = new Vec3();
     protected static final float[] hsv = new float[3];
@@ -66,6 +67,12 @@ public class TjCube {
 
     public static void at(Position v) {
         position.set(v);
+    }
+
+    public static Vec2 getOffsetByHeight(float x, float y, float z) {
+        float cx = camera.position.x;
+        float cy = camera.position.y;
+        return v.set(cx - (cx - x) * z, cy - (cy - y) * z);
     }
 
     public TjCube setScale(float scale) {

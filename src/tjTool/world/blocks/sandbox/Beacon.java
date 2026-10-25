@@ -36,27 +36,27 @@ public class Beacon extends SandboxBlock {
 
     @Override
     protected void config() {
-        config(Item.class, (BeaconBuild build, Item v) -> {
+        config(Item.class, (BuildType build, Item v) -> {
             build.c = v;
             build.icon = v.uiIcon;
             build.color = v.color;
         });
-        config(Liquid.class, (BeaconBuild build, Liquid v) -> {
+        config(Liquid.class, (BuildType build, Liquid v) -> {
             build.c = v;
             build.icon = v.uiIcon;
             build.color = v.color;
         });
-        config(Block.class, (BeaconBuild build, Block v) -> {
+        config(Block.class, (BuildType build, Block v) -> {
             build.c = v;
             build.icon = v.uiIcon;
             build.color = null;
         });
-        config(UnitType.class, (BeaconBuild build, UnitType v) -> {
+        config(UnitType.class, (BuildType build, UnitType v) -> {
             build.c = v;
             build.icon = v.uiIcon;
             build.color = null;
         });
-        configClear((BeaconBuild build) -> {
+        configClear((BuildType build) -> {
             build.c = null;
             build.icon = null;
             build.color = null;
@@ -69,8 +69,7 @@ public class Beacon extends SandboxBlock {
         forRange(4, i -> teamIcons[i] = Core.atlas.find("team-" + Team.baseTeams[i]));
     }
 
-    @SuppressWarnings("unused")
-    public class BeaconBuild extends SandboxBuild {
+    public class BuildType extends SandboxBlock.BuildType {
         public UnlockableContent c;
         public TextureRegion icon;
         public Color color;

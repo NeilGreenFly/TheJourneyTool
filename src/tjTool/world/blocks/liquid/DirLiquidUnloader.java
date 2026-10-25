@@ -51,7 +51,7 @@ public class DirLiquidUnloader extends TjBlock {
 
             @Override
             public void draw(Building build) {
-                if (build instanceof DirLiquidUnloaderBuild unloader && unloader.sortLiquid != null)
+                if (build instanceof BuildType unloader && unloader.sortLiquid != null)
                     drawTiledFrames(size, build.x, build.y, 2.5f, unloader.sortLiquid, 1);
             }
         }, new DrawRegion(), new DrawRegion("-top") {{ buildingRotate = true; }});
@@ -59,8 +59,8 @@ public class DirLiquidUnloader extends TjBlock {
 
     @Override
     protected void config() {
-        config(Liquid.class, (DirLiquidUnloaderBuild build, Liquid v) -> build.sortLiquid = v);
-        configClear((DirLiquidUnloaderBuild build) -> build.sortLiquid = null);
+        config(Liquid.class, (BuildType build, Liquid v) -> build.sortLiquid = v);
+        configClear((BuildType build) -> build.sortLiquid = null);
     }
 
     @Override
@@ -75,8 +75,7 @@ public class DirLiquidUnloader extends TjBlock {
         removeBar("liquid");
     }
 
-    @SuppressWarnings("unused")
-    public class DirLiquidUnloaderBuild extends TjBuilding {
+    public class BuildType extends TjBlock.BuildType {
         public @Nullable Liquid sortLiquid = null;
         public int currentId = 0;
 

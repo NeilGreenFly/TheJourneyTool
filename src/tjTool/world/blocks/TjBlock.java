@@ -54,7 +54,7 @@ public abstract class TjBlock extends Block {
     }
 
     @SuppressWarnings("unused")
-    public abstract class TjBuilding extends Building {
+    public abstract class BuildType extends Building {
         @Override
         public void draw() {
             drawer.draw(this);

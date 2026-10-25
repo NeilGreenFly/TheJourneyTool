@@ -24,7 +24,7 @@ public class ShieldSource extends BaseShield {
         saveConfig = true;
         alwaysUnlocked = true;
         placeableLiquid = true;
-        config(Float.class, (ShieldSourceBuild build, Float v) -> build.optionalEfficiency = v);
+        config(Float.class, (BuildingType build, Float v) -> build.optionalEfficiency = v);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ShieldSource extends BaseShield {
     }
 
     @SuppressWarnings("unused")
-    public class ShieldSourceBuild extends BaseShieldBuild {
+    public class BuildingType extends BaseShieldBuild {
         @Override
         public void buildConfiguration(Table table) {
             table.background(Tex.pane).left();

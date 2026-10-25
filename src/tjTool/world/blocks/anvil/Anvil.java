@@ -54,8 +54,8 @@ public class Anvil extends TjBlock {
 
     @Override
     protected void config() {
-        config(Byte.class, (AnvilBuild build, Byte v) -> build.planet = content.planets().get(v));
-        configClear((AnvilBuild build) -> build.planet = null);
+        config(Byte.class, (BuildType build, Byte v) -> build.planet = content.planets().get(v));
+        configClear((BuildType build) -> build.planet = null);
     }
 
     @Override
@@ -72,15 +72,14 @@ public class Anvil extends TjBlock {
     @Override
     public void setBars() {
         super.setBars();
-        addBar("E", (AnvilBuild build) -> new Bar(
+        addBar("E", (BuildType build) -> new Bar(
                 () -> "EE",
                 () -> color,
                 () -> build.energy / energyCapacity
         ));
     }
 
-    @SuppressWarnings("unused")
-    public class AnvilBuild extends TjBuilding {
+    public class BuildType extends TjBlock.BuildType {
         public @Nullable Planet planet;
         public float delta = 0;
         public float energy = 0;
@@ -106,7 +105,7 @@ public class Anvil extends TjBlock {
         @Override
         public void onProximityUpdate() {
             for (var d : d8edge) if (world.build(tile.x + (size / 2 + 1) * d.x, tile.y + (size / 2 + 1) * d.y)
-                    instanceof AnvilAmplifier.AnvilAmplifierBuild build && build.team == team)
+                    instanceof AnvilAmplifier.BuildType build && build.team == team)
                 build.onProximityUpdate();
         }
 

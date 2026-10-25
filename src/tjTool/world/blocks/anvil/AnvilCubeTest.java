@@ -42,8 +42,7 @@ public class AnvilCubeTest extends Anvil {
         super(name);
     }
 
-    @SuppressWarnings("unused")
-    public class AnvilCubeTestBuild extends AnvilBuild {
+    public class BuildType extends Anvil.BuildType {
         Planet planet = Planets.serpulo;
 
         @Override
