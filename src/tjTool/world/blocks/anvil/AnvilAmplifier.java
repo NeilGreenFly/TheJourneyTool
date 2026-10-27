@@ -13,7 +13,7 @@ import tjTool.world.draw.DrawRotationAtlas;
 import static arc.math.geom.Geometry.d8edge;
 import static mindustry.Vars.control;
 import static mindustry.Vars.tilesize;
-import static tjTool.core.TjDraw.validColor;
+import static tjTool.world.LazyGetter.validColor;
 import static tjTool.world.blocks.anvil.Anvil.coreSize;
 
 public class AnvilAmplifier extends AnvilAddon {

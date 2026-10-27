@@ -29,10 +29,6 @@ public class TjDraw {
     public static float z = 2f;
     public static final Color rainbow = new Color();
 
-    public static Color validColor(boolean valid) {
-        return valid ? Pal.accent : Pal.remove;
-    }
-
     public static void update() {
         rainbow.set(rainbow(25f, 100f));
     }

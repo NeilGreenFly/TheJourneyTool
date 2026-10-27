@@ -3,6 +3,7 @@ package tjTool.world;
 import arc.func.Cons;
 import arc.graphics.Color;
 import mindustry.ctype.UnlockableContent;
+import mindustry.graphics.Pal;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
 
@@ -19,6 +20,14 @@ public class LazyGetter {
 
     public static Color c(Liquid liquid) {
         return liquid != null ? liquid.color : Color.clear;
+    }
+
+    public static Color validDarkGray(boolean valid) {
+        return valid ? Pal.accent : Color.darkGray;
+    }
+
+    public static Color validColor(boolean valid) {
+        return valid ? Pal.accent : Pal.remove;
     }
 
     public static <T> T apply(T any, Cons<T> it) {

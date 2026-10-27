@@ -11,7 +11,7 @@ import tjTool.core.TjDraw;
 import tjTool.core.TjStat;
 
 import static mindustry.Vars.tilesize;
-import static tjTool.core.TjDraw.validColor;
+import static tjTool.world.LazyGetter.validColor;
 import static tjTool.core.TjTable.iconSize;
 
 public class ShieldSource extends BaseShield {

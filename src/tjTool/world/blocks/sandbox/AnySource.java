@@ -40,6 +40,7 @@ import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.*;
 import static tjTool.core.TjTable.*;
 import static tjTool.core.TjVars.halfSize;
+import static tjTool.world.LazyGetter.*;
 
 /**
  * 邻接源现已并入任意源, 原邻接源已被移除, 但可能会因其他测试重新加入, 不过这只会是暂时的.<p>
@@ -58,6 +59,7 @@ public class AnySource extends BaseSource {
         super(name);
         solid = false;
         hasLiquids = true;
+        outputsLiquid = true;
         liquidCapacity = 1f;
         configurable = true;
         saveConfig = true;
@@ -259,6 +261,16 @@ public class AnySource extends BaseSource {
 
                     但请不要仅将此界面截图发送!
                     开发者需要的是日志而不是一段文本!""").color(Pal.remove).growX().left();
+        }
+
+        @Override
+        public void displayConsumption(Table table) {
+            table.background(Tex.scroll).left().defaults().size(iconSize).padRight(5);
+            table.image(Icon.box).update(v -> v.color.set(validDarkGray(outputItem)));
+            table.image(Icon.liquid).update(v -> v.color.set(validDarkGray(outputLiquid)));
+            table.image(Icon.power).update(v -> v.color.set(validDarkGray(outputPower)));
+            table.image(Icon.waves).update(v -> v.color.set(validDarkGray(outputHeat)));
+            table.image(Icon.units).update(v -> v.color.set(validDarkGray(outputPayload)));
         }
 
         @Override

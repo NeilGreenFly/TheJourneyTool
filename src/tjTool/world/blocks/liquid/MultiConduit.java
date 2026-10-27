@@ -16,6 +16,7 @@ import mindustry.world.Tile;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.liquid.LiquidBlock;
 import mindustry.world.modules.LiquidModule;
+import tjTool.world.LazyGetter;
 import tjTool.world.blocks.TjBlock;
 
 import static arc.math.geom.Geometry.d4;
@@ -25,6 +26,7 @@ import static tjTool.core.TjDraw.*;
 import static tjTool.core.TjVars.halfSize;
 import static tjTool.world.AutoTile.atlasRegions;
 
+// 没做完
 // TODO Maybe we need MultiLiquidModule.
 public class MultiConduit extends TjBlock {
     protected static byte[] status = new byte[]{-1, -1, -1, 6, -1, -1, 8, 7, -1, 0, -1, 3, 2, 1, 5, 4};
@@ -131,7 +133,7 @@ public class MultiConduit extends TjBlock {
 
         @Override
         public void drawSelect() {
-            Draw.color(validColor(next != null));
+            Draw.color(LazyGetter.validColor(next != null));
             drawSelected(this);
             Draw.color(Color.acid);
             if (next != null) drawSelected(next);

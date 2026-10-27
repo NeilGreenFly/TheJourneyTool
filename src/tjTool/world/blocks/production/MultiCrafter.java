@@ -52,7 +52,7 @@ public class MultiCrafter extends TjBlock {
     public float updateEffectChance = 0.04f;
     public float updateEffectSpread = 4f;
     public float warmupSpeed = 0.019f;
-    protected @Nullable Table consumption = null;
+    protected @Nullable Table consumption;
 
     public MultiCrafter(String name) {
         super(name);
@@ -333,8 +333,7 @@ public class MultiCrafter extends TjBlock {
 
         @Override
         public void displayConsumption(Table table) {
-            consumption = table;
-            table.clear();
+            (consumption = table).clear();
             currentConsumer().displayConsumption(table.left(), this);
         }
 

@@ -6,8 +6,8 @@ import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
 import mindustry.ui.ReqImage;
 
-import static mindustry.Vars.*;
 import static mindustry.world.meta.StatValues.stack;
+import static tjTool.core.TjTable.iconSize;
 
 public class SingleConsumer extends BaseConsumer {
     public float craftTime = 60;
@@ -71,11 +71,11 @@ public class SingleConsumer extends BaseConsumer {
 
     public void displayConsumption(Table table, Building building) {
         table.table(c -> {
-            c.defaults().padRight(8);
+            c.defaults().size(iconSize).padRight(8);
             for (var v : input.items)
                 c.add(new ReqImage(stack(v.item, v.amount), () -> building.items.has(v.item, v.amount)));
             for (var v : input.liquids)
-                c.add(new ReqImage(v.liquid.uiIcon, () -> building.liquids.get(v.liquid) > 0)).size(iconMed);
+                c.add(new ReqImage(v.liquid.uiIcon, () -> building.liquids.get(v.liquid) > 0));
         });
     }
 }
