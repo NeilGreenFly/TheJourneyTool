@@ -64,6 +64,7 @@ public class Blocks {
         multiConduit = new MultiConduit("multi-conduit") {{
             staticInit(this);
             requirements(liquid, with(beryllium, 16));
+            buildVisibility = debugOnly;
         }};
 
         mendWall = new MendWall("mend-wall") {{
@@ -124,7 +125,7 @@ public class Blocks {
 
     public static void staticInit(Block block) {
         block.alwaysUnlocked = true;
-        block.buildVisibility = debugOnly;
+        block.buildVisibility = debugOnly; // 会被 requirements(...) 方法覆盖, 不过现阶段无所谓我以后会来调整的.
         block.details = TjBundle.details(block, "test");
     }
 

@@ -138,7 +138,7 @@ public class AnvilRingRender {
 //            renderRing();
 //        }));
 
-        camera.near = camera.position.z - 1;
+        camera.near = 1;
         camera.far = 100;
         camera.update();
         gl(() -> {

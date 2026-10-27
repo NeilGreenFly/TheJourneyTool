@@ -1,5 +1,6 @@
 package tjTool;
 
+import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Log;
@@ -31,13 +32,15 @@ public final class TheJourney extends Mod {
 
     @Override
     public void init() {
+        theJourney.meta.displayName = Core.bundle.get("tj-tool.displayName");
+        theJourney.meta.subtitle = Core.bundle.get("tj-tool.subtitle");
+        theJourney.meta.description = Core.bundle.get("tj-tool.description");
         TjVars.load();
     }
 
     @Override
     public void loadContent() {
         theJourney = mods.getMod(this.getClass());
-        // theJourney.meta.displayName = Core.bundle.get("mod-name"); // 真没想到可以替换成本地化名称
         try {
             MultiModel.load();
             TjBlocks.load();

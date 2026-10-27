@@ -26,7 +26,7 @@ public class TjStat {
     public static final Stat multiConsumersConfig = new Stat("config", crafting);
 
     public static BaseDialog updateDialog = new BaseDialog(TjBundle.getThis("saying")) {{
-        cont.table(TjConfigTable.updateLog);
+        cont.table(TjConfigTable.updateLog).growY();
         addCloseButton();
     }};
 
