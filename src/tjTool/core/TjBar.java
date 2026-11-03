@@ -10,7 +10,7 @@ public class TjBar {
 
     public static Func<Building, Bar> makeHealthBalance = entity -> new Bar(
             () -> Core.bundle.get("stat.health", "rainbowHealth"),
-            TjDraw::rainbow,
+            () -> TjDraw.rainbow,
             entity::healthf
     ).blink(Color.white);
 

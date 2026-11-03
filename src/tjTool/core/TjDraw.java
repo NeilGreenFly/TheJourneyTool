@@ -19,6 +19,7 @@ import static arc.math.geom.Geometry.*;
 import static mindustry.Vars.renderer;
 import static mindustry.Vars.tilesize;
 import static tjTool.core.TjVars.halfSize;
+import static tjTool.world.LazyGetter.*;
 
 @SuppressWarnings("unused")
 public class TjDraw {
@@ -33,30 +34,21 @@ public class TjDraw {
         rainbow.set(rainbow(25f, 100f));
     }
 
-    public static String colorToString(Color color) {
-        return "[#" + color + "]";
-    }
-
-    public static Color rainbow() {
-        return rainbow;
-    }
-
     public static Color rainbow(float s, float v) {
         return Color.HSVtoRGB(Time.time % 360, s, v, c1.a(1));
     }
 
-    public static String rainbowStream(String string) {
-        StringBuilder rainbowString = new StringBuilder();
-        for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(colorToString(Color.HSVtoRGB((Time.time + i) * 3 % 360f, 25f, 100f, c1.a(1)))).append(string.charAt(i));
-        return rainbowString.toString();
-    }
-
-    public static String flashingStream(String string, Color color, Color colorTo) {
-        StringBuilder rainbowString = new StringBuilder();
-        for (int i = 0; i < string.length(); i += 1)
-            rainbowString.append(colorToString(c1.set(color).lerp(colorTo, Math.abs((Time.time + i) % 200 - 100) / 100))).append(string.charAt(i));
-        return rainbowString.toString();
+    /**
+     * @param rawtext rawtext
+     * @param color readonly
+     * @param colorTo readonly
+     * @return gradient text
+     */
+    public static String gradient(String rawtext, Color color, Color colorTo) {
+        return apply(new StringBuilder(), stringBuilder -> {
+            for (int i = 0; i < rawtext.length(); i += 1)
+                stringBuilder.append(cFmt(c1.set(color).lerp(colorTo, (float) i / rawtext.length()))).append(rawtext.charAt(i));
+        }).toString();
     }
 
     public static void arcCircle(float x, float y, float radius, int sectors, float fraction, float rotateSpeed) {
@@ -86,15 +78,15 @@ public class TjDraw {
         Draw.reset();
     }
 
-    public static void overdrive(Building building, String hex, float heat) {
-        overdrive(building, hex, hex, heat);
+    public static void overdrive(Building building, Color color, float heat) {
+        overdrive(building, color, color, heat);
     }
 
-    public static void overdrive(Building building, String hex, String hexTo, float heat) {
+    public static void overdrive(Building building, Color from, Color to, float heat) {
         float f = 1f - (Time.time / 100f) % 1f;
         float r = Math.max(0, Mathf.clamp(2f - f * 2f) * building.block.size * halfSize - f - 0.2f);
         float w = Mathf.clamp(0.5f - f) * building.block.size * tilesize;
-        Draw.color(Color.valueOf(c1, hexTo), Color.valueOf(c2, hex), f);
+        Draw.color(c1.set(to), c2.set(from), f);
         Lines.stroke((2f * f + 0.1f) * heat);
         Lines.beginLine();
         for (int i = 0; i < 4; ++i) {
@@ -278,10 +270,7 @@ public class TjDraw {
 
     public static void drawProximity(int x, int y, int size, Color color) {
         Draw.color(color, 0.5f);
-        Fill.square((x - 1) * tilesize, y * tilesize, 2 * size);
-        Fill.square((x + 1) * tilesize, y * tilesize, 2 * size);
-        Fill.square(x * tilesize, (y - 1) * tilesize, 2 * size);
-        Fill.square(x * tilesize, (y + 1) * tilesize, 2 * size);
+        for (var d : d4) Fill.square((x + d.x) * tilesize, (y + d.y) * tilesize, size * 2);
     }
 
     public static void drawPlaceText(String text, float x, float y, Color color) {

@@ -1,5 +1,6 @@
 package tjTool.core;
 
+import arc.flabel.FLabel;
 import arc.graphics.g2d.TextureRegion;
 import arc.scene.event.*;
 import arc.scene.ui.Image;
@@ -12,6 +13,7 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.defense.turrets.ReloadTurret;
 import mindustry.world.meta.*;
+import tjTool.dialogs.UpdateDialog;
 import tjTool.world.consumers.MultiConsumer;
 
 import static arc.util.Strings.autoFixed;
@@ -19,16 +21,14 @@ import static mindustry.gen.Tex.*;
 import static mindustry.world.meta.StatCat.*;
 import static mindustry.world.meta.StatValues.withTooltip;
 import static tjTool.core.TjTable.*;
+import static tjTool.world.LazyGetter.apply;
 
 public class TjStat {
 
     public static final Stat config = new Stat("config", function);
     public static final Stat multiConsumersConfig = new Stat("config", crafting);
 
-    public static BaseDialog updateDialog = new BaseDialog(TjBundle.getThis("saying")) {{
-        cont.table(TjConfigTable.updateLog).growY();
-        addCloseButton();
-    }};
+    public static BaseDialog updateDialog = new UpdateDialog();
 
     public static StatValue acknowledgements(TextureRegion region) {
         return table -> {
@@ -75,7 +75,7 @@ public class TjStat {
             float multiple = 40f / Math.max(region.width, region.height);
             frame.table(in -> in.add(image).tooltip(name, true).size(region.width * multiple, region.height * multiple)).size(40f).pad(12f).left().top();
             frame.table(label -> {
-                label.label(() -> TjDraw.colorToString(TjDraw.rainbow) + name).growX().left().row();
+                label.add(apply(new FLabel("{rainbow=10;;0.25}" + name), FLabel::skipToTheEnd)).growX().left().row();
                 label.label(() -> description).growX().left().row();
             }).growX().pad(12f).padLeft(0f).row();
         }).growX().pad(5f).row();

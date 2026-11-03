@@ -22,7 +22,6 @@ import mindustry.world.meta.BlockGroup;
 import tjTool.world.blocks.TjBlock;
 
 import static mindustry.Vars.*;
-import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjTable.*;
 import static tjTool.world.LazyGetter.*;
 
@@ -154,7 +153,7 @@ public class MultiSorter extends TjBlock {
         }
 
         protected byte[] configPack(Item item, boolean enabled) { // Maybe we should use int[].
-            return new byte[]{(byte) w(item), (byte) byBool(enabled)};
+            return new byte[]{(byte) w(item), (byte) Mathf.num(enabled)};
         }
 
         @Override

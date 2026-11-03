@@ -12,6 +12,9 @@ import mindustry.world.draw.DrawDefault;
 public abstract class TjBlock extends Block {
     public DrawBlock drawer;
 
+    /** if true, double-tapping this configurable block to deselect it. */
+    public boolean deselectOnDoubleTap;
+
     public TjBlock(String name) {
         super(name);
         config();
@@ -64,6 +67,13 @@ public abstract class TjBlock extends Block {
         public void drawLight() {
             super.drawLight();
             drawer.drawLight(this);
+        }
+
+        @Override
+        public boolean onConfigureBuildTapped(Building other) {
+            if (!deselectOnDoubleTap) return super.onConfigureBuildTapped(other);
+            if (this == other) deselect();
+            return this != other;
         }
     }
 }

@@ -41,7 +41,7 @@ public abstract class AnvilAddon extends TjBlock {
         quickRotate = false;
         update = true;
         configurable = true;
-        clearOnDoubleTap = true;
+        deselectOnDoubleTap = true;
     }
 
     @Override

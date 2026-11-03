@@ -10,7 +10,6 @@ import arc.scene.ui.layout.Table;
 import arc.util.Nullable;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Layer;
@@ -48,7 +47,7 @@ public class Anvil extends TjBlock {
         super(name);
         size = coreSize;
         configurable = true;
-        clearOnDoubleTap = true;
+        deselectOnDoubleTap = true;
         update = true;
     }
 
@@ -129,12 +128,6 @@ public class Anvil extends TjBlock {
                 }
             }).row();
             table.slider(0, 10, 0.01f, z, v -> z = v).growX().padTop(10).row();
-        }
-
-        @Override
-        public boolean onConfigureBuildTapped(Building other) {
-            if (this == other) deselect();
-            return this != other;
         }
 
         @Override

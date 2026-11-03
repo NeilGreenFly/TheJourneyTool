@@ -1,9 +1,9 @@
 package tjTool.world.blocks.sandbox;
 
 import arc.Core;
+import arc.flabel.FLabel;
 import arc.func.Boolc;
 import arc.func.Boolp;
-import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
@@ -12,7 +12,6 @@ import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.util.Eachable;
 import arc.util.Nullable;
-import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Blocks;
@@ -63,7 +62,6 @@ public class AnySource extends BaseSource {
         liquidCapacity = 1f;
         configurable = true;
         saveConfig = true;
-        clearOnDoubleTap = true;
         commandable = true;
     }
 
@@ -252,7 +250,7 @@ public class AnySource extends BaseSource {
                 return;
             }
             table.background(Tex.pane);
-            table.label(() -> TjDraw.flashingStream(exception + " >>>", Pal.remove, Color.valueOf(Tmp.c1, "#f59f9f"))).growX().left().row();
+            table.add(apply(new FLabel("{gradient=e55454;f59f9f;;2}" + exception + " >>>"), FLabel::skipToTheEnd)).growX().left().row();
             table.image().color(Pal.remove).height(4).growX().padTop(5).padBottom(5).row();
             table.label(() -> """
                     这里似乎出现了异常...

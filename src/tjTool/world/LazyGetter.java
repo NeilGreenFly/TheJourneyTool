@@ -1,12 +1,18 @@
 package tjTool.world;
 
+import arc.Core;
 import arc.func.Cons;
 import arc.graphics.Color;
+import arc.scene.Element;
+import arc.util.Strings;
 import mindustry.ctype.UnlockableContent;
 import mindustry.graphics.Pal;
 import mindustry.type.Item;
 import mindustry.type.Liquid;
 
+/**
+ * @author NeilGreenFly
+ */
 @SuppressWarnings("unused")
 public class LazyGetter {
 
@@ -30,9 +36,21 @@ public class LazyGetter {
         return valid ? Pal.accent : Pal.remove;
     }
 
+    public static String cFmt(Color color) {
+        return "[#" + color + "]";
+    }
+
+    public static String autoFixed(float v) {
+        return Strings.autoFixed(v, 3);
+    }
+
     public static <T> T apply(T any, Cons<T> it) {
         it.get(any);
         return any;
+    }
+
+    public static void clearScrollFocus(Element element) {
+        if (element.hasScroll()) Core.scene.setScrollFocus(null);
     }
 
 }

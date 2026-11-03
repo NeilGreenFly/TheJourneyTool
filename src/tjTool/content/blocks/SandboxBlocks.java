@@ -1,5 +1,6 @@
 package tjTool.content.blocks;
 
+import arc.func.Cons;
 import arc.graphics.Color;
 import mindustry.content.*;
 import mindustry.gen.Building;
@@ -17,6 +18,7 @@ import tjTool.core.*;
 import static mindustry.type.Category.*;
 import static mindustry.type.ItemStack.*;
 import static mindustry.world.meta.BuildVisibility.sandboxOnly;
+import static tjTool.world.LazyGetter.apply;
 
 public class SandboxBlocks {
 
@@ -27,29 +29,12 @@ public class SandboxBlocks {
 
     public static void load() {
 
-        anySource = new AnySource("any-source") {{
-            staticRequirements(this, distribution);
-        }};
-
-        dirSource = new DirSource("dir-source") {{
-            staticRequirements(this, distribution);
-        }};
-
-        anyVoid = new AnyVoid("any-void") {{
-            staticRequirements(this, distribution);
-        }};
-
-        solarSource = new SolarSource("solar-source") {{
-            staticRequirements(this, power);
-        }};
-
-        bedrock = new Bedrock("bedrock") {{
-            staticRequirements(this, defense);
-        }};
-
-        beacon = new Beacon("beacon") {{
-            staticRequirements(this, effect);
-        }};
+        anySource = apply(new AnySource("any-source"), staticRequirements(distribution));
+        dirSource = apply(new DirSource("dir-source"), staticRequirements(distribution));
+        anyVoid = apply(new AnyVoid("any-void"), staticRequirements(distribution));
+        solarSource = apply(new SolarSource("solar-source"), staticRequirements(power));
+        bedrock = apply(new Bedrock("bedrock"), staticRequirements(defense));
+        beacon = apply(new Beacon("beacon"), staticRequirements(effect));
 
         mendSource = new MendProjector("mend-source") {
             {
@@ -71,26 +56,7 @@ public class SandboxBlocks {
             }
         };
 
-        overdriveSource = new OverdriveProjector("overdrive-source") {
-            {
-                staticRequirements(this, effect);
-                hasPower = false;
-                hasItems = false;
-                hasBoost = false;
-                lightRadius = 50f;
-                size = 3;
-                health = 360;
-                range = 200f;
-                speedBoost = 2.5f;
-                useTime = 300f;
-            }
-
-            @Override
-            public void setStats() {
-                super.setStats();
-                stats.add(TjStat.config, TjStat.acknowledgements(region));
-            }
-        };
+        overdriveSource = apply(new OverdriveSource("overdrive-source"), staticRequirements(effect));
 
         regenSource = new RegenProjector("regen-source") {
             {
@@ -142,8 +108,12 @@ public class SandboxBlocks {
 
     }
 
-    public static void staticRequirements(Block block, Category cat) {
-        block.requirements(cat, sandboxOnly, empty);
+    public static <T extends Block> Cons<T> staticRequirements(Category category) {
+        return block -> staticRequirements(block, category);
+    }
+
+    public static void staticRequirements(Block block, Category category) {
+        block.requirements(category, sandboxOnly, empty);
         block.alwaysUnlocked = true;
         block.placeableLiquid = true;
         block.description = TjBundle.description(block, "sandbox");

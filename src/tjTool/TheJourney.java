@@ -2,12 +2,9 @@ package tjTool;
 
 import arc.Core;
 import arc.Events;
-import arc.struct.Seq;
-import arc.util.Log;
 import mindustry.game.EventType.*;
 import mindustry.graphics.MultiPacker;
 import mindustry.mod.*;
-import mindustry.ui.dialogs.BaseDialog;
 import tjTool.content.*;
 import tjTool.core.*;
 import tjTool.world.graphics.*;
@@ -18,38 +15,30 @@ import static tjTool.core.TjFunc.*;
 @SuppressWarnings("unused")
 public final class TheJourney extends Mod {
     public static Mods.LoadedMod theJourney;
-    public Seq<Exception> err = new Seq<>();
 
     public TheJourney() {
         Events.on(ClientLoadEvent.class, event -> {
-            if (!err.any()) return;
-            BaseDialog dialog = new BaseDialog("ERROR");
-            err.each(e -> dialog.cont.label(e::toString).row());
-            dialog.cont.button("Sure", dialog::hide).size(100f, 50f);
-            dialog.show();
+            var setting = theJourney.name + "-auto-show-load";
+            ui.settings.graphics.checkPref(setting, false);
+            if (Core.settings.getBool(setting)) ui.load.show();
         });
     }
 
     @Override
     public void init() {
-        theJourney.meta.displayName = Core.bundle.get("tj-tool.displayName");
-        theJourney.meta.subtitle = Core.bundle.get("tj-tool.subtitle");
-        theJourney.meta.description = Core.bundle.get("tj-tool.description");
+        theJourney.meta.displayName = Core.bundle.get(theJourney.name + ".displayName");
+        theJourney.meta.subtitle = Core.bundle.get(theJourney.name + ".subtitle");
+        theJourney.meta.description = Core.bundle.get(theJourney.name + ".description");
         TjVars.load();
     }
 
     @Override
     public void loadContent() {
         theJourney = mods.getMod(this.getClass());
-        try {
-            MultiModel.load();
-            TjBlocks.load();
-            TjOverride.load();
-            TjEvents.load();
-        } catch (Exception e) {
-            Log.err(e);
-            err.add(e);
-        }
+        MultiModel.load();
+        TjBlocks.load();
+        TjOverride.load();
+        TjEvents.load();
     }
 
     @Override

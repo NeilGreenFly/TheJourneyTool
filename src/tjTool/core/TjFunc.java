@@ -16,10 +16,6 @@ import static tjTool.TheJourney.theJourney;
 @SuppressWarnings("unused")
 public class TjFunc {
 
-    public static int byBool(boolean b) {
-        return b ? 1 : 0;
-    }
-
     public static void forRange(int to, Intc cons) {
         for (int index = 0; index < to; index += 1) cons.get(index);
     }

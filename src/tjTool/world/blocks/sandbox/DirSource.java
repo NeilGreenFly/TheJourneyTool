@@ -12,6 +12,7 @@ import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Nullable;
+import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Blocks;
@@ -49,7 +50,6 @@ public class DirSource extends BaseSource {
         regionRotated1 = 1;
         configurable = true;
         saveConfig = true;
-        clearOnDoubleTap = true;
     }
 
     @Override
@@ -167,9 +167,9 @@ public class DirSource extends BaseSource {
         public void draw() {
             super.draw();
             Draw.z(Layer.blockAdditive);
-            TjDraw.overdrive(this, "#D2F0FF", "#CBA3FF", heat);
+            TjDraw.overdrive(this, Color.valueOf(Tmp.c1, "#D2F0FF"), Color.valueOf(Tmp.c2, "#CBA3FF"), heat);
             if (checkBuild(targetBuild))
-                TjDraw.overdrive(targetBuild, "#ffd59e", heat);
+                TjDraw.overdrive(targetBuild, Color.valueOf(Tmp.c3, "#ffd59e"), heat);
         }
 
         @Override

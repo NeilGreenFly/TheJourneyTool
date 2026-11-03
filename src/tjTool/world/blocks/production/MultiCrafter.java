@@ -12,7 +12,6 @@ import arc.scene.actions.Actions;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.Button;
 import arc.scene.ui.Image;
-import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Table;
 import arc.struct.EnumSet;
 import arc.util.Nullable;
@@ -32,6 +31,7 @@ import mindustry.ui.Bar;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.heat.HeatConsumer;
 import mindustry.world.meta.BlockFlag;
+import tjTool.world.LazyButton;
 import tjTool.world.blocks.TjBlock;
 import tjTool.world.consumers.*;
 
@@ -62,6 +62,7 @@ public class MultiCrafter extends TjBlock {
         sync = true;
         drawArrow = false;
         saveConfig = true;
+        deselectOnDoubleTap = true;
         ambientSound = Sounds.loopMachine;
         ambientSoundVolume = 0.03f;
         flags = EnumSet.of(BlockFlag.factory);
@@ -242,16 +243,12 @@ public class MultiCrafter extends TjBlock {
         }
 
         protected void addButton(Table root, Table table, TextureRegionDrawable icon, Boolp isChecked, Boolc setChecked) {
-            table.add(new ImageButton(icon, Styles.clearNoneTogglei) {{
-                resizeImage(iconSize);
-                update(() -> setChecked(isChecked.get()));
-                changed(() -> {
-                    setChecked.get(isChecked());
-                    root.clear();
-                    buildConfiguration(root);
-                    root.pack();
-                });
-            }});
+            LazyButton.add(this, table, icon, isChecked, v -> {
+                setChecked.get(v);
+                root.clear();
+                buildConfiguration(root);
+                root.pack();
+            }, null);
         }
 
         @Override
@@ -323,12 +320,6 @@ public class MultiCrafter extends TjBlock {
                         }).growX();
                     }).growX().height(uiSize).row()))
             );
-        }
-
-        @Override
-        public boolean onConfigureBuildTapped(Building other) {
-            if (this == other) deselect();
-            return this != other;
         }
 
         @Override

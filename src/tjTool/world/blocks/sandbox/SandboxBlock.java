@@ -35,6 +35,7 @@ public abstract class SandboxBlock extends TjBlock {
         configurable = false;
         saveConfig = false;
         clearOnDoubleTap = false;
+        deselectOnDoubleTap = true;
 
         envEnabled = Env.any;
         schematicPriority = -9;
