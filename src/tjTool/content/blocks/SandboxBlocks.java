@@ -102,9 +102,7 @@ public class SandboxBlocks {
             }
         };
 
-        shieldSource = new ShieldSource("shield-source") {{
-            staticRequirements(this, effect);
-        }};
+        shieldSource = apply(new ShieldSource("shield-source"), staticRequirements(effect));
 
     }
 

@@ -243,12 +243,10 @@ public class MultiCrafter extends TjBlock {
         }
 
         protected void addButton(Table root, Table table, TextureRegionDrawable icon, Boolp isChecked, Boolc setChecked) {
-            LazyButton.add(this, table, icon, isChecked, v -> {
+            table.add(LazyButton.button(icon, isChecked, v -> {
                 setChecked.get(v);
-                root.clear();
-                buildConfiguration(root);
-                root.pack();
-            }, null);
+                rebuild(root);
+            }));
         }
 
         @Override

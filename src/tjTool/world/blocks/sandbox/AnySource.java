@@ -165,7 +165,10 @@ public class AnySource extends BaseSource {
         );
 
         private void addButton(Table table, TextureRegionDrawable icon, Boolp isChecked, Boolc setChecked, Block block) {
-            LazyButton.add(this, table, icon, isChecked, setChecked, this::config).tooltip(tip -> {
+            table.add(LazyButton.button(icon, isChecked, v -> {
+                setChecked.get(v);
+                configure(config());
+            })).size(uiSize).tooltip(tip -> {
                 tip.background(Tex.paneLeft).image(block.uiIcon).size(iconSize).padLeft(5).padRight(10);
                 tip.label(() -> block.localizedName + "    " + Core.bundle.get(isChecked.get() ? "mod.enabled" : "mod.disabled") + "[]\n" + block.description);
             });

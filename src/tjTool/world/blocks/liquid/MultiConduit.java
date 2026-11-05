@@ -28,6 +28,7 @@ import static tjTool.world.AutoTile.atlasRegions;
 
 // 没做完
 // TODO Maybe we need MultiLiquidModule.
+@SuppressWarnings("unused")
 public class MultiConduit extends TjBlock {
     protected static byte[] status = new byte[]{-1, -1, -1, 6, -1, -1, 8, 7, -1, 0, -1, 3, 2, 1, 5, 4};
     public TextureRegion[] regions;

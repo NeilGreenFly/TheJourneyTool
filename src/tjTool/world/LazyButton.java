@@ -6,7 +6,6 @@ import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.util.Nullable;
-import mindustry.gen.Building;
 import mindustry.ui.Styles;
 
 import static tjTool.core.TjTable.*;
@@ -19,19 +18,17 @@ import static tjTool.world.LazyGetter.*;
 @SuppressWarnings("unused")
 public class LazyButton {
 
-    public static Cell<ImageButton> add(Building building, Table table, TextureRegionDrawable icon, Boolp isChecked, @Nullable Boolc setChecked, @Nullable Prov<?> configure) {
-        return table.add(apply(new ImageButton(icon, Styles.clearNoneTogglei), it -> {
-            it.resizeImage(iconSize);
-            it.update(() -> it.setChecked(isChecked.get()));
-            it.changed(() -> {
-                if (setChecked != null) setChecked.get(it.isChecked());
-                if (configure != null) building.configure(configure.get());
-            });
-        })).size(uiSize);
+    public static Cell<ImageButton> add(Table table, ImageButton button) {
+        return table.add(button).size(uiSize);
     }
 
     public static ImageButton button(TextureRegionDrawable icon, Boolp isChecked, @Nullable Boolc changed) {
-        return apply(new ImageButton(icon, Styles.clearNoneTogglei), it -> {
+        return button(icon, null, isChecked, changed);
+    }
+
+    public static ImageButton button(TextureRegionDrawable iconUp, TextureRegionDrawable iconChecked, Boolp isChecked, @Nullable Boolc changed) {
+        return apply(new ImageButton(iconUp, Styles.clearNoneTogglei), it -> {
+            it.getStyle().imageChecked = iconChecked;
             it.resizeImage(iconSize);
             it.update(() -> it.setChecked(isChecked.get()));
             if (changed != null) it.changed(() -> changed.get(it.isChecked()));

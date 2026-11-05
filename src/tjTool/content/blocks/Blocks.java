@@ -14,6 +14,7 @@ import static mindustry.content.Liquids.*;
 import static mindustry.type.Category.*;
 import static mindustry.type.ItemStack.mult;
 import static mindustry.world.meta.BuildVisibility.*;
+import static tjTool.world.LazyGetter.apply;
 import static tjTool.world.consumers.MultiStack.with;
 import static tjTool.world.consumers.OptionalConsumer.by;
 import static tjTool.world.consumers.SingleConsumer.by;
@@ -26,75 +27,75 @@ public class Blocks {
 
     public static Block
             multiSorter, plastaniumJunction,
-            dirLiquidRouter, liquidUnloader, dirLiquidUnloader, multiConduit,
+            dirLiquidRouter, liquidUnloader, dirLiquidUnloader,
             mendWall, mendWallLarge,
             chargedLyreWall,
             multiCrafter;
 
     public static void load() {
 
-        multiSorter = new MultiSorter("multi-sorter") {{
-            staticInit(this);
-            requirements(distribution, with(copper, 2, lead, 2));
-        }};
+        multiSorter = apply(new MultiSorter("multi-sorter"), it -> {
+            staticInit(it);
+            it.requirements(distribution, with(copper, 2, lead, 2));
+        });
 
-        plastaniumJunction = new StackJunction("plastanium-junction") {{
-            staticInit(this);
-            requirements(distribution, with(graphite, 4, silicon, 2, plastanium, 2));
-            health = 160;
-            speed = 4f / 60f;
-            itemCapacity = 10;
-        }};
+        plastaniumJunction = apply(new StackJunction("plastanium-junction"), it -> {
+            staticInit(it);
+            it.requirements(distribution, with(graphite, 4, silicon, 2, plastanium, 2));
+            it.health = 160;
+            it.speed = 4f / 60f;
+            it.itemCapacity = 10;
+        });
 
-        dirLiquidRouter = new DirLiquidRouter("dir-liquid-router") {{
-            staticInit(this);
-            requirements(liquid, with(beryllium, 4, graphite, 10));
-        }};
+        dirLiquidRouter = apply(new DirLiquidRouter("dir-liquid-router"), it -> {
+            staticInit(it);
+            it.requirements(liquid, with(beryllium, 4, graphite, 10));
+        });
 
-        liquidUnloader = new LiquidUnloader("liquid-unloader") {{
-            staticInit(this);
-            requirements(liquid, with(metaglass, 10, titanium, 20, silicon, 30));
-        }};
+        liquidUnloader = apply(new LiquidUnloader("liquid-unloader"), it -> {
+            staticInit(it);
+            it.requirements(liquid, with(metaglass, 10, titanium, 20, silicon, 30));
+        });
 
-        dirLiquidUnloader = new DirLiquidUnloader("dir-liquid-unloader") {{
-            staticInit(this);
-            requirements(liquid, with(metaglass, 10, titanium, 20, silicon, 30));
-        }};
+        dirLiquidUnloader = apply(new DirLiquidUnloader("dir-liquid-unloader"), it -> {
+            staticInit(it);
+            it.requirements(liquid, with(metaglass, 10, titanium, 20, silicon, 30));
+        });
 
-        multiConduit = new MultiConduit("multi-conduit") {{
-            staticInit(this);
-            requirements(liquid, with(beryllium, 16));
-            buildVisibility = debugOnly;
-        }};
+        // multiConduit = new MultiConduit("multi-conduit") {{
+        //     staticInit(this);
+        //     requirements(liquid, with(beryllium, 16));
+        //     buildVisibility = debugOnly;
+        // }};
 
-        mendWall = new MendWall("mend-wall") {{
-            staticInit(this);
-            requirements(defense, with(titanium, 4));
-            size = 1;
-            health = 1200;
-            range = 14f;
-        }};
+        mendWall = apply(new MendWall("mend-wall"), it -> {
+            staticInit(it);
+            it.requirements(defense, with(titanium, 4));
+            it.size = 1;
+            it.health = 1200;
+            it.range = 14f;
+        });
 
-        mendWallLarge = new MendWall("mend-wall-large") {{
-            staticInit(this);
-            requirements(defense, mult(mendWall.requirements, 4f));
-            size = 2;
-            health = mendWall.health * 4;
-            range = 28f;
-        }};
+        mendWallLarge = apply(new MendWall("mend-wall-large"), it -> {
+            staticInit(it);
+            it.requirements(defense, mult(mendWall.requirements, 4f));
+            it.size = 2;
+            it.health = mendWall.health * 4;
+            it.range = 28f;
+        });
 
-        chargedLyreWall = new EdgeWall("charged-lyre-wall") {{
-            staticInit(this);
-            requirements(defense, with(surgeAlloy, 32));
-            health = 1600;
-        }};
+        chargedLyreWall = apply(new EdgeWall("charged-lyre-wall"), it -> {
+            staticInit(it);
+            it.requirements(defense, with(surgeAlloy, 32));
+            it.health = 1600;
+        });
 
-        multiCrafter = new MultiCrafter("multi-crafter") {{
-            staticInit(this);
-            requirements(crafting, with(beryllium, 1));
-            size = 3;
-            drawer = new DrawMulti(new DrawDefault(), new DrawHeatInput(), new DrawFlame(), new DrawCrucibleFlame());
-            multiConsumers = new MultiConsumer(
+        multiCrafter = apply(new MultiCrafter("multi-crafter"), it -> {
+            staticInit(it);
+            it.requirements(crafting, with(beryllium, 1));
+            it.size = 3;
+            it.drawer = new DrawMulti(new DrawDefault(), new DrawHeatInput(), new DrawFlame(), new DrawCrucibleFlame());
+            it.multiConsumers = new MultiConsumer(
                     by(1.25f)
                             .inputBy(with(copper, 3, lead, 4, titanium, 2, silicon, 3), null)
                             .outputBy(with(surgeAlloy, 4), null)
@@ -119,7 +120,7 @@ public class Blocks {
             ).optional(
                     by(null, with(cyanogen, 2 / 60f))
             );
-        }};
+        });
 
     }
 

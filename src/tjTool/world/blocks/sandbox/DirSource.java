@@ -262,12 +262,6 @@ public class DirSource extends BaseSource {
             if (tap) targetBuild.configTapped();
         }
 
-        protected void rebuild(Table table) {
-            table.background(null).clear();
-            buildConfiguration(table);
-            table.pack();
-        }
-
         @Override
         public void buildConfiguration(Table table) {
             if (targetBuild == null) return;

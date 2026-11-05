@@ -16,11 +16,9 @@ import arc.struct.Seq;
 import arc.util.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.entities.units.BuildPlan;
 import mindustry.game.EventType;
-import mindustry.gen.Building;
-import mindustry.gen.Icon;
-import mindustry.gen.Sounds;
-import mindustry.gen.Tex;
+import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Lod;
@@ -39,17 +37,15 @@ import tjTool.world.LazyButton;
 
 import static mindustry.Vars.*;
 import static tjTool.core.TjDraw.rainbow;
-import static tjTool.core.TjTable.iconSize;
-import static tjTool.core.TjTable.uiSize;
+import static tjTool.core.TjTable.*;
 import static tjTool.core.TjVars.halfSize;
 import static tjTool.world.LazyGetter.*;
 
 /**
  * @see OverdriveProjector.OverdriveBuild
  */
-@SuppressWarnings("unused")
 public class OverdriveSource extends SandboxBlock {
-    public static float lastRange;
+    public static float defaultRange = 200;
 
     public static boolean alwaysShowRange = true;
     public static int sort;
@@ -66,9 +62,9 @@ public class OverdriveSource extends SandboxBlock {
     public OverdriveSource(String name) {
         super(name);
         size = 3;
+        noUpdateDisabled = false;
         configurable = true;
         saveConfig = true;
-        deselectOnDoubleTap = true;
         emitLight = true;
         lightRadius = 50;
         ambientSound = Sounds.loopCircuit;
@@ -107,9 +103,15 @@ public class OverdriveSource extends SandboxBlock {
     }
 
     @Override
-    public void drawOverlay(float x, float y, int rotation) {
-        Drawf.dashCircle(x, y, lastRange, baseColor);
-        indexer.eachBlock(player.team(), x, y, lastRange, this::selectBy, this::selectDraw);
+    public void drawPlan(BuildPlan plan, Eachable<BuildPlan> list, boolean valid, float alpha) {
+        super.drawPlan(plan, list, valid, alpha);
+        float range = defaultRange;
+        if (plan.config instanceof String config) {
+            var arr = config.split(";");
+            if (arr.length > 1) range = Strings.parseFloat(arr[1]);
+        }
+        Drawf.dashCircle(plan.drawx(), plan.drawy(), range, baseColor);
+        indexer.eachBlock(player.team(), plan.drawx(), plan.drawy(), range, this::selectBy, this::selectDraw);
     }
 
     public boolean selectBy(Building other) {
@@ -129,10 +131,10 @@ public class OverdriveSource extends SandboxBlock {
     }
 
     public class BuildType extends SandboxBlock.BuildType implements Ranged {
-        public OverdriveConfig overdriveConfig = new OverdriveConfig(2.5f, 200);
+        public OverdriveConfig overdriveConfig = new OverdriveConfig(2.5f, defaultRange);
 
-        public float heat;
         public float charge = Mathf.random(reload);
+        public float smoothRange;
         public float smoothEfficiency;
 
         @Override
@@ -143,18 +145,12 @@ public class OverdriveSource extends SandboxBlock {
         @Override
         public void updateTile() {
             smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency, 0.08f);
-            heat = Mathf.lerpDelta(heat, Mathf.num(efficiency > 0), 0.08f);
+            smoothRange = Mathf.lerpDelta(smoothRange, enabled ? overdriveConfig.range : 0, 0.08f);
 
-            if ((charge += heat * Time.delta) < reload) return;
+            if ((charge += smoothEfficiency * Time.delta) < reload) return;
             charge = 0;
             indexer.eachBlock(this, overdriveConfig.range, OverdriveSource.this::selectBy,
                     other -> other.applyBoost(realBoost(), reload + 1f));
-        }
-
-        protected void rebuild(Table table) {
-            table.background(null).clear();
-            buildConfiguration(table);
-            table.pack();
         }
 
         @Override
@@ -188,7 +184,7 @@ public class OverdriveSource extends SandboxBlock {
 
             table.table(t -> {
                 t.defaults().size(uiSize);
-                LazyButton.add(this, t, Icon.eyeOffSmall, () -> alwaysShowRange, v -> alwaysShowRange = v, null).get().getStyle().imageChecked = Icon.eyeSmall;
+                t.add(LazyButton.button(Icon.eyeSmall, Icon.eyeOffSmall, () -> alwaysShowRange, v -> alwaysShowRange = v));
                 configs.each(config -> {
                     if (!config.boost) t.button(Icon.info, Styles.clearNonei, iconSize, () -> {
                         ui.content.show(config.block);
@@ -204,7 +200,7 @@ public class OverdriveSource extends SandboxBlock {
                         rangeSlider.setValue(current.range);
                     })).size(uiSize).tooltip(tip -> {
                         tip.background(Tex.paneLeft).image(current.block.uiIcon).size(iconSize).padLeft(5).padRight(10);
-                        tip.label(() -> current.block.localizedName + "\n" + current.block.description);
+                        tip.label(() -> current.block.localizedName + (current.boost ? (" [accent]" + Iconc.star + "[]\n") : "\n") + current.block.description);
                     }));
                     if (!current.boost) t.add(button);
                     else t.stack(
@@ -220,23 +216,25 @@ public class OverdriveSource extends SandboxBlock {
                     );
                 });
                 t.row().image(Icon.upOpen);
-                configs.each(current -> apply(LazyButton.add(this, t, Icon.hammer, () -> current.speed == overdriveConfig.speed, ignore -> overdriveConfig.setSpeed(current.speed), overdriveConfig::serialize).tooltip(speedString(current.speed), true).get(), b -> {
-                    b.changed(() -> speedSlider.setValue(current.speed));
-                    b.getStyle().imageChecked = Icon.ok;
-                }));
-                LazyButton.add(this, t, Icon.tag, () -> sort == 1, v -> {
+                configs.each(current -> t.add(LazyButton.button(
+                        Icon.hammer, Icon.ok, () -> current.speed == overdriveConfig.speed,
+                        ignore -> configure(overdriveConfig.setSpeed(current.speed).serialize())))
+                        .tooltip(speedString(current.speed), true).get()
+                        .changed(() -> speedSlider.setValue(current.speed)));
+                t.add(LazyButton.button(Icon.tag, Icon.tags, () -> sort == 1, v -> {
                     sort = v ? 1 : 0;
                     rebuild(table);
-                }, null).tooltip("@block." + name + ".sort-by-speed", true).get().getStyle().imageChecked = Icon.tags;
+                })).size(uiSize).tooltip("@block." + name + ".sort-by-speed", true);
                 t.row().image(Icon.resize);
-                configs.each(current -> apply(LazyButton.add(this, t, Icon.hammer, () -> current.range == overdriveConfig.range, ignore -> overdriveConfig.setRange(current.range), overdriveConfig::serialize).tooltip(rangeString(current.range), true).get(), b -> {
-                    b.changed(() -> rangeSlider.setValue(current.range));
-                    b.getStyle().imageChecked = Icon.ok;
-                }));
-                LazyButton.add(this, t, Icon.tag, () -> sort == 2, v -> {
+                configs.each(current -> t.add(LazyButton.button(
+                        Icon.hammer, Icon.ok, () -> current.range == overdriveConfig.range,
+                        ignore -> configure(overdriveConfig.setRange(current.range).serialize())))
+                        .tooltip(rangeString(current.range), true).get()
+                        .changed(() -> rangeSlider.setValue(current.range)));
+                t.add(LazyButton.button(Icon.tag, Icon.tags, () -> sort == 2, v -> {
                     sort = v ? 2 : 0;
                     rebuild(table);
-                }, null).tooltip("@block." + name + ".sort-by-range", true).get().getStyle().imageChecked = Icon.tags;
+                })).size(uiSize).tooltip("@block." + name + ".sort-by-range", true);
             }).row();
             table.table(t -> {
                 sliderPack(t, speedSlider, Stat.speedIncrease.localized(), OverdriveSource.this::speedString);
@@ -263,15 +261,15 @@ public class OverdriveSource extends SandboxBlock {
             super.draw();
             if (!alwaysShowRange) {
                 if (Lod.l2) {
-                    Draw.color(baseColor, heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1) * 0.5f * Lod.alpha2);
+                    Draw.color(baseColor, smoothEfficiency * Mathf.absin(Time.time, 50f / Mathf.PI2, 1) * 0.5f * Lod.alpha2);
                     Draw.rect(regionTop, x, y);
                     Draw.alpha(Lod.alpha2);
-                    TjDraw.overdrive(this, baseColor, phaseColor, heat);
+                    TjDraw.overdrive(this, baseColor, phaseColor, smoothEfficiency);
                 }
             } else {
                 Draw.z(Layer.shields);
                 Draw.color(baseColor, 1);
-                Fill.poly(x, y, 32, overdriveConfig.range, Time.time / 10);
+                Fill.poly(x, y, 32, smoothRange, Time.time / 10);
             }
             Draw.reset();
 
@@ -324,6 +322,7 @@ public class OverdriveSource extends SandboxBlock {
             } else if (revision == 1) {
                 overdriveConfig.speed = read.f();
                 overdriveConfig.range = read.f();
+                smoothRange = overdriveConfig.range;
             }
         }
     }

@@ -6,6 +6,7 @@ import tjTool.world.blocks.anvil.*;
 import static mindustry.content.Items.surgeAlloy;
 import static mindustry.type.Category.*;
 import static tjTool.content.blocks.Blocks.staticInit;
+import static tjTool.world.LazyGetter.apply;
 import static tjTool.world.consumers.MultiStack.with;
 
 public class Anvils {
@@ -14,23 +15,23 @@ public class Anvils {
 
     public static void load() {
 
-        anvil = new Anvil("anvil") {{
-            staticInit(this);
-            requirements(effect, with(surgeAlloy, 300));
-            health = 8000;
-        }};
+        anvil = apply(new Anvil("anvil"), it -> {
+            staticInit(it);
+            it.requirements(effect, with(surgeAlloy, 300));
+            it.health = 8000;
+        });
 
-        anvilEdge = new AnvilEdge("anvil-edge") {{
-            staticInit(this);
-            requirements(effect, with(surgeAlloy, 300));
-            health = 4000;
-        }};
+        anvilEdge = apply(new AnvilEdge("anvil-edge"), it -> {
+            staticInit(it);
+            it.requirements(effect, with(surgeAlloy, 300));
+            it.health = 4000;
+        });
 
-        anvilAmplifier = new AnvilAmplifier("anvil-amplifier") {{
-            staticInit(this);
-            requirements(effect, with(surgeAlloy, 300));
-            health = 4000;
-        }};
+        anvilAmplifier = apply(new AnvilAmplifier("anvil-amplifier"), it -> {
+            staticInit(it);
+            it.requirements(effect, with(surgeAlloy, 300));
+            it.health = 4000;
+        });
 
     }
 

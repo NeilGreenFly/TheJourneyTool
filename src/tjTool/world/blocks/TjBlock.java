@@ -1,6 +1,7 @@
 package tjTool.world.blocks;
 
 import arc.graphics.g2d.TextureRegion;
+import arc.scene.ui.layout.Table;
 import arc.util.Eachable;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
@@ -56,7 +57,6 @@ public abstract class TjBlock extends Block {
         drawPlaceText(text, tile.x, tile.y, valid);
     }
 
-    @SuppressWarnings("unused")
     public abstract class BuildType extends Building {
         @Override
         public void draw() {
@@ -67,6 +67,12 @@ public abstract class TjBlock extends Block {
         public void drawLight() {
             super.drawLight();
             drawer.drawLight(this);
+        }
+
+        protected void rebuild(Table table) {
+            table.background(null).clear();
+            buildConfiguration(table);
+            table.pack();
         }
 
         @Override

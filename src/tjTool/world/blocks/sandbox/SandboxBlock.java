@@ -18,6 +18,7 @@ public abstract class SandboxBlock extends TjBlock {
     public static Building input;
 
     public boolean drawProximity = false;
+    public boolean drawSelecting = true;
 
     public SandboxBlock(String name) {
         super(name);
@@ -82,7 +83,7 @@ public abstract class SandboxBlock extends TjBlock {
         @Override
         public void draw() {
             super.draw();
-            drawSelecting();
+            if (drawSelecting) drawSelecting();
         }
 
         @Override
