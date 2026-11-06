@@ -46,13 +46,13 @@ public class DirLiquidUnloader extends TjBlock {
             @Override
             public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list) {
                 if (plan.config instanceof Liquid liquid)
-                    drawTiledFrames(size, plan.drawx(), plan.drawy(), 2.5f, liquid, 1);
+                    drawTiledFrames(size, plan.drawx(), plan.drawy(), 1.75f, liquid, 1);
             }
 
             @Override
             public void draw(Building build) {
                 if (build instanceof BuildType unloader && unloader.sortLiquid != null)
-                    drawTiledFrames(size, build.x, build.y, 2.5f, unloader.sortLiquid, 1);
+                    drawTiledFrames(size, build.x, build.y, 1.75f, unloader.sortLiquid, 1);
             }
         }, new DrawRegion(), new DrawRegion("-top") {{ buildingRotate = true; }});
     }
@@ -78,6 +78,12 @@ public class DirLiquidUnloader extends TjBlock {
     public class BuildType extends TjBlock.BuildType {
         public @Nullable Liquid sortLiquid = null;
         public int currentId = 0;
+
+        @Override
+        public void drawSelect() {
+            super.drawSelect();
+            drawItemSelection(sortLiquid);
+        }
 
         protected Liquid getNext(Building from) {
             if (sortLiquid != null || from == null) return sortLiquid;

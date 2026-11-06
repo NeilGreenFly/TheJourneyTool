@@ -10,6 +10,8 @@ import mindustry.world.Tile;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawDefault;
 
+import static mindustry.Vars.tilesize;
+
 public abstract class TjBlock extends Block {
     public DrawBlock drawer;
 
@@ -55,6 +57,10 @@ public abstract class TjBlock extends Block {
 
     public void drawPlaceText(String text, Tile tile, boolean valid) { // @return float
         drawPlaceText(text, tile.x, tile.y, valid);
+    }
+
+    public float pos(int n) {
+        return n * tilesize + offset;
     }
 
     public abstract class BuildType extends Building {

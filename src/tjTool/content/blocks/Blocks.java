@@ -50,6 +50,7 @@ public class Blocks {
         dirLiquidRouter = apply(new DirLiquidRouter("dir-liquid-router"), it -> {
             staticInit(it);
             it.requirements(liquid, with(beryllium, 4, graphite, 10));
+            it.health = 300;
         });
 
         liquidUnloader = apply(new LiquidUnloader("liquid-unloader"), it -> {
@@ -59,7 +60,8 @@ public class Blocks {
 
         dirLiquidUnloader = apply(new DirLiquidUnloader("dir-liquid-unloader"), it -> {
             staticInit(it);
-            it.requirements(liquid, with(metaglass, 10, titanium, 20, silicon, 30));
+            it.requirements(liquid, with(beryllium, 10, graphite, 20, silicon, 20, tungsten, 10));
+            it.health = 250;
         });
 
         // multiConduit = new MultiConduit("multi-conduit") {{

@@ -84,6 +84,12 @@ public class LiquidUnloader extends TjBlock {
         public @Nullable Liquid sortLiquid = null;
         public int currentId = 0;
 
+        @Override
+        public void drawSelect() {
+            super.drawSelect();
+            drawItemSelection(sortLiquid);
+        }
+
         protected Liquid getNext() {
             if (sortLiquid != null) return sortLiquid;
             for (int i = 0; i < allLiquids.length; i += 1) {

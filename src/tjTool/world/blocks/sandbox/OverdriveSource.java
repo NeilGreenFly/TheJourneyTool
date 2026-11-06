@@ -18,7 +18,6 @@ import arc.util.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.entities.Effect;
-import mindustry.entities.units.BuildPlan;
 import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -110,15 +109,15 @@ public class OverdriveSource extends SandboxBlock {
     }
 
     @Override
-    public void drawPlan(BuildPlan plan, Eachable<BuildPlan> list, boolean valid, float alpha) {
-        super.drawPlan(plan, list, valid, alpha);
+    public void drawPlace(int x, int y, int rotation, boolean valid) {
+        super.drawPlace(x, y, rotation, valid);
         float range = defaultRange;
-        if (plan.config instanceof String config) {
+        if (lastConfig instanceof String config) {
             var arr = config.split(";");
             if (arr.length > 1) range = Strings.parseFloat(arr[1]);
         }
-        Drawf.dashCircle(plan.drawx(), plan.drawy(), range, baseColor);
-        indexer.eachBlock(player.team(), plan.drawx(), plan.drawy(), range, this::selectBy, this::selectDraw);
+        Drawf.dashCircle(pos(x), pos(y), range, baseColor);
+        indexer.eachBlock(player.team(), pos(x), pos(y), range, this::selectBy, this::selectDraw);
     }
 
     public boolean selectBy(Building other) {
