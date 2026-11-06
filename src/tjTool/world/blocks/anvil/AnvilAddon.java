@@ -12,10 +12,11 @@ import mindustry.game.Team;
 import mindustry.graphics.BlockRenderer;
 import mindustry.world.Tile;
 import tjTool.world.blocks.TjBlock;
+import tjTool.world.graphics.TjColor;
 
 import static arc.math.Angles.randLenVectors;
 import static mindustry.Vars.state;
-import static tjTool.core.TjDraw.beacon;
+import static tjTool.world.graphics.TjDraw.beacon;
 import static tjTool.core.TjVars.frame;
 
 public abstract class AnvilAddon extends TjBlock {
@@ -32,7 +33,7 @@ public abstract class AnvilAddon extends TjBlock {
         beacon(cx, cy, r, e.color, 0.3f * f);
     }));
 
-    public Color color = Color.valueOf("#FFBFFF");
+    public Color color = TjColor.anvil;
 
     public AnvilAddon(String name) {
         super(name);

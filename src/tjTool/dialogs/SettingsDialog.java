@@ -15,7 +15,8 @@ import mindustry.gen.Icon;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
-import tjTool.core.TjDraw;
+import tjTool.world.graphics.TjColor;
+import tjTool.world.graphics.TjDraw;
 
 import static tjTool.world.LazyGetter.*;
 
@@ -61,7 +62,7 @@ public class SettingsDialog {
                 apply(new ModSetting("mod-" + name + "-enabled"), mod -> {
                     mod.searchName = mod.displayName = name;
                     if (name.equals("mindustryx")) mod.displayName = TjDraw.gradient(name, Color.orange, Pal.accent);
-                    else if (name.equals("kotlin")) mod.displayName = TjDraw.gradient(name, Color.valueOf("#7F52FF"), Color.purple);
+                    else if (name.equals("kotlin")) mod.displayName = TjDraw.gradient(name, TjColor.kotlin, Color.purple);
                 }));
         keySeq[0].keys.each(v -> {
             for (var mod : modSeq) if (v.startsWith("mod-" + mod.searchName + "-")) {

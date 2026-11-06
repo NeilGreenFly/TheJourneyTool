@@ -26,7 +26,7 @@ public final class TheJourney extends Mod {
 
     @Override
     public void init() {
-        theJourney.meta.displayName = Core.bundle.get(theJourney.name + ".displayName");
+        theJourney.meta.displayName = TjDraw.gradient(Core.bundle.get(theJourney.name + ".displayName"), TjColor.n, TjColor.anvil);
         theJourney.meta.subtitle = Core.bundle.get(theJourney.name + ".subtitle");
         theJourney.meta.description = Core.bundle.get(theJourney.name + ".description");
         TjVars.load();

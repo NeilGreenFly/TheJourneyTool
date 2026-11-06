@@ -5,7 +5,7 @@ import arc.graphics.g2d.Draw;
 import arc.struct.Seq;
 import mindustry.ui.Fonts;
 import tjTool.world.blocks.sandbox.*;
-import tjTool.core.*;
+import tjTool.world.graphics.TjDraw;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;

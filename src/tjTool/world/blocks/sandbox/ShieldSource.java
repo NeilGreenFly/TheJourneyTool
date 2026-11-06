@@ -7,7 +7,7 @@ import mindustry.gen.Tex;
 import mindustry.graphics.Drawf;
 import mindustry.world.blocks.defense.BaseShield;
 import tjTool.core.TjBar;
-import tjTool.core.TjDraw;
+import tjTool.world.graphics.TjDraw;
 import tjTool.core.TjStat;
 
 import static mindustry.Vars.tilesize;

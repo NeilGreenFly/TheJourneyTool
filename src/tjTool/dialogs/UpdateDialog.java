@@ -35,6 +35,7 @@ public class UpdateDialog extends BaseDialog {
                 - 任意源 & 任意黑洞 现在可以覆盖流体元件
                 - 移除了任意源多余的介绍
                 - 为 StatusEffects.invincible 覆盖新的精灵(原为空)
+                - 超速源现在可以配置提速和范围
                 """, false);
         titleTable(frame, "v1.1.7 alpha 其他方面", """
                 新增 >>
@@ -46,7 +47,7 @@ public class UpdateDialog extends BaseDialog {
                 - 修复墙
                 - 大型修复墙
                 - 联合墙 (未完成)
-                - [accent]复合工厂[] (未完成)
+                - [accent]复合工厂[]
                 - [magenta]锻星砧[] (未完成)
                 - [magenta]锻星砧接口占位符[] (未完成)
                 - [magenta]锻星砧增幅器[] (未完成)

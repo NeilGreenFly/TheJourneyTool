@@ -33,6 +33,8 @@ import mindustry.world.blocks.ControlBlock;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.draw.*;
 import tjTool.core.*;
+import tjTool.world.graphics.TjColor;
+import tjTool.world.graphics.TjDraw;
 
 import static mindustry.Vars.*;
 import static tjTool.core.TjBundle.*;
@@ -168,8 +170,7 @@ public class DirSource extends BaseSource {
             super.draw();
             Draw.z(Layer.blockAdditive);
             TjDraw.overdrive(this, Color.valueOf(Tmp.c1, "#D2F0FF"), Color.valueOf(Tmp.c2, "#CBA3FF"), heat);
-            if (checkBuild(targetBuild))
-                TjDraw.overdrive(targetBuild, Color.valueOf(Tmp.c3, "#ffd59e"), heat);
+            if (checkBuild(targetBuild)) TjDraw.overdrive(targetBuild, TjColor.phaseColor, heat);
         }
 
         @Override

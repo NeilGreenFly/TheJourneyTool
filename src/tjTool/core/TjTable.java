@@ -32,7 +32,7 @@ import static mindustry.Vars.control;
 import static mindustry.Vars.ui;
 import static mindustry.ui.Styles.none;
 import static mindustry.ui.Styles.outlineLabel;
-import static tjTool.core.TjDraw.rainbow;
+import static tjTool.world.graphics.TjDraw.rainbow;
 import static tjTool.core.TjFunc.*;
 
 /**

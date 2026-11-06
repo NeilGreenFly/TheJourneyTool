@@ -1,5 +1,6 @@
 package tjTool.world.blocks.anvil;
 
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.scene.ui.layout.Table;
 import mindustry.content.Planets;
@@ -9,7 +10,7 @@ import tjTool.core.TjCube;
 
 import static tjTool.content.TjEvents.update;
 import static tjTool.core.TjCube.*;
-import static tjTool.core.TjDraw.beacon;
+import static tjTool.world.graphics.TjDraw.beacon;
 import static tjTool.core.TjFunc.forRange;
 import static tjTool.core.TjVars.frame;
 
@@ -18,6 +19,9 @@ public class AnvilCubeTest extends Anvil {
     protected static final TjCube cube = new TjCube().setScale(10);
     protected static final TjCube circle = new TjCube().setScale(10);
     protected static final TjCube circleLarge = new TjCube().setScale(10);
+
+    public Color outline = Color.valueOf("#FE00FF");
+    public Color in = Color.valueOf("#6A00A2");
 
     {
         cube.rotationSpeed.set(1f, 0.5f, 0);

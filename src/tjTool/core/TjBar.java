@@ -5,6 +5,7 @@ import arc.func.Func;
 import arc.graphics.Color;
 import mindustry.gen.Building;
 import mindustry.ui.Bar;
+import tjTool.world.graphics.TjDraw;
 
 public class TjBar {
 

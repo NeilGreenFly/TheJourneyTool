@@ -11,6 +11,7 @@ import mindustry.type.Liquid;
 import mindustry.world.meta.Env;
 import tjTool.core.*;
 import tjTool.world.blocks.TjBlock;
+import tjTool.world.graphics.TjDraw;
 
 import static mindustry.Vars.*;
 

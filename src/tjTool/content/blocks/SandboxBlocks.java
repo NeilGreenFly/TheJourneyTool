@@ -68,7 +68,7 @@ public class SandboxBlocks {
                 range = 28;
                 baseColor = Pal.regen;
                 healPercent = 4f / 60f;
-                Color col = Color.valueOf("8ca9e8");
+                Color col = Color.valueOf("#8ca9e8");
                 drawer = new DrawMulti(
                         new DrawBottom(),
                         new DrawLiquidTile(Liquids.hydrogen, 9f / 4f) {

@@ -25,10 +25,11 @@ import tjTool.world.blocks.TjBlock;
 import tjTool.world.draw.DrawBottom;
 import tjTool.world.draw.DrawZ;
 import tjTool.world.graphics.AnvilRingRender;
+import tjTool.world.graphics.TjColor;
 
 import static arc.math.geom.Geometry.d8edge;
 import static mindustry.Vars.*;
-import static tjTool.core.TjDraw.beacon;
+import static tjTool.world.graphics.TjDraw.beacon;
 import static tjTool.core.TjTable.uiSize;
 import static tjTool.world.LazyGetter.w;
 import static tjTool.world.graphics.AnvilRingRender.*;
@@ -38,9 +39,7 @@ public class Anvil extends TjBlock {
     protected static final int coreSize = 9;
 
     public TextureRegion drawConfigure;
-    public Color color = Color.valueOf("#FFBFFF");
-    public Color outline = Color.valueOf("#FE00FF");
-    public Color in = Color.valueOf("#6A00A2");
+    public Color color = TjColor.anvil;
     public float energyCapacity = 100;
 
     public Anvil(String name) {

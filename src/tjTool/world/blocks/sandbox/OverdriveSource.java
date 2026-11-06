@@ -5,6 +5,7 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.event.Touchable;
@@ -16,6 +17,7 @@ import arc.struct.Seq;
 import arc.util.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.entities.Effect;
 import mindustry.entities.units.BuildPlan;
 import mindustry.game.EventType;
 import mindustry.gen.*;
@@ -27,16 +29,14 @@ import mindustry.logic.Ranged;
 import mindustry.ui.Bar;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.defense.OverdriveProjector;
-import mindustry.world.meta.BlockGroup;
-import mindustry.world.meta.Env;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
+import mindustry.world.meta.*;
 import tjTool.core.TjBar;
-import tjTool.core.TjDraw;
+import tjTool.world.graphics.TjDraw;
 import tjTool.world.LazyButton;
+import tjTool.world.graphics.TjColor;
 
 import static mindustry.Vars.*;
-import static tjTool.core.TjDraw.rainbow;
+import static tjTool.world.graphics.TjDraw.rainbow;
 import static tjTool.core.TjTable.*;
 import static tjTool.core.TjVars.halfSize;
 import static tjTool.world.LazyGetter.*;
@@ -56,8 +56,14 @@ public class OverdriveSource extends SandboxBlock {
     public TextureRegion regionTop;
     public float reload = 60;
 
-    public Color baseColor = Color.valueOf("#feb380");
-    public Color phaseColor = Color.valueOf("#ffd59e");
+    public Color baseColor = TjColor.overdrive;
+    public Color phaseColor = TjColor.phaseColor;
+
+    public Effect changedEffect = new Effect(40, e -> {
+        Draw.color(phaseColor, baseColor, e.fin());
+        Lines.stroke(3f * e.fout());
+        Lines.circle(e.x, e.y, e.rotation + e.fin());
+    });
 
     public OverdriveSource(String name) {
         super(name);
@@ -79,6 +85,7 @@ public class OverdriveSource extends SandboxBlock {
             var arr = v.split(";");
             if (arr.length > 0) build.overdriveConfig.setSpeed(Strings.parseFloat(arr[0]));
             if (arr.length > 1) build.overdriveConfig.setRange(Strings.parseFloat(arr[1]));
+            if (alwaysShowRange) changedEffect.at(build, build.smoothRange);
         });
     }
 
@@ -97,9 +104,9 @@ public class OverdriveSource extends SandboxBlock {
     public void setBars() {
         addBar("health", TjBar.makeHealthBalance);
         addBar("boost", (BuildType build) -> new Bar(
-                () -> Core.bundle.format("bar.boost", Mathf.round(Mathf.maxZero(build.realBoost() * 100 - 100))),
+                () -> Core.bundle.format("bar.boost", Mathf.round(Mathf.maxZero(build.overdriveConfig.speed * 100 - 100))),
                 () -> Pal.accent,
-                () -> build.realBoost() / build.overdriveConfig.speed));
+                () -> 1));
     }
 
     @Override
@@ -149,8 +156,8 @@ public class OverdriveSource extends SandboxBlock {
 
             if ((charge += smoothEfficiency * Time.delta) < reload) return;
             charge = 0;
-            indexer.eachBlock(this, overdriveConfig.range, OverdriveSource.this::selectBy,
-                    other -> other.applyBoost(realBoost(), reload + 1f));
+            if (overdriveConfig.range > 0 && overdriveConfig.speed > 1) indexer.eachBlock(this, overdriveConfig.range, OverdriveSource.this::selectBy,
+                    other -> other.applyBoost(overdriveConfig.speed, reload + 1f));
         }
 
         @Override
@@ -268,7 +275,8 @@ public class OverdriveSource extends SandboxBlock {
                 }
             } else {
                 Draw.z(Layer.shields);
-                Draw.color(baseColor, 1);
+                Draw.alpha(1);
+                Draw.color(baseColor, enabled ? phaseColor : BlockStatus.logicDisable.color, Math.abs(overdriveConfig.range - smoothRange) / overdriveConfig.range);
                 Fill.poly(x, y, 32, smoothRange, Time.time / 10);
             }
             Draw.reset();
@@ -290,10 +298,6 @@ public class OverdriveSource extends SandboxBlock {
         @Override
         public void drawLight() {
             Drawf.light(x, y, lightRadius * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
-        }
-
-        public float realBoost() {
-            return overdriveConfig.speed * efficiency;
         }
 
         @Override

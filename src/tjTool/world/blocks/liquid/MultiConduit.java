@@ -22,7 +22,7 @@ import tjTool.world.blocks.TjBlock;
 import static arc.math.geom.Geometry.d4;
 import static mindustry.Vars.tilesize;
 import static mindustry.Vars.world;
-import static tjTool.core.TjDraw.*;
+import static tjTool.world.graphics.TjDraw.*;
 import static tjTool.core.TjVars.halfSize;
 import static tjTool.world.AutoTile.atlasRegions;
 

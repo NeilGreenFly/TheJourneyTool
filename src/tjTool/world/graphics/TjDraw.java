@@ -1,4 +1,4 @@
-package tjTool.core;
+package tjTool.world.graphics;
 
 import arc.func.Boolf3;
 import arc.graphics.Color;
@@ -47,7 +47,7 @@ public class TjDraw {
     public static String gradient(String rawtext, Color color, Color colorTo) {
         return apply(new StringBuilder(), stringBuilder -> {
             for (int i = 0; i < rawtext.length(); i += 1)
-                stringBuilder.append(cFmt(c1.set(color).lerp(colorTo, (float) i / rawtext.length()))).append(rawtext.charAt(i));
+                stringBuilder.append(cFmt(c1.set(color).lerp(colorTo, (float) i / rawtext.length()))).append(rawtext.charAt(i)).append("[]");
         }).toString();
     }
 
@@ -86,7 +86,7 @@ public class TjDraw {
         float f = 1f - (Time.time / 100f) % 1f;
         float r = Math.max(0, Mathf.clamp(2f - f * 2f) * building.block.size * halfSize - f - 0.2f);
         float w = Mathf.clamp(0.5f - f) * building.block.size * tilesize;
-        Draw.color(c1.set(to), c2.set(from), f);
+        Draw.color(to, from, f);
         Lines.stroke((2f * f + 0.1f) * heat);
         Lines.beginLine();
         for (int i = 0; i < 4; ++i) {

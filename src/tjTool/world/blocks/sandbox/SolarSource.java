@@ -5,6 +5,7 @@ import mindustry.gen.Building;
 import mindustry.world.blocks.power.SolarGenerator;
 import tjTool.core.*;
 import tjTool.world.AutoTile;
+import tjTool.world.graphics.TjDraw;
 
 import static arc.Core.atlas;
 import static arc.math.geom.Geometry.d8;
