@@ -39,7 +39,7 @@ public class SettingsDialog {
     private static void init() {
         dialog = new BaseDialog("Settings\n这里非常危险, 在没有把握的情况下请立刻离开这里 !");
         dialog.addCloseButton();
-        dialog.buttons.button("@quit", Icon.left, Core.app::exit).size(210, 64);
+        dialog.buttons.button("@quit", Icon.exit, Core.app::exit).size(210, 64);
         dialog.cont.top().left();
 
         keySeq = new KeySeq[]{
@@ -62,7 +62,7 @@ public class SettingsDialog {
                 apply(new ModSetting("mod-" + name + "-enabled"), mod -> {
                     mod.searchName = mod.displayName = name;
                     if (name.equals("mindustryx")) mod.displayName = TjDraw.gradient(name, Color.orange, Pal.accent);
-                    else if (name.equals("kotlin")) mod.displayName = TjDraw.gradient(name, TjColor.kotlin, Color.purple);
+                    else if (name.equals("kotlin")) mod.displayName = TjDraw.gradient(name, TjColor.kotlin, Color.violet);
                 }));
         keySeq[0].keys.each(v -> {
             for (var mod : modSeq) if (v.startsWith("mod-" + mod.searchName + "-")) {
