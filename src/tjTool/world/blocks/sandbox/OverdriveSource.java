@@ -60,8 +60,15 @@ public class OverdriveSource extends SandboxBlock {
 
     public Effect changedEffect = new Effect(40, e -> {
         Draw.color(phaseColor, baseColor, e.fin());
-        Lines.stroke(3f * e.fout());
+        Lines.stroke(4 * e.fout());
         Lines.circle(e.x, e.y, e.rotation + e.fin());
+    });
+
+    public Effect waveEffect = new Effect(90, e -> {
+        Draw.color(phaseColor, baseColor, e.fin());
+        Draw.alpha(Mathf.clamp(e.fout() * 5 / 2));
+        Lines.stroke(4);
+        Lines.circle(e.x, e.y, e.rotation * Mathf.clamp(e.fin() * 5 / 3));
     });
 
     public OverdriveSource(String name) {
@@ -146,6 +153,12 @@ public class OverdriveSource extends SandboxBlock {
         @Override
         public float range() {
             return overdriveConfig.range;
+        }
+
+        @Override
+        public void placed() {
+            super.placed();
+            waveEffect.at(this, overdriveConfig.range);
         }
 
         @Override
@@ -275,7 +288,8 @@ public class OverdriveSource extends SandboxBlock {
             } else {
                 Draw.z(Layer.shields);
                 Draw.alpha(1);
-                Draw.color(baseColor, enabled ? phaseColor : BlockStatus.logicDisable.color, Math.abs(overdriveConfig.range - smoothRange) / overdriveConfig.range);
+                if (enabled) Draw.color(baseColor, phaseColor, Mathf.clamp(Math.abs(overdriveConfig.range - smoothRange) / 160));
+                else Draw.color(BlockStatus.logicDisable.color, baseColor, Mathf.clamp(smoothRange / overdriveConfig.range));
                 Fill.poly(x, y, 32, smoothRange, Time.time / 10);
             }
             Draw.reset();

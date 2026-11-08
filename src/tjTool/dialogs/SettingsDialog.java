@@ -93,7 +93,7 @@ public class SettingsDialog {
         dialog.cont.table(table -> {
             var to = new FLabel("Click the button to refresh ->");
             var from = new TextArea(TjDraw.gradient("NeilGreenFly", Color.cyan, Color.purple));
-//            var from = new TextArea("{rainbow}TEXT");
+            // var from = new TextArea("{rainbow}TEXT");
             table.add(to).growX().row();
             table.add(from).height(100).growX().row();
             table.button(Icon.upOpen, Styles.clearNonei, 32, () -> {
