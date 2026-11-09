@@ -7,7 +7,7 @@ import mindustry.type.LiquidStack;
 import mindustry.ui.ReqImage;
 
 import static mindustry.world.meta.StatValues.stack;
-import static tjTool.core.TjTable.iconSize;
+import static tjTool.widgets.TjTable.iconSize;
 
 public class SingleConsumer extends BaseConsumer {
     public float craftTime = 60;

@@ -4,13 +4,15 @@ import arc.Events;
 import arc.graphics.g2d.Draw;
 import arc.struct.Seq;
 import mindustry.ui.Fonts;
+import tjTool.dialogs.TjSettingTable;
 import tjTool.world.blocks.sandbox.*;
 import tjTool.world.graphics.TjDraw;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static mindustry.game.EventType.*;
 import static mindustry.game.EventType.Trigger.*;
-import static tjTool.core.TjVars.*;
+import static tjTool.dialogs.TjSettingTable.alwaysShowFPS;
 
 public final class TjEvents {
 
@@ -22,6 +24,10 @@ public final class TjEvents {
 
     public static void load() {
 
+        Events.on(ClientLoadEvent.class, event -> {
+            if (TjSettingTable.autoShowLoad.getBool()) ui.load.show();
+        });
+
         Events.run(update, () -> {
             TjDraw.update();
             SandboxBlock.input = control.input.block == null && !scene.hasMouse()
@@ -31,8 +37,8 @@ public final class TjEvents {
 
         Events.run(beforeGameUpdate, () -> updates.each(Runnable::run));
 
-        if (alwaysShowFPS) Events.run(uiDrawEnd, () -> {
-            if (!ui.hudfrag.shown) return;
+        Events.run(uiDrawEnd, () -> {
+            if (!alwaysShowFPS.getBool() || !ui.hudfrag.shown) return;
             Fonts.outline.draw("FPS: [cyan]" + graphics.getFramesPerSecond(),
                     graphics.getWidth() / 4f,
                     graphics.getHeight() / 4f * 3);

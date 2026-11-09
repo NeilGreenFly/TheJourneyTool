@@ -6,13 +6,13 @@ import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Drawf;
 import mindustry.world.blocks.defense.BaseShield;
-import tjTool.core.TjBar;
+import tjTool.widgets.TjBar;
 import tjTool.world.graphics.TjDraw;
 import tjTool.core.TjStat;
 
 import static mindustry.Vars.tilesize;
 import static tjTool.world.LazyGetter.validColor;
-import static tjTool.core.TjTable.iconSize;
+import static tjTool.widgets.TjTable.iconSize;
 
 public class ShieldSource extends BaseShield {
     public ShieldSource(String name) {

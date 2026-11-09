@@ -30,7 +30,7 @@ import tjTool.world.graphics.TjColor;
 import static arc.math.geom.Geometry.d8edge;
 import static mindustry.Vars.*;
 import static tjTool.world.graphics.TjDraw.beacon;
-import static tjTool.core.TjTable.uiSize;
+import static tjTool.widgets.TjTable.uiSize;
 import static tjTool.world.LazyGetter.w;
 import static tjTool.world.graphics.AnvilRingRender.*;
 

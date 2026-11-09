@@ -22,7 +22,7 @@ import mindustry.world.meta.BlockGroup;
 import tjTool.world.blocks.TjBlock;
 
 import static mindustry.Vars.*;
-import static tjTool.core.TjTable.*;
+import static tjTool.widgets.TjTable.*;
 import static tjTool.world.LazyGetter.*;
 
 public class MultiSorter extends TjBlock {

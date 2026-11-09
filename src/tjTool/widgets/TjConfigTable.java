@@ -1,4 +1,4 @@
-package tjTool.core;
+package tjTool.widgets;
 
 import arc.func.*;
 import arc.math.Mathf;
@@ -19,7 +19,7 @@ import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.world.consumers.ConsumeLiquids;
 
 import static tjTool.core.TjFunc.*;
-import static tjTool.core.TjTable.*;
+import static tjTool.widgets.TjTable.*;
 
 @SuppressWarnings("unused")
 public class TjConfigTable {

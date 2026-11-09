@@ -20,7 +20,7 @@ import static arc.util.Strings.autoFixed;
 import static mindustry.gen.Tex.*;
 import static mindustry.world.meta.StatCat.*;
 import static mindustry.world.meta.StatValues.withTooltip;
-import static tjTool.core.TjTable.*;
+import static tjTool.widgets.TjTable.*;
 import static tjTool.world.LazyGetter.apply;
 
 public class TjStat {

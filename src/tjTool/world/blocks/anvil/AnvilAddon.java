@@ -17,7 +17,7 @@ import tjTool.world.graphics.TjColor;
 import static arc.math.Angles.randLenVectors;
 import static mindustry.Vars.state;
 import static tjTool.world.graphics.TjDraw.beacon;
-import static tjTool.core.TjVars.frame;
+import static tjTool.widgets.TjDrawable.frame;
 
 public abstract class AnvilAddon extends TjBlock {
     public static Effect anvilEffect = new Effect(240, e -> randLenVectors(e.id, 2, e.finpow() * 20, (x, y) -> {

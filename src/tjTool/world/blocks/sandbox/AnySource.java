@@ -37,7 +37,7 @@ import java.util.Arrays;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.*;
-import static tjTool.core.TjTable.*;
+import static tjTool.widgets.TjTable.*;
 import static tjTool.core.TjVars.halfSize;
 import static tjTool.world.LazyGetter.*;
 
@@ -129,6 +129,7 @@ public class AnySource extends BaseSource {
         public boolean outputHeat = true;
         // public float outputOverdrive;
 
+        private boolean shouldUpdate;
         public @Nullable Vec2 commandPos;
         private boolean handle;
         private boolean warning;
@@ -192,6 +193,7 @@ public class AnySource extends BaseSource {
         @Override
         public void onProximityUpdate() {
             warning = proximity.contains(other -> other instanceof BaseTurret.BaseTurretBuild && !(other instanceof BuildTurret.BuildTurretBuild));
+            shouldUpdate = proximity.contains(other -> !(other instanceof BaseSource.BuildType));
         }
 
         @Override
@@ -204,6 +206,7 @@ public class AnySource extends BaseSource {
 
         @Override
         public void tryUpdateTile() {
+            if (!shouldUpdate) return;
             if (outputItem) content.items().each(item -> {
                 handle = true;
                 for (int i = 10; i-- > 0 && handle;) offload(item);

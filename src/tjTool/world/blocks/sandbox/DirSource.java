@@ -38,8 +38,8 @@ import tjTool.world.graphics.TjDraw;
 
 import static mindustry.Vars.*;
 import static tjTool.core.TjBundle.*;
-import static tjTool.core.TjConfigTable.*;
-import static tjTool.core.TjTable.*;
+import static tjTool.widgets.TjConfigTable.*;
+import static tjTool.widgets.TjTable.*;
 import static tjTool.world.LazyGetter.*;
 
 public class DirSource extends BaseSource {

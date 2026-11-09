@@ -10,6 +10,7 @@ import mindustry.type.Item;
 import mindustry.type.Liquid;
 import mindustry.world.meta.Env;
 import tjTool.core.*;
+import tjTool.widgets.TjBar;
 import tjTool.world.blocks.TjBlock;
 import tjTool.world.graphics.TjDraw;
 

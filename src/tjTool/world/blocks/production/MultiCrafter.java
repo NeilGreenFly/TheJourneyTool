@@ -40,11 +40,14 @@ import static mindustry.Vars.*;
 import static mindustry.world.meta.StatValues.withTooltip;
 import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjStat.multiConsumersConfig;
-import static tjTool.core.TjTable.*;
-import static tjTool.core.TjVars.*;
+import static tjTool.dialogs.TjSettingTable.buttonDrop;
+import static tjTool.widgets.TjTable.*;
 
 public class MultiCrafter extends TjBlock {
-    public boolean buttonDrop = false;
+    public static boolean showConsPower = false;
+    public static boolean showConsHeat = true;
+    public static boolean showCraftTime = false;
+
     public MultiConsumer multiConsumers;
     public boolean dumpExtraLiquid = true;
     public Effect craftEffect = Fx.none;
@@ -265,7 +268,7 @@ public class MultiCrafter extends TjBlock {
                 addButton(table, info, Icon.rightOpen, () -> showCraftTime, v -> showCraftTime = v);
             }).growX().padBottom(10).row();
             table.stack(
-                    new Table(t -> t.add(image).growX().height(uiSize).padTop(!buttonDrop ? uiSize * currentConsumer : 0)).top(),
+                    new Table(t -> t.add(image).growX().height(uiSize).padTop(!buttonDrop.getBool() ? uiSize * currentConsumer : 0)).top(),
                     new Table(t -> {
                         t.marginLeft(10).marginRight(10);
                         for (var consumer : multiConsumers.consumers) {

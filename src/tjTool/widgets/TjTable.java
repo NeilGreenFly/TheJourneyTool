@@ -1,4 +1,4 @@
-package tjTool.core;
+package tjTool.widgets;
 
 import arc.Core;
 import arc.func.*;

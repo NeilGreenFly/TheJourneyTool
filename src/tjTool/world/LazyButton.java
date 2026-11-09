@@ -8,7 +8,7 @@ import arc.scene.ui.layout.Table;
 import arc.util.Nullable;
 import mindustry.ui.Styles;
 
-import static tjTool.core.TjTable.*;
+import static tjTool.widgets.TjTable.*;
 import static tjTool.world.LazyGetter.*;
 
 /**

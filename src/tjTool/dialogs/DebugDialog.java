@@ -5,7 +5,7 @@ import mindustry.content.TechTree;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.ui.dialogs.BaseDialog;
-import tjTool.core.TjVars;
+import tjTool.widgets.TjDrawable;
 
 import static arc.Core.settings;
 import static mindustry.Vars.*;
@@ -39,7 +39,7 @@ public class DebugDialog {
 
     private static void rebuild() {
         dialog.cont.clearChildren();
-        dialog.cont.table(TjVars.frame, table -> {
+        dialog.cont.table(TjDrawable.frame, table -> {
             table.defaults().width(200);
             table.button("@database", Icon.book, ui.database::show).row();
             table.button("@research", Icon.tree, ui.research::show).row();

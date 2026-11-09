@@ -12,7 +12,7 @@ import static tjTool.content.TjEvents.update;
 import static tjTool.core.TjCube.*;
 import static tjTool.world.graphics.TjDraw.beacon;
 import static tjTool.core.TjFunc.forRange;
-import static tjTool.core.TjVars.frame;
+import static tjTool.widgets.TjDrawable.frame;
 
 @SuppressWarnings("unused")
 public class AnvilCubeTest extends Anvil {

@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import mindustry.gen.Building;
 import mindustry.world.blocks.power.SolarGenerator;
 import tjTool.core.*;
+import tjTool.widgets.TjBar;
 import tjTool.world.AutoTile;
 import tjTool.world.graphics.TjDraw;
 

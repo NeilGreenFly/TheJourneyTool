@@ -29,14 +29,14 @@ import mindustry.ui.Bar;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.meta.*;
-import tjTool.core.TjBar;
+import tjTool.widgets.TjBar;
 import tjTool.world.graphics.TjDraw;
 import tjTool.world.LazyButton;
 import tjTool.world.graphics.TjColor;
 
 import static mindustry.Vars.*;
 import static tjTool.world.graphics.TjDraw.rainbow;
-import static tjTool.core.TjTable.*;
+import static tjTool.widgets.TjTable.*;
 import static tjTool.core.TjVars.halfSize;
 import static tjTool.world.LazyGetter.*;
 

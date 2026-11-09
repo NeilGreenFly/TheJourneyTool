@@ -22,7 +22,7 @@ import tjTool.world.graphics.TjDraw;
 
 import static mindustry.Vars.*;
 import static tjTool.core.TjFunc.*;
-import static tjTool.core.TjTable.*;
+import static tjTool.widgets.TjTable.*;
 import static tjTool.core.TjVars.halfSize;
 
 public class Beacon extends SandboxBlock {
