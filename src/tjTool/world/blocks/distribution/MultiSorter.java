@@ -35,7 +35,6 @@ public class MultiSorter extends TjBlock {
         update = false;
         noUpdateDisabled = false;
         autoResetEnabled = false;
-        destructible = true;
         underBullets = true;
         instantTransfer = true;
         unloadable = false;

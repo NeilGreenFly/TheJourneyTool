@@ -23,7 +23,7 @@ import static tjTool.world.consumers.SingleConsumer.by;
  * @see mindustry.content.Blocks
  */
 @SuppressWarnings("SpellCheckingInspection")
-public class Blocks {
+public final class Blocks {
 
     public static Block
             multiSorter, plastaniumJunction,

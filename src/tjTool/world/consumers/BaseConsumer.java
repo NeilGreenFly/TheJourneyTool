@@ -9,6 +9,14 @@ public class BaseConsumer {
         input.init();
     }
 
+    public boolean hasItems() {
+        return input.hasItems();
+    }
+
+    public boolean hasLiquids() {
+        return input.hasLiquids();
+    }
+
     public float efficiency(Building building) {
         if (!(building.consumeTriggerValid() || building.items.has(input.items))) return 0;
         if (!(building.shouldConsume() && building.productionValid())) return 0;

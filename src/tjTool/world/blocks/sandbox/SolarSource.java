@@ -45,7 +45,7 @@ public class SolarSource extends SolarGenerator {
     public void setBars() {
         super.setBars();
         removeBar("power");
-        addBar("health", TjBar.makeHealthBalance);
+        addBar("health", TjBar.healthBar);
         addBar("power", makePowerBalance());
         addBar("batteries", makeBatteryBalance());
     }

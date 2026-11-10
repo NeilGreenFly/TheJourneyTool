@@ -9,7 +9,7 @@ import static tjTool.core.TjEffect.*;
 
 /** Stay tuned */
 @SuppressWarnings("unused")
-public class TjStatus {
+public final class TjStatus {
 
     public static StatusEffect dissociation;
 

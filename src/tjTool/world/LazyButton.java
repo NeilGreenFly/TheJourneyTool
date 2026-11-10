@@ -16,7 +16,7 @@ import static tjTool.world.LazyGetter.*;
  * @author NeilGreenFly
  */
 @SuppressWarnings("unused")
-public class LazyButton {
+public final class LazyButton {
 
     public static Cell<ImageButton> add(Table table, ImageButton button) {
         return table.add(button).size(uiSize);

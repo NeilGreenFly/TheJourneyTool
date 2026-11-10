@@ -18,11 +18,11 @@ import mindustry.world.consumers.ConsumeItems;
 import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.world.consumers.ConsumeLiquids;
 
-import static tjTool.core.TjFunc.*;
 import static tjTool.widgets.TjTable.*;
+import static tjTool.world.Range.*;
 
 @SuppressWarnings("unused")
-public class TjConfigTable {
+public final class TjConfigTable {
 
     public static class Pack {
         protected Seq<BaseContent> contents = new Seq<>();

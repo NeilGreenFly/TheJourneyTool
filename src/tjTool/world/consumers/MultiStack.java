@@ -6,7 +6,7 @@ import mindustry.type.Liquid;
 import mindustry.type.LiquidStack;
 
 import static mindustry.Vars.content;
-import static tjTool.core.TjFunc.forRange;
+import static tjTool.world.Range.*;
 
 @SuppressWarnings("unused")
 public class MultiStack {
@@ -29,6 +29,14 @@ public class MultiStack {
         liquidFilter = new boolean[content.liquids().size];
         for (var v : this.items) itemFilter[v.item.id] = true;
         for (var v : this.liquids) liquidFilter[v.liquid.id] = true;
+    }
+
+    public boolean hasItems() {
+        return items.length > 0;
+    }
+
+    public boolean hasLiquids() {
+        return liquids.length > 0;
     }
 
     public static ItemStack[] with(Item v, Object... n) {

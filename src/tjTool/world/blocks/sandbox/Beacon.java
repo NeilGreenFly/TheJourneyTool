@@ -21,9 +21,9 @@ import tjTool.core.*;
 import tjTool.world.graphics.TjDraw;
 
 import static mindustry.Vars.*;
-import static tjTool.core.TjFunc.*;
 import static tjTool.widgets.TjTable.*;
 import static tjTool.core.TjVars.halfSize;
+import static tjTool.world.Range.*;
 
 public class Beacon extends SandboxBlock {
     public static final TextureRegion[] teamIcons = new TextureRegion[4];

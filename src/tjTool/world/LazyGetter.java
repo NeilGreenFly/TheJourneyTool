@@ -14,7 +14,7 @@ import mindustry.type.Liquid;
  * @author NeilGreenFly
  */
 @SuppressWarnings("unused")
-public class LazyGetter {
+public final class LazyGetter {
 
     public static <T extends UnlockableContent> int w(T t) {
         return t != null ? t.id : -1;

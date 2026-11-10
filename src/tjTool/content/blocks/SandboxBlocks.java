@@ -20,7 +20,7 @@ import static mindustry.type.ItemStack.*;
 import static mindustry.world.meta.BuildVisibility.sandboxOnly;
 import static tjTool.world.LazyGetter.apply;
 
-public class SandboxBlocks {
+public final class SandboxBlocks {
 
     public static Block
             anySource, dirSource, anyVoid,

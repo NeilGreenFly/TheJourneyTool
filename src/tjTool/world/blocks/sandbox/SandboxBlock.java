@@ -59,7 +59,7 @@ public abstract class SandboxBlock extends TjBlock {
 
     @Override
     public void setBars() {
-        addBar("health", TjBar.makeHealthBalance);
+        addBar("health", TjBar.healthBar);
     }
 
     @Override

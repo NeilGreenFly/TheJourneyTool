@@ -2,11 +2,9 @@ package tjTool.core;
 
 import arc.Core;
 import arc.files.Fi;
-import arc.func.Intc;
 import arc.graphics.Pixmap;
 import arc.graphics.Pixmaps;
 import arc.graphics.g2d.PixmapRegion;
-import arc.struct.Seq;
 import mindustry.graphics.MultiPacker;
 import mindustry.graphics.MultiPacker.PageType;
 
@@ -15,18 +13,6 @@ import static tjTool.TheJourney.theJourney;
 
 @SuppressWarnings("unused")
 public class TjFunc {
-
-    public static void forRange(int to, Intc cons) {
-        for (int index = 0; index < to; index += 1) cons.get(index);
-    }
-
-    public static <T> void forEach(T[] it, ForCons<T> cons) {
-        for (int index = 0; index < it.length; index += 1) cons.get(index, it[index]);
-    }
-
-    public static <T> void forEach(Seq<T> it, ForCons<T> cons) {
-        for (int index = 0; index < it.size; index += 1) cons.get(index, it.get(index));
-    }
 
     private static final byte key = (byte) 233;
     private static byte[] b(byte[] array) {

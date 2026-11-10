@@ -13,8 +13,10 @@ public class MultiConsumer {
     public boolean[] liquidFilter;
     public boolean[] optionalItemFilter;
     public boolean[] optionalLiquidFilter;
-    public boolean hasPower = false;
-    public boolean hasHeat = false;
+    public boolean hasItems;
+    public boolean hasLiquids;
+    public boolean hasPower;
+    public boolean hasHeat;
     public int multiplier = 4;
     public int itemCapacity = 0;
     public int[] capacities;
@@ -43,10 +45,14 @@ public class MultiConsumer {
         optionalLiquidFilter = new boolean[content.liquids().size];
         capacities = new int[content.items().size];
         for (var consumer : optionalConsumers) {
+            if (consumer.hasItems()) hasItems = true;
+            if (consumer.hasLiquids()) hasLiquids = true;
             for (var stack : consumer.input.items) optionalItemFilter[stack.item.id] = true;
             for (var stack : consumer.input.liquids) optionalLiquidFilter[stack.liquid.id] = true;
         }
         for (var consumer : consumers) {
+            if (consumer.hasItems()) hasItems = true;
+            if (consumer.hasLiquids()) hasLiquids = true;
             if (consumer.consPower()) hasPower = true;
             if (consumer.consHeat()) hasHeat = true;
             for (var stack : consumer.input.liquids) liquidFilter[stack.liquid.id] = true;

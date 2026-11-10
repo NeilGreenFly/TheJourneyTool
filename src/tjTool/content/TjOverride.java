@@ -10,7 +10,7 @@ import tjTool.core.*;
 import static mindustry.content.UnitTypes.emanate;
 import static mindustry.entities.part.DrawPart.PartProgress.warmup;
 
-public class TjOverride {
+public final class TjOverride {
 
     public static void load() {
 

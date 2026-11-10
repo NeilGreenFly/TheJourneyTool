@@ -5,7 +5,7 @@ import arc.graphics.Color;
 import static arc.graphics.Color.*;
 
 @SuppressWarnings("unused")
-public class TjColor {
+public final class TjColor {
 
     public static final Color kotlin = valueOf("#7F52FF");
 

@@ -7,6 +7,7 @@ import arc.util.Tmp;
 
 import static tjTool.TheJourney.theJourney;
 import static tjTool.core.TjFunc.*;
+import static tjTool.world.Range.*;
 
 public class MultiModel {
     public static void load() {

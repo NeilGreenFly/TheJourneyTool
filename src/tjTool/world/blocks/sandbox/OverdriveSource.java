@@ -29,7 +29,6 @@ import mindustry.ui.Bar;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.meta.*;
-import tjTool.widgets.TjBar;
 import tjTool.world.graphics.TjDraw;
 import tjTool.world.LazyButton;
 import tjTool.world.graphics.TjColor;
@@ -108,7 +107,7 @@ public class OverdriveSource extends SandboxBlock {
 
     @Override
     public void setBars() {
-        addBar("health", TjBar.makeHealthBalance);
+        super.setBars();
         addBar("boost", (BuildType build) -> new Bar(
                 () -> Core.bundle.format("bar.boost", Mathf.round(Mathf.maxZero(build.overdriveConfig.speed * 100 - 100))),
                 () -> Pal.accent,

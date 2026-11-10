@@ -22,7 +22,7 @@ import static tjTool.core.TjVars.halfSize;
 import static tjTool.world.LazyGetter.*;
 
 @SuppressWarnings("unused")
-public class TjDraw {
+public final class TjDraw {
 
     private static final Color c1 = new Color();
     private static final Color c2 = new Color();
@@ -35,7 +35,7 @@ public class TjDraw {
     }
 
     public static Color rainbow(float s, float v) {
-        return Color.HSVtoRGB(Time.time % 360, s, v, c1.a(1));
+        return Color.HSVtoRGB(Time.globalTime % 360, s, v, c1.a(1));
     }
 
     /**

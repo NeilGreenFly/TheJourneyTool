@@ -13,11 +13,9 @@ import mindustry.world.blocks.power.PowerBlock;
 import mindustry.world.meta.Env;
 import tjTool.world.AutoTile;
 
-import static arc.graphics.g2d.Draw.color;
-import static arc.graphics.g2d.Lines.stroke;
 import static mindustry.world.blocks.power.PowerNode.makeBatteryBalance;
 import static mindustry.world.blocks.power.PowerNode.makePowerBalance;
-import static tjTool.core.TjFunc.forRange;
+import static tjTool.world.Range.forRange;
 import static tjTool.core.TjVars.halfSize;
 
 /** Stay tuned */
@@ -39,8 +37,8 @@ public class PowerWire extends PowerBlock {
         envEnabled |= Env.space;
 
         placeEffect = new Effect(16, e -> {
-            color(Color.valueOf(Tmp.c1.a(1), "#8CAAEB"));
-            stroke(3f - e.fin() * 2f);
+            Draw.color(Color.valueOf(Tmp.c1.a(1), "#8CAAEB"));
+            Lines.stroke(3f - e.fin() * 2f);
             Lines.square(e.x, e.y, halfSize * e.rotation + e.fin() * 3f);
         });
     }

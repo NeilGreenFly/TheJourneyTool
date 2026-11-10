@@ -5,7 +5,7 @@ import tjTool.dialogs.TjSettingTable;
 import tjTool.widgets.TjDrawable;
 import tjTool.world.graphics.MultiModel;
 
-public class Register {
+public final class Register {
 
     public static void loadContent() {
         MultiModel.load();

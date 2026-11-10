@@ -15,6 +15,7 @@ import arc.scene.ui.Image;
 import arc.scene.ui.layout.Table;
 import arc.struct.EnumSet;
 import arc.util.Nullable;
+import arc.util.Strings;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
@@ -31,6 +32,8 @@ import mindustry.ui.Bar;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.heat.HeatConsumer;
 import mindustry.world.meta.BlockFlag;
+import mindustry.world.meta.Stat;
+import tjTool.widgets.TjBar;
 import tjTool.world.LazyButton;
 import tjTool.world.blocks.TjBlock;
 import tjTool.world.consumers.*;
@@ -38,10 +41,10 @@ import tjTool.world.consumers.*;
 import static arc.util.Strings.*;
 import static mindustry.Vars.*;
 import static mindustry.world.meta.StatValues.withTooltip;
-import static tjTool.core.TjFunc.*;
 import static tjTool.core.TjStat.multiConsumersConfig;
 import static tjTool.dialogs.TjSettingTable.buttonDrop;
 import static tjTool.widgets.TjTable.*;
+import static tjTool.world.Range.*;
 
 public class MultiCrafter extends TjBlock {
     public static boolean showConsPower = false;
@@ -60,8 +63,6 @@ public class MultiCrafter extends TjBlock {
     public MultiCrafter(String name) {
         super(name);
         update = true;
-        hasItems = true;
-        hasLiquids = true;
         sync = true;
         drawArrow = false;
         saveConfig = true;
@@ -87,6 +88,8 @@ public class MultiCrafter extends TjBlock {
     public void init() {
         multiConsumers.init();
         super.init();
+        hasItems = multiConsumers.hasItems;
+        hasLiquids = multiConsumers.hasLiquids;
         hasConsumers = multiConsumers.hasConsumers();
         configurable = multiConsumers.consumers.length > 1;
         itemFilter = multiConsumers.itemFilter;
@@ -100,7 +103,7 @@ public class MultiCrafter extends TjBlock {
     public void setStats() { // TODO 这部分 ui 过于紧凑了, 需要使用更合适的布局方式.
         super.setStats();
         stats.add(multiConsumersConfig, multiConsumersConfig(multiConsumers));
-        stats.add(multiConsumersConfig, table -> table.row().table(Tex.paneLeft, t -> {
+        stats.add(Stat.booster, table -> table.row().table(Tex.paneLeft, t -> {
             for (var c : multiConsumers.optionalConsumers) {
                 for (var v : c.input.items) withTooltip(stack(t, v).get(), v.item, true);
                 for (var v : c.input.liquids) withTooltip(stack(t, v).get(), v.liquid, true);
@@ -115,11 +118,7 @@ public class MultiCrafter extends TjBlock {
         super.setBars();
         removeBar("items");
         removeBar("liquid");
-        if (multiConsumers.hasPower) addBar("power", entity -> new Bar(
-                () -> Core.bundle.get("bar.power"),
-                () -> Pal.powerBar,
-                () -> Mathf.zero(consPower.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status)
-        );
+        if (multiConsumers.hasPower) addBar("power", TjBar.powerBar);
         if (multiConsumers.hasHeat) addBar("heat", (BuildType building) -> new Bar(
                 () -> Core.bundle.format("bar.heatpercent", (int) (building.heat + 0.01f), (int) (building.efficiencyScale() * 100 + 0.01f)),
                 () -> Pal.lightOrange,
@@ -130,6 +129,11 @@ public class MultiCrafter extends TjBlock {
         }
         if (multiConsumers.hasOption()) for (var c : multiConsumers.optionalConsumers)
             for (var stack : c.input.liquids) addLiquidBar(stack.liquid);
+        addBar("progress", (BuildType building) -> new Bar(
+                () -> Iconc.crafting + " " + (int) (building.progress() * 100) + " %" + (building.efficiency > 0 ? ("  [coral]" + Strings.fixed(building.currentConsumer().craftTime / 60 / building.efficiency * (1 - building.progress()), 2) + "[]s") : ""),
+                () -> Pal.ammo,
+                building::progress
+        ));
     }
 
     public class BuildType extends TjBlock.BuildType implements HeatConsumer {

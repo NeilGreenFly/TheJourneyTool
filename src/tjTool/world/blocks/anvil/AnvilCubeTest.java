@@ -11,7 +11,7 @@ import tjTool.core.TjCube;
 import static tjTool.content.TjEvents.update;
 import static tjTool.core.TjCube.*;
 import static tjTool.world.graphics.TjDraw.beacon;
-import static tjTool.core.TjFunc.forRange;
+import static tjTool.world.Range.*;
 import static tjTool.widgets.TjDrawable.frame;
 
 @SuppressWarnings("unused")

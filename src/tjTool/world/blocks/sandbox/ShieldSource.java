@@ -36,7 +36,7 @@ public class ShieldSource extends BaseShield {
     @Override
     public void setBars() {
         super.setBars();
-        addBar("health", TjBar.makeHealthBalance);
+        addBar("health", TjBar.healthBar);
     }
 
     @Override

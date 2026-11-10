@@ -32,8 +32,8 @@ import static mindustry.Vars.control;
 import static mindustry.Vars.ui;
 import static mindustry.ui.Styles.none;
 import static mindustry.ui.Styles.outlineLabel;
+import static tjTool.world.Range.*;
 import static tjTool.world.graphics.TjDraw.rainbow;
-import static tjTool.core.TjFunc.*;
 
 /**
  * 由于旧的 {@code TjConfigTable} 将用户面和数据过度耦合导致极难扩展, 所以我们需要一种新的设计, 但是显然这需要一点时间...<p>
@@ -75,7 +75,7 @@ import static tjTool.core.TjFunc.*;
  */
 
 @SuppressWarnings("unused")
-public class TjTable {
+public final class TjTable {
     public static final float uiSize = 44f;
     public static final float iconSize = 32f;
 

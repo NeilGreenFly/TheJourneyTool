@@ -12,8 +12,8 @@ import static tjTool.widgets.TjTable.iconSize;
 public class SingleConsumer extends BaseConsumer {
     public float craftTime = 60;
     public MultiStack output;
-    public float usage = 0;
-    public float heatRequirement = 0;
+    public float usage;
+    public float heatRequirement;
     // TODO liquidOutputDirections
 
     private SingleConsumer(MultiStack input, MultiStack output) {
@@ -25,6 +25,16 @@ public class SingleConsumer extends BaseConsumer {
     public void init() {
         super.init();
         output.init();
+    }
+
+    @Override
+    public boolean hasItems() {
+        return super.hasItems() || output.hasItems();
+    }
+
+    @Override
+    public boolean hasLiquids() {
+        return super.hasLiquids() || output.hasLiquids();
     }
 
     public static SingleConsumer by(float sec) {
