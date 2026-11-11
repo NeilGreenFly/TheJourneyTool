@@ -1,7 +1,6 @@
 package tjTool.dialogs;
 
 import arc.Core;
-import arc.flabel.FLabel;
 import arc.func.Boolf;
 import arc.func.Cons;
 import arc.graphics.Color;
@@ -89,19 +88,7 @@ public class SettingsDialog {
         setup();
     }
 
-    private static void other() {
-        dialog.cont.table(table -> {
-            var to = new FLabel("Click the button to refresh ->");
-            var from = new TextArea(TjDraw.gradient("NeilGreenFly", Color.cyan, Color.purple));
-            // var from = new TextArea("{rainbow}TEXT");
-            table.add(to).growX().row();
-            table.add(from).height(100).growX().row();
-            table.button(Icon.upOpen, Styles.clearNonei, 32, () -> {
-                to.restart(from.getText());
-                to.skipToTheEnd();
-            }).growX().row();
-        }).top().width(500);
-    }
+    private static void other() {}
 
     private static void setup() {
 

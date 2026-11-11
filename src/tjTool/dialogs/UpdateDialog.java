@@ -1,6 +1,5 @@
 package tjTool.dialogs;
 
-import arc.Core;
 import arc.flabel.FLabel;
 import arc.func.Cons;
 import arc.scene.ui.ScrollPane;
@@ -12,7 +11,7 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import tjTool.core.TjBundle;
 
-import static tjTool.world.LazyGetter.apply;
+import static tjTool.world.LazyGetter.*;
 
 public class UpdateDialog extends BaseDialog {
     public static Cons<Table> updateLog = table -> {
@@ -23,11 +22,12 @@ public class UpdateDialog extends BaseDialog {
         table.add(apply(new ScrollPane(frame, Styles.smallPane), panel -> {
             panel.setScrollingDisabled(true, false);
             panel.setOverscroll(false, false);
-            panel.exited(() -> {
-                if (panel.hasScroll()) Core.scene.setScrollFocus(null);
-            });
-        })).growY().row();
+            panel.exited(() -> clearScrollFocus(panel));
+        })).grow().row();
 
+        titleTable(frame, "v1.2 alpha", """
+                [sky]>>所有沙盒建筑的功能均已趋于完善，已陆续修复、优化包括沙盒建筑、其他测试建筑等在内的各类问题，现在正式步入v1.2。由于高版本暂时没有破坏性更新，模组最低游戏版本暂不提升。现阶段仍然以完善和扩充功能、优化体验为主，更多更新敬请期待。[]
+                """, false);
         titleTable(frame, "v1.1.7 alpha", """
                 新增 & 修复 >>
                 - 修复任意源对管道错误的输出物品
@@ -36,8 +36,8 @@ public class UpdateDialog extends BaseDialog {
                 - 移除了任意源多余的介绍
                 - 为 StatusEffects.invincible 覆盖新的精灵(原为空)
                 - 超速源现在可以配置提速和范围
-                """, false);
-        titleTable(frame, "v1.1.7 alpha 其他方面", """
+                """);
+        titleTable(frame, "v1.1.7 alpha 其他部分", """
                 新增 >>
                 - 复合分类器
                 - 塑钢交叉器
@@ -151,7 +151,7 @@ public class UpdateDialog extends BaseDialog {
             table.button("=", SettingsDialog::show).row();
             table.button("-", DebugDialog::show).row();
         }).top().get().color.a(0.2f); // debug
-        cont.table(updateLog).growY();
+        cont.table(updateLog).growY().width(500);
         addCloseButton();
     }
 
@@ -163,7 +163,7 @@ public class UpdateDialog extends BaseDialog {
         table.table(tag -> {
             tag.add(title).left().color(Pal.gray);
             tag.image().height(4).color(Pal.gray).growX().pad(5);
-            Collapser coll = new Collapser(new Table().add("[lightgray]" + label).growX().left().getTable(), collapsed);
+            Collapser coll = new Collapser(new Table().labelWrap("[lightgray]" + label).growX().left().getTable(), collapsed);
             coll.setDuration(0.1f);
             tag.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> {
                 i.getStyle().imageUp = !coll.isCollapsed() ? Icon.upOpen : Icon.downOpen;

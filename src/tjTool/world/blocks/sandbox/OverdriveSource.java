@@ -202,7 +202,7 @@ public class OverdriveSource extends SandboxBlock {
 
             table.table(t -> {
                 t.defaults().size(uiSize);
-                t.add(LazyButton.button(Icon.eyeSmall, Icon.eyeOffSmall, () -> alwaysShowRange, v -> alwaysShowRange = v));
+                t.add(LazyButton.button(Icon.eyeOffSmall, Icon.eyeSmall, () -> alwaysShowRange, v -> alwaysShowRange = v));
                 configs.each(config -> {
                     if (!config.boost) t.button(Icon.info, Styles.clearNonei, iconSize, () -> {
                         ui.content.show(config.block);
