@@ -29,6 +29,7 @@ import mindustry.ui.Bar;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.meta.*;
+import tjTool.func.FloatT;
 import tjTool.world.graphics.TjDraw;
 import tjTool.world.LazyButton;
 import tjTool.world.graphics.TjColor;
@@ -86,10 +87,9 @@ public class OverdriveSource extends SandboxBlock {
 
     @Override
     protected void config() {
-        config(String.class, (BuildType build, String v) -> {
-            var arr = v.split(";");
-            if (arr.length > 0) build.overdriveConfig.setSpeed(Strings.parseFloat(arr[0]));
-            if (arr.length > 1) build.overdriveConfig.setRange(Strings.parseFloat(arr[1]));
+        config(2, (BuildType build, String[] arr) -> {
+            build.overdriveConfig.setSpeed(Strings.parseFloat(arr[0]));
+            build.overdriveConfig.setRange(Strings.parseFloat(arr[1]));
             if (alwaysShowRange) changedEffect.at(build, build.smoothRange);
         });
     }
@@ -260,7 +260,7 @@ public class OverdriveSource extends SandboxBlock {
             }).growX();
         }
 
-        private void sliderPack(Table table, Slider slider, String name, FloatString getValue) {
+        private void sliderPack(Table table, Slider slider, String name, FloatT<String> getValue) {
             Label value = new Label("", Styles.outlineLabel);
 
             Runnable setText = () -> value.setText(getValue.get(slider.getValue()));
@@ -373,9 +373,5 @@ public class OverdriveSource extends SandboxBlock {
         public String serialize() {
             return String.join(";", autoFixed(speed), autoFixed(range));
         }
-    }
-
-    public interface FloatString {
-        String get(float f);
     }
 }

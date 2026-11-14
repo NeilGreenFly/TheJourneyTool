@@ -68,6 +68,7 @@ public class AnySource extends BaseSource {
     @Override
     protected void config() {
         config(boolean[].class, (BuildType build, boolean[] v) -> {
+            if (v.length != 5) return;
             build.outputItem = v[0];
             build.outputLiquid = v[1];
             build.outputPower = v[2];

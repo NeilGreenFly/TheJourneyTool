@@ -148,7 +148,7 @@ public class UpdateDialog extends BaseDialog {
     public UpdateDialog() {
         super(TjBundle.getThis("saying"));
         cont.table(table -> {
-            table.button("=", SettingsDialog::show).row();
+            table.button("=", SettingsViewerDialog::show).row();
             table.button("-", DebugDialog::show).row();
         }).top().get().color.a(0.2f); // debug
         cont.table(updateLog).growY().width(500);

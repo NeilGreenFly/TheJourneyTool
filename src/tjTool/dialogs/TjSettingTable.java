@@ -11,6 +11,7 @@ import mindustry.gen.Tex;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.SettingsMenuDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog.*;
+import tjTool.core.TjStat;
 import tjTool.world.Range;
 
 import static arc.Core.settings;
@@ -37,6 +38,7 @@ public class TjSettingTable {
             public void rebuild() {
                 super.rebuild();
                 row().table(t -> {
+                    t.button("TJ", Styles.cleart, TjStat.updateDialog::show).right().row();
                     float h = 40;
                     var to = new FLabel("Click the button to refresh ->");
                     var from = new TextArea("{rainbow}DEFAULT-TEXT{/rainbow} ");

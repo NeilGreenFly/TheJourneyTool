@@ -103,7 +103,7 @@ public class MultiCrafter extends TjBlock {
     public void setStats() { // TODO 这部分 ui 过于紧凑了, 需要使用更合适的布局方式.
         super.setStats();
         stats.add(multiConsumersConfig, multiConsumersConfig(multiConsumers));
-        stats.add(Stat.booster, table -> table.row().table(Tex.paneLeft, t -> {
+        if (multiConsumers.hasOption()) stats.add(Stat.booster, table -> table.row().table(Tex.paneLeft, t -> {
             for (var c : multiConsumers.optionalConsumers) {
                 for (var v : c.input.items) withTooltip(stack(t, v).get(), v.item, true);
                 for (var v : c.input.liquids) withTooltip(stack(t, v).get(), v.liquid, true);

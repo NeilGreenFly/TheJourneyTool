@@ -3,7 +3,7 @@ package tjTool.world;
 import arc.func.Intc;
 import arc.func.Intc2;
 import arc.struct.Seq;
-import tjTool.core.ForCons;
+import tjTool.func.ForCons;
 
 @SuppressWarnings("unused")
 public final class Range {

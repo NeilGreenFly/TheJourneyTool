@@ -7,6 +7,7 @@ import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
 import arc.util.Eachable;
 import arc.util.Nullable;
+import arc.util.Strings;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.entities.units.BuildPlan;
@@ -50,14 +51,15 @@ public class MultiSorter extends TjBlock {
 
     @Override
     protected void config() {
-        config(byte[].class, (BuildType build, byte[] v) -> {
-            if (build.enabled != (v[1] == 1)) placeEffect.at(build, size);
-            build.sortItem = content.item(v[0]);
-            build.enabled = v[1] == 1;
-        });
         config(Item.class, (BuildType build, Item v) -> build.sortItem = v);
         config(Boolean.class, (BuildType build, Boolean v) -> build.enabled = v);
         configClear((BuildType build) -> build.sortItem = null);
+        config(2, (BuildType build, String[] arr) -> {
+            boolean b = build.enabled;
+            build.sortItem = content.item(Strings.parseInt(arr[0]));
+            build.enabled = parseBool(arr[1]);
+            if (build.enabled != b) placeEffect.at(build, size);
+        });
     }
 
     @Override
@@ -74,10 +76,13 @@ public class MultiSorter extends TjBlock {
 
     @Override
     public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list) {
-        if (!(plan.config instanceof byte[] v)) return;
-        if (v[1] == 0) Draw.rect(invertRegion, plan.drawx(), plan.drawy());
-        if (v[0] < 0) return;
-        Draw.color(content.item(v[0]).color, Draw.getColorAlpha());
+        if (!(plan.config instanceof String args)) return;
+        String[] arr = args.split(";");
+        if (arr.length != 2) return;
+        var item = content.item(Strings.parseInt(arr[0]));
+        if (!parseBool(arr[1])) Draw.rect(invertRegion, plan.drawx(), plan.drawy());
+        if (item == null) return;
+        Draw.color(item.color, Draw.getColorAlpha());
         Draw.rect(configRegion, plan.drawx(), plan.drawy());
         Draw.color();
     }
@@ -151,19 +156,19 @@ public class MultiSorter extends TjBlock {
             return to;
         }
 
-        protected byte[] configPack(Item item, boolean enabled) { // Maybe we should use int[].
-            return new byte[]{(byte) w(item), (byte) Mathf.num(enabled)};
+        protected String serialize(Item item, boolean enabled) {
+            return String.join(";", String.valueOf(w(item)), String.valueOf(Mathf.num(enabled)));
         }
 
         @Override
         public void buildConfiguration(Table table) {
-            leftList(table, t -> t.button(Icon.wrench, Styles.clearNonei, () -> configure(configPack(sortItem, !enabled))).tooltip("@table.toggle", true).size(uiSize));
-            ItemSelection.buildTable(block, table, content.items(), () -> sortItem, item -> configure(configPack(item, enabled)), selectionRows, selectionColumns);
+            leftList(table, t -> t.button(Icon.wrench, Styles.clearNonei, () -> configure(serialize(sortItem, !enabled))).tooltip("@table.toggle", true).size(uiSize));
+            ItemSelection.buildTable(block, table, content.items(), () -> sortItem, item -> configure(serialize(item, enabled)), selectionRows, selectionColumns);
         }
 
         @Override
         public Object config() {
-            return configPack(sortItem, enabled);
+            return serialize(sortItem, enabled);
         }
 
         @Override

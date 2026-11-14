@@ -1,5 +1,6 @@
 package tjTool.world.blocks;
 
+import arc.func.Cons2;
 import arc.graphics.g2d.TextureRegion;
 import arc.scene.ui.layout.Table;
 import arc.util.Eachable;
@@ -33,6 +34,13 @@ public abstract class TjBlock extends Block {
      * @see mindustry.io.TypeIO
      */
     protected void config() {}
+
+    protected <T extends BuildType> void config(int count, Cons2<T, String[]> config) {
+        config(String.class, (T building, String args) -> {
+            var arr = args.split(";");
+            if (arr.length == count) config.get(building, arr);
+        });
+    }
 
     protected DrawBlock defaultDrawer() {
         return new DrawDefault();

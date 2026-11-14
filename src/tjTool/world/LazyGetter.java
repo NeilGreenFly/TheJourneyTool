@@ -16,6 +16,8 @@ import mindustry.type.Liquid;
 @SuppressWarnings("unused")
 public final class LazyGetter {
 
+    public static final boolean[] boolMap = new boolean[]{false, true};
+
     public static <T extends UnlockableContent> int w(T t) {
         return t != null ? t.id : -1;
     }
@@ -42,6 +44,10 @@ public final class LazyGetter {
 
     public static String autoFixed(float v) {
         return Strings.autoFixed(v, 3);
+    }
+
+    public static boolean parseBool(String n) {
+        return !n.equals("0");
     }
 
     public static <T> T apply(T any, Cons<T> it) {

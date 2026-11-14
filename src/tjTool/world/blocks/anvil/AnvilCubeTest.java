@@ -16,6 +16,8 @@ import static tjTool.widgets.TjDrawable.frame;
 
 @SuppressWarnings("unused")
 public class AnvilCubeTest extends Anvil {
+    public static boolean debug;
+
     protected static final TjCube cube = new TjCube().setScale(10);
     protected static final TjCube circle = new TjCube().setScale(10);
     protected static final TjCube circleLarge = new TjCube().setScale(10);
@@ -23,7 +25,7 @@ public class AnvilCubeTest extends Anvil {
     public Color outline = Color.valueOf("#FE00FF");
     public Color in = Color.valueOf("#6A00A2");
 
-    {
+    { if (debug) {
         cube.rotationSpeed.set(1f, 0.5f, 0);
         forRange(2, x -> forRange(2, y -> forRange(2, z -> cube.add(x * 2 - 1, y * 2 - 1, z * 2 - 1))));
         cube.areas.addAll(cubeArea);
@@ -40,7 +42,7 @@ public class AnvilCubeTest extends Anvil {
             circleLarge.rotation.y = circle.rotation.y;
             circleLarge.update();
         });
-    }
+    }}
 
     public AnvilCubeTest(String name) {
         super(name);
