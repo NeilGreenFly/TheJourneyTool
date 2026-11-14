@@ -38,8 +38,8 @@ public class TjSettingTable {
             public void rebuild() {
                 super.rebuild();
                 row().table(t -> {
-                    t.button("TJ", Styles.cleart, TjStat.updateDialog::show).right().row();
                     float h = 40;
+                    apply(t.button("TJ", Styles.cleart, TjStat.updateDialog::show), it -> it.get().color.a(0.2f)).size(h).right().row();
                     var to = new FLabel("Click the button to refresh ->");
                     var from = new TextArea("{rainbow}DEFAULT-TEXT{/rainbow} ");
                     to.setWrap(true);
