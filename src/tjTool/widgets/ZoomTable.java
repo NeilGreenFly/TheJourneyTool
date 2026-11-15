@@ -36,6 +36,7 @@ public class ZoomTable<T extends ZoomTable.Entry> extends Table {
     public Seq<T> currSeq = new Seq<>(maxEntry);
     public Table content = new Table(Tex.paneLeft).margin(10).left();
     public TextField search;
+    public @Nullable String title;
     public boolean readonly;
     private int page;
     private int count;
@@ -43,17 +44,15 @@ public class ZoomTable<T extends ZoomTable.Entry> extends Table {
     private Boolp searchByValue;
     private Boolp allEquals;
 
-    public ZoomTable(boolean readonly) {
-        this(null, readonly);
+    public ZoomTable(String title, Seq<T> entrySeq) {
+        this(title, entrySeq, true);
     }
 
-    public ZoomTable(Seq<T> entrySeq) {
-        this(entrySeq, true);
-    }
-
-    public ZoomTable(Seq<T> entrySeq, boolean readonly) {
+    public ZoomTable(String title, Seq<T> entrySeq, boolean readonly) {
         this.readonly = readonly;
+        this.title = title;
         seq = entrySeq;
+        if (title != null && !title.isEmpty()) table(Styles.black6, top -> top.left().add(title).color(Color.gray)).margin(5).growX().row();
         table(zoom -> {
             zoom.image(Icon.zoom).padLeft(5).padRight(5);
             search = apply(zoom.field(null, this::rebuild).padBottom(4).left().growX().get(), it -> it.setMessageText("@players.search"));
@@ -61,7 +60,7 @@ public class ZoomTable<T extends ZoomTable.Entry> extends Table {
             zoom.button(Icon.cancel, Styles.clearNonei, iconSize, () -> {
                 search.setText("");
                 refresh();
-            }).size(uiSize).tooltip("@clear");
+            }).size(uiSize).tooltip("@clear", true);
             zoom.add(apply(new TextButton("K", Styles.clearTogglet), it -> {
                 searchByValue = it::isChecked;
                 it.clicked(() -> {
@@ -73,7 +72,7 @@ public class ZoomTable<T extends ZoomTable.Entry> extends Table {
                 allEquals = it::isChecked;
                 it.clicked(this::refresh);
             })).size(uiSize).tooltip("完全匹配", true);
-            zoom.button(Icon.refreshSmall, Styles.clearNonei, this::refresh).size(uiSize);
+            zoom.button(Icon.refreshSmall, Styles.clearNonei, this::refresh).size(uiSize).tooltip("@hosts.refresh", true);
         }).growX().row();
         collapser(p -> {
             p.button(Icon.leftOpen, Styles.clearNonei, iconSize, () -> changePageBy(-5)).size(uiSize).tooltip("-5", true).get().setDisabled(() -> page <= 0);
@@ -118,7 +117,7 @@ public class ZoomTable<T extends ZoomTable.Entry> extends Table {
     private void addLine(Entry entry, int line, int idx) {
         content.add(String.valueOf(line)).color(Color.gray).right().padRight(20).get().setAlignment(Align.right);
         content.stack(
-                apply(new Button(Styles.cleari), it -> it.clicked(entry::clicked)),
+                apply(new Button(Styles.cleari), it -> it.clicked(() -> entry.clicked(this))),
                 apply(new Label(idx == -1
                         ? entry.displayName + " "
                         : "[gray]" + entry.searchName.substring(0, idx) + "[accent]"
@@ -163,6 +162,7 @@ public class ZoomTable<T extends ZoomTable.Entry> extends Table {
     }
 
     public static class Entry {
+        // TODO public @Nullable ZoomTable<?> table // <-- maybe will be better ?
         public String searchName;
         public String displayName;
         public boolean skipRemove;
@@ -180,7 +180,7 @@ public class ZoomTable<T extends ZoomTable.Entry> extends Table {
         }
 
         /** Called when this entry is clicked. */
-        public void clicked() {}
+        public <T extends Entry> void clicked(ZoomTable<T> table) {}
 
         /** Called when this entry is removed. */
         public <T extends Entry> void onRemoved(ZoomTable<T> table) {}

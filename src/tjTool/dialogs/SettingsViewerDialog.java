@@ -1,13 +1,16 @@
 package tjTool.dialogs;
 
 import arc.Core;
-import arc.func.Boolf;
-import arc.func.Boolf2;
-import arc.func.Func;
+import arc.Input;
+import arc.func.*;
 import arc.graphics.Color;
+import arc.input.KeyCode;
+import arc.scene.ui.Dialog;
 import arc.scene.ui.ScrollPane;
+import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.util.Strings;
 import mindustry.gen.Icon;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
@@ -16,7 +19,7 @@ import tjTool.widgets.ZoomTable;
 import tjTool.world.graphics.TjColor;
 import tjTool.world.graphics.TjDraw;
 
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 import static tjTool.widgets.TjTable.*;
 import static tjTool.world.LazyGetter.*;
 
@@ -27,9 +30,11 @@ public class SettingsViewerDialog {
     public static boolean showMods = true;
 
     private static Seq<ModEntry> modSeq;
+    private static Seq<SettingEntry> planetsSeq;
     private static Seq<SettingEntry> saveSeq;
     private static Seq<SettingEntry> hiscoreSeq;
     private static Seq<SettingEntry> usidSeq;
+    private static Seq<SettingEntry> arcSeq;
     private static Seq<SettingEntry> defaultSeq;
 
     public static void show() {
@@ -53,6 +58,8 @@ public class SettingsViewerDialog {
         var preHiscore = new KeySeq("hiscore", 1000, key -> key.startsWith("hiscore"));
         var preUsid = new KeySeq("usid", 1000, key -> key.startsWith("usid-"));
 
+        var preArc = new KeySeq("arc", 100, key -> key.startsWith("achievement.") || key.startsWith("achievementstat."));
+        var prePlanets = new KeySeq("planets", 2, key -> content.planets().contains(it -> key.startsWith(it.name + "-")));
         var preDef = new KeySeq("default", 1000, ignore -> true);
 
         Core.settings.keys().forEach(key -> {
@@ -68,10 +75,12 @@ public class SettingsViewerDialog {
         select(preReq, mod -> mod.req, (mod, key) -> key.startsWith("req-" + mod + "-"));
         select(preUnlocked, mod -> mod.unlocked, (mod, key) -> key.startsWith(mod + "-"));
 
+        planetsSeq = prePlanets.keys.map(SettingEntry::new);
         saveSeq = preSave.keys.map(SettingEntry::new);
         hiscoreSeq = preHiscore.keys.map(SettingEntry::new);
         usidSeq = preUsid.keys.map(SettingEntry::new);
 
+        arcSeq = preArc.keys.map(SettingEntry::new);
         defaultSeq = preDef.keys.map(SettingEntry::new);
 
         modSeq.add(apply(new ModEntry("< null >"), it -> {
@@ -100,7 +109,7 @@ public class SettingsViewerDialog {
         content.defaults().top().left();
         content.collapser(table -> {
             table.defaults().top().left();
-            table.add(new ZoomTable<>(modSeq));
+            table.add(new ZoomTable<>("Mods", modSeq));
             table.image().color(Color.darkGray).width(5).growY().pad(5);
             table.add(apply(new ScrollPane(apply(new Table().top().left(), panel -> {
                 panel.defaults().top().left();
@@ -117,10 +126,12 @@ public class SettingsViewerDialog {
             table.defaults().top().left();
             table.add(apply(new ScrollPane(apply(new Table().top().left(), panel -> {
                 panel.defaults().top().left();
-                panel.add(new ZoomTable<>(defaultSeq, false));
-                panel.add(new ZoomTable<>(saveSeq, false));
-                panel.add(new ZoomTable<>(hiscoreSeq, false));
-                panel.add(new ZoomTable<>(usidSeq, false));
+                panel.add(new ZoomTable<>("Default", defaultSeq, false));
+                panel.add(new ZoomTable<>("Planets", planetsSeq, false));
+                panel.add(new ZoomTable<>("Save", saveSeq, false));
+                panel.add(new ZoomTable<>("hiscore", hiscoreSeq, false));
+                panel.add(new ZoomTable<>("usid", usidSeq, false));
+                panel.add(new ZoomTable<>("ARC-achievements", arcSeq, false));
             }), Styles.smallPane), it -> {
                 it.setScrollingDisabled(false, true);
                 it.setOverscroll(false, false);
@@ -146,7 +157,7 @@ public class SettingsViewerDialog {
         public static Seq<KeySeq> all = new Seq<>();
 
         public Seq<KeyPreEntry> keys;
-        public String name;
+        public String name; // 后来发现这个名称没有用, 不过反正没什么影响就当注释用了
         public Boolf<String> b;
 
         public KeySeq(String name, int capacity, Boolf<String> b) {
@@ -169,6 +180,11 @@ public class SettingsViewerDialog {
             key = name;
         }
 
+        public <T extends ZoomTable.Entry> void setValue(ZoomTable<T> table, Object value) {
+            Core.settings.put(key, value);
+            table.refresh();
+        }
+
         @Override
         public Object getValue() {
             return Core.settings.get(key, null);
@@ -177,6 +193,24 @@ public class SettingsViewerDialog {
         @Override
         public String tooltip() {
             return "[accent]" + getValue();
+        }
+
+        @Override
+        public <T extends ZoomTable.Entry> void clicked(ZoomTable<T> table) {
+            var v = getValue();
+            if (v instanceof Boolean o)
+                ui.showConfirm(key, "[gray]" + o + "[sky]  ->  " + cFmt(validColor(!o)) + !o, () -> setValue(table, !o));
+            else if (v instanceof Integer o)
+                showNumInput(false, key, "[gray]" + o + "[sky]  ->  ", o.toString(), str -> {
+                    if (Strings.canParsePositiveInt(str)) setValue(table, Strings.parseInt(str));
+                    else ui.showInfo("@invalid");
+                });
+            else if (v instanceof Float o) {
+                showNumInput(true, key, "[gray]" + o + "[sky]  ->  ", o.toString(), str -> {
+                    if (Strings.canParsePositiveFloat(str)) setValue(table, Strings.parseFloat(str));
+                    else ui.showInfo("@invalid");
+                });
+            }
         }
 
         @Override
@@ -195,7 +229,7 @@ public class SettingsViewerDialog {
         }
 
         @Override
-        public void clicked() {
+        public <T extends ZoomTable.Entry> void clicked(ZoomTable<T> table) {
             ui.showConfirm("创建新的模组条目 (需要重启)", "模组条目的识别依赖于以\"mod-\"起始的配置，但是由于部分相关配置不会在加载模组后自动注册，因此部分模组即使加载过也不能被识别到，所幸它们的相关配置仍然保留于此，您可以手动注册模组启用配置，在重启后即可查看此模组条目的相关配置了。\n当然您也可以放弃注册，通过搜索过滤查询该模组的相关配置。\n放心，注册名称填写错误后您可以随时回来移除它们...但是请确保名称是合法的，故意使用一些可能导致异常的特殊字符我们概不负责。\n\n仅需填入模组名称，我们会帮您补全\"mod-[accent]name[]-enabled\"\n[red]自动填充的名称可能并不完整，如有缺失请自行补全。[]", () -> {
                 String def = "";
                 if (key.startsWith("req-")) {
@@ -211,9 +245,9 @@ public class SettingsViewerDialog {
 
     public static class ModEntry extends SettingEntry {
         public static ModEntry currMod;
-        public static ZoomTable<SettingEntry> modTable = new ZoomTable<>(false);
-        public static ZoomTable<SettingEntry> reqTable = new ZoomTable<>(false);
-        public static ZoomTable<SettingEntry> unlockedTable = new ZoomTable<>(false);
+        public static ZoomTable<SettingEntry> modTable = new ZoomTable<>("Info", null, false);
+        public static ZoomTable<SettingEntry> reqTable = new ZoomTable<>("Req", null, false);
+        public static ZoomTable<SettingEntry> unlockedTable = new ZoomTable<>("Unlocked", null, false);
 
         public Seq<SettingEntry> mod = new Seq<>();
         public Seq<SettingEntry> req = new Seq<>(1000);
@@ -233,7 +267,7 @@ public class SettingsViewerDialog {
         }
 
         @Override
-        public void clicked() {
+        public <T extends ZoomTable.Entry> void clicked(ZoomTable<T> table) {
             if ((currMod = currMod != this ? this : null) != null) {
                 modTable.seq = currMod.mod;
                 reqTable.seq = currMod.req;
@@ -247,6 +281,50 @@ public class SettingsViewerDialog {
                 unlockedTable.seq = null;
             }
         }
+    }
+
+    public static void showNumInput(boolean isFloat, String title, String text, String def, Cons<String> confirmed) {
+        showNumInput(isFloat, title, text, 10, def, confirmed, () -> {});
+    }
+
+    public static void showNumInput(boolean isFloat, String title, String text, int textLength, String def, Cons<String> confirmed, Runnable closed) {
+        if (mobile) Core.input.getTextInput(apply(new Input.TextInput(), it -> {
+            it.title = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title);
+            it.text = def;
+            it.numeric = true;
+            it.maxLength = textLength;
+            it.accepted = confirmed;
+            it.canceled = closed;
+            it.allowEmpty = false;
+            it.message = text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
+        }));
+        else apply(new Dialog(title), it -> {
+            it.cont.margin(30).add(text).padRight(6f);
+            TextField field = it.cont.field(def, t -> {}).size(330f, 50f).get();
+            field.setMaxLength(textLength);
+            field.setFilter(isFloat ? TextField.TextFieldFilter.floatsOnly : TextField.TextFieldFilter.digitsOnly);
+            field.setCursorPosition(def.length());
+            Core.scene.setKeyboardFocus(field);
+
+            it.buttons.defaults().size(120, 54).pad(4);
+            it.buttons.button("@cancel", () -> {
+                closed.run();
+                it.hide();
+            });
+            it.buttons.button("@ok", () -> {
+                confirmed.get(field.getText());
+                it.hide();
+            }).disabled(b -> field.getText().isEmpty());
+
+            it.closeOnBack(closed);
+            it.keyDown(KeyCode.enter, () -> {
+                String get = field.getText();
+                if (!get.isEmpty()) {
+                    confirmed.get(get);
+                    it.hide();
+                }
+            });
+        }).show();
     }
 
 }
