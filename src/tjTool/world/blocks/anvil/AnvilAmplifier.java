@@ -1,6 +1,7 @@
 package tjTool.world.blocks.anvil;
 
 import arc.graphics.g2d.Draw;
+import mindustry.entities.units.BuildPlan;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
@@ -52,6 +53,11 @@ public class AnvilAmplifier extends AnvilAddon {
                 9 * tilesize, 9 * tilesize);
         control.input.drawArrow(this, x, y, rotation, valid);
         control.input.drawArrow(this, x, y, rotation + 1, valid);
+    }
+
+    @Override
+    public void flipRotation(BuildPlan req, boolean x) {
+        req.rotation = planRotation(req.rotation ^ (x ? 1 : 3));
     }
 
     public class BuildType extends AnvilAddon.BuildType {}

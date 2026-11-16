@@ -30,7 +30,6 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.BuildTurret;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.meta.BlockGroup;
-import tjTool.core.*;
 import tjTool.world.LazyButton;
 
 import java.util.Arrays;
@@ -187,7 +186,7 @@ public class AnySource extends BaseSource {
             drawSelecting();
             if (warning) {
                 Draw.z(overlayUI);
-                drawPlaceText(TjBundle.getBlock(name, "warning"), tile, false);
+                drawPlaceText(bundle("warning"), tile, false);
             }
         }
 

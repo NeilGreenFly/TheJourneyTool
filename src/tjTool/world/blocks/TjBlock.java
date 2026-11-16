@@ -10,14 +10,25 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.draw.DrawBlock;
 import mindustry.world.draw.DrawDefault;
+import tjTool.world.Bundle;
 
 import static mindustry.Vars.tilesize;
 
-public abstract class TjBlock extends Block {
+public abstract class TjBlock extends Block implements Bundle {
     public DrawBlock drawer;
 
-    /** if true, double-tapping this configurable block to deselect it. */
+    /** If true, double-tapping this configurable block to deselect it. */
     public boolean deselectOnDoubleTap;
+
+    @Override
+    public String namespace() {
+        return "block";
+    }
+
+    @Override
+    public String specificKey() {
+        return name;
+    }
 
     public TjBlock(String name) {
         super(name);

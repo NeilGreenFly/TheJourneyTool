@@ -161,6 +161,11 @@ public class OverdriveSource extends SandboxBlock {
         }
 
         @Override
+        public void onRemoved() {
+            if (alwaysShowRange) changedEffect.at(this, smoothRange);
+        }
+
+        @Override
         public void updateTile() {
             smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency, 0.08f);
             smoothRange = Mathf.lerpDelta(smoothRange, enabled ? overdriveConfig.range : 0, 0.08f);
@@ -242,7 +247,7 @@ public class OverdriveSource extends SandboxBlock {
                 t.add(LazyButton.button(Icon.tag, Icon.tags, () -> sort == 1, v -> {
                     sort = v ? 1 : 0;
                     rebuild(table);
-                })).size(uiSize).tooltip("@block." + name + ".sort-by-speed", true);
+                })).size(uiSize).tooltip(atKey("sort-by-speed"), true);
                 t.row().image(Icon.resize);
                 configs.each(current -> t.add(LazyButton.button(
                         Icon.hammer, Icon.ok, () -> current.range == overdriveConfig.range,
@@ -252,7 +257,7 @@ public class OverdriveSource extends SandboxBlock {
                 t.add(LazyButton.button(Icon.tag, Icon.tags, () -> sort == 2, v -> {
                     sort = v ? 2 : 0;
                     rebuild(table);
-                })).size(uiSize).tooltip("@block." + name + ".sort-by-range", true);
+                })).size(uiSize).tooltip(atKey("sort-by-range"), true);
             }).row();
             table.table(t -> {
                 sliderPack(t, speedSlider, Stat.speedIncrease.localized(), OverdriveSource.this::speedString);

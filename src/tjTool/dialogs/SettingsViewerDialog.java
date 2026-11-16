@@ -256,7 +256,7 @@ public class SettingsViewerDialog {
         public ModEntry(String name) {
             super(name);
             key = "mod-" + name + "-enabled";
-            if (name.equals("mindustryx")) displayName = TjDraw.gradient(name, Color.orange, Pal.accent);
+            if (name.equals("mindustryx")) displayName = TjDraw.gradient(name, Color.coral, Pal.accent);
             else if (name.equals("kotlin")) displayName = TjDraw.gradient(name, TjColor.kotlin, Color.violet);
         }
 

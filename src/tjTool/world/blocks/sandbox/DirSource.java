@@ -37,7 +37,6 @@ import tjTool.world.graphics.TjColor;
 import tjTool.world.graphics.TjDraw;
 
 import static mindustry.Vars.*;
-import static tjTool.core.TjBundle.*;
 import static tjTool.widgets.TjConfigTable.*;
 import static tjTool.widgets.TjTable.*;
 import static tjTool.world.LazyGetter.*;
@@ -85,11 +84,15 @@ public class DirSource extends BaseSource {
         super.setStats();
         stats.add(TjStat.config, table -> {
             table.row();
-            TjStat.newConfigStats(table, Icon.turret.getRegion(), getBlock(name, "config-ammo"), getBlock(name, "config-ammo-description"));
-            TjStat.newConfigStats(table, Icon.star.getRegion(), getBlock(name, "config-boost"), getBlock(name, "config-boost-description"));
-            TjStat.newConfigStats(table, Icon.download.getRegion(), getBlock(name, "config-consumes"), getBlock(name, "config-consumes-description"));
-            TjStat.newConfigStats(table, Icon.effect.getRegion(), getBlock(name, "config-overdrive"), getBlock(name, "config-overdrive-description"));
+            addStats(table, Icon.turret.getRegion(), "ammo");
+            addStats(table, Icon.star.getRegion(), "boost");
+            addStats(table, Icon.download.getRegion(), "consumes");
+            addStats(table, Icon.effect.getRegion(), "overdrive");
         });
+    }
+
+    private void addStats(Table table, TextureRegion region, String str) {
+        TjStat.newConfigStats(table, region, bundle(str = "config-" + str), bundle(str + "-description"));
     }
 
     public class BuildType extends BaseSource.BuildType {
@@ -108,9 +111,9 @@ public class DirSource extends BaseSource {
 
         public Pack pack = new Pack(this).prefix(() -> w(target)).with(
                 TypeContent.unlockableContent(() -> new Image(target.uiIcon), () -> target.localizedName, () -> ammoTypes, v -> v.emoji() + v.localizedName, () -> ammo).setAlwaysBuild(true).setLock(() -> target instanceof BaseTurret),
-                TypeContent.unlockableContent(() -> new Image(Icon.star), () -> getBlock(name, "config-boost"), coolants::as, v -> target instanceof ReloadTurret reloadTurret ? v.emoji() + v.localizedName + "\n" + TjStat.boosters(reloadTurret, true, (Liquid) v) : v.localizedName, () -> coolant).setFavorite(v -> ((Liquid) v).heatCapacity),
-                new StackContent(() -> new Image(Icon.download), () -> getBlock(name, "config-consumes"), () -> new Seq<UnlockableContent>(items).add(liquids), () -> target),
-                new IntContent(() -> new Image(Icon.effect), () -> getBlock(name, "config-overdrive"), () -> overdrive)
+                TypeContent.unlockableContent(() -> new Image(Icon.star), () -> bundle("config-boost"), coolants::as, v -> target instanceof ReloadTurret reloadTurret ? v.emoji() + v.localizedName + "\n" + TjStat.boosters(reloadTurret, true, (Liquid) v) : v.localizedName, () -> coolant).setFavorite(v -> ((Liquid) v).heatCapacity),
+                new StackContent(() -> new Image(Icon.download), () -> bundle("config-consumes"), () -> new Seq<UnlockableContent>(items).add(liquids), () -> target),
+                new IntContent(() -> new Image(Icon.effect), () -> bundle("config-overdrive"), () -> overdrive)
                         .add(new TextureRegionDrawable(Blocks.overdriveProjector.uiIcon), "150%")
                         .add(new TextureRegionDrawable(Blocks.overdriveProjector.uiIcon), "225%")
                         .add(new TextureRegionDrawable(Blocks.overdriveDome.uiIcon), "250%")

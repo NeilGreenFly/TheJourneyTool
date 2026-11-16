@@ -1,33 +1,24 @@
 package tjTool.core;
 
-import arc.Core;
 import mindustry.ctype.UnlockableContent;
 
-public class TjBundle {
+import static arc.Core.bundle;
+import static java.lang.String.join;
+import static tjTool.world.Bundle.dot;
 
-    public static String get(String namespace, String attribute) {
-        return Core.bundle.get(namespace + "." + attribute);
-    }
-
-    public static String get(String namespace, String path, String attribute) {
-        return Core.bundle.get(namespace + "." + path + "." + attribute);
-    }
+public final class TjBundle {
 
     public static String getThis(String path) {
-        return get("tj-tool", path);
-    }
-
-    public static String getBlock(String name, String attribute) {
-        return get("block", name, attribute);
+        return bundle.get("tj-tool." + path);
     }
 
     public static String description(UnlockableContent content, String name) {
         return (content.description != null ? content.description + "\n" : "")
-                + get(content.getContentType().toString(), name, "description");
+                + bundle.get(join(dot, content.getContentType().toString(), name, "description"));
     }
 
     public static String details(UnlockableContent content, String name) {
-        return get(content.getContentType().toString(), name, "details")
+        return bundle.get(join(dot, content.getContentType().toString(), name, "details"))
                 + (content.details != null ? "\n\n" + content.details : "");
     }
 
