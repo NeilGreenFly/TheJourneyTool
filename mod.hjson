@@ -7,6 +7,6 @@ author: NeilGreenFly
 
 main: tjTool.TheJourney
 
-version: 1.2.0.1-alpha-pre
+version: 1.2.1-alpha
 minGameVersion: 159.2
 java: true

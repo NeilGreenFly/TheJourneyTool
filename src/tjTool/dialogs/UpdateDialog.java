@@ -25,6 +25,12 @@ public class UpdateDialog extends BaseDialog {
             panel.exited(() -> clearScrollFocus(panel));
         })).grow().row();
 
+        titleTable(frame, "v1.2.1 alpha", """
+                新增 & 修复 >>
+                - 完善 设置查看器 的相关功能
+                - 新增 海绵
+                - 修复所有具有朝向的建筑在构建时的绘制朝向
+                """, false);
         titleTable(frame, "v1.2 alpha", """
                 [sky]>>所有沙盒建筑的功能均已趋于完善，已陆续修复、优化包括沙盒建筑、其他测试建筑等在内的各类问题，现在正式步入v1.2。由于高版本暂时没有破坏性更新，模组最低游戏版本暂不提升。现阶段仍然以完善和扩充功能、优化体验为主，更多更新敬请期待。[]
                 """, false);

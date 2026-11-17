@@ -16,6 +16,7 @@ public final class Register {
     public static void init() {
         TjDrawable.load();
         TjSettingTable.load();
+        TjSettings.load();
     }
 
 }

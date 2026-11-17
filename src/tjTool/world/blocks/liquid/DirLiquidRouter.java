@@ -24,6 +24,7 @@ public class DirLiquidRouter extends TjBlock {
         underBullets = true;
         solid = false;
         group = BlockGroup.liquids;
+        regionRotated1 = 2;
     }
 
     @Override

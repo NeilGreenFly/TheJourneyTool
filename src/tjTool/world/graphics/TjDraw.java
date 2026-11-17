@@ -69,12 +69,16 @@ public final class TjDraw {
     }
 
     public static void lightPoly(float x, float y, int sides, float radius, Color color) {
-        Fill.lightInner(x, y, sides, Math.max(0, radius * 0.6f), radius, 0,
+        lightPoly(x, y, sides, radius, color, 0);
+    }
+
+    public static void lightPoly(float x, float y, int sides, float radius, Color color, float angle) {
+        Fill.lightInner(x, y, sides, Math.max(0, radius * 0.6f), radius, angle,
                 c1.set(color).a(0),
                 c2.set(color).a(0.7f));
         Draw.color(color);
         Lines.stroke(1);
-        Lines.poly(x, y, sides, radius + 0.5f);
+        Lines.poly(x, y, sides, radius + 0.5f, angle);
         Draw.reset();
     }
 
@@ -232,8 +236,8 @@ public final class TjDraw {
         float hr = r * z;
         float len = (Mathf.len(dx, dy) - tilesize * 16) / 128f;
         float a = Math.min(len, alpha);
-        float from = color.a(Mathf.clamp(a)).toFloatBits();
-        float to = color.a(0).toFloatBits();
+        float from = c1.set(color).a(Mathf.clamp(a)).toFloatBits();
+        float to = c1.set(color).a(0).toFloatBits();
         if (a <= 0.01f) return;
         Draw.z(Layer.effect - 1); // Layer.flyingUnit + 1   Layer.blockOver
         for (int i = 0; i < 4; i += 1) {
@@ -255,12 +259,12 @@ public final class TjDraw {
             float d = z * 0.95f;
             Draw.z(Layer.effect);
             Lines.stroke(32);
-            Draw.color(color.a(Mathf.clamp(a, 0, 0.3f)));
+            Draw.color(c1.set(color).a(Mathf.clamp(a, 0, 0.3f)));
             Lines.circle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize);
-            Draw.color(color.a(Mathf.clamp(a, 0, 0.5f)));
+            Draw.color(c1.set(color).a(Mathf.clamp(a, 0, 0.5f)));
             arcCircle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize + 64, 6, 0.1f, 0.5f);
             d = z * 0.9f;
-            Draw.color(color.a(Mathf.clamp(a, 0, 0.25f)));
+            Draw.color(c1.set(color).a(Mathf.clamp(a, 0, 0.25f)));
             arcCircle(camera.position.x - dx * d, camera.position.y - dy * d, iconSize / 2, 3, 0.16f, -0.5f);
             Draw.color();
             Draw.alpha(len);

@@ -38,6 +38,7 @@ public class DirLiquidUnloader extends TjBlock {
         clearOnDoubleTap = true;
         squareSprite = false;
         group = BlockGroup.liquids;
+        regionRotated1 = 2;
     }
 
     @Override

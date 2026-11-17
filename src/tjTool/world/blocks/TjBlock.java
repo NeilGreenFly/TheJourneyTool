@@ -39,6 +39,8 @@ public abstract class TjBlock extends Block implements Bundle {
         noUpdateDisabled = true;
         selectionRows = 5;
         selectionColumns = 6;
+        regionRotated1 = -2;
+        regionRotated2 = -2;
     }
 
     /**

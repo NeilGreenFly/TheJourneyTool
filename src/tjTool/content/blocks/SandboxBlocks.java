@@ -23,7 +23,7 @@ import static tjTool.world.LazyGetter.apply;
 public final class SandboxBlocks {
 
     public static Block
-            anySource, dirSource, anyVoid,
+            anySource, dirSource, anyVoid, sponge,
             solarSource, bedrock, beacon,
             mendSource, overdriveSource, regenSource, shieldSource;
 
@@ -32,6 +32,7 @@ public final class SandboxBlocks {
         anySource = apply(new AnySource("any-source"), staticRequirements(distribution));
         dirSource = apply(new DirSource("dir-source"), staticRequirements(distribution));
         anyVoid = apply(new AnyVoid("any-void"), staticRequirements(distribution));
+        sponge = apply(new Sponge("sponge"), staticRequirements(distribution));
         solarSource = apply(new SolarSource("solar-source"), staticRequirements(power));
         bedrock = apply(new Bedrock("bedrock"), staticRequirements(defense));
         beacon = apply(new Beacon("beacon"), staticRequirements(effect));

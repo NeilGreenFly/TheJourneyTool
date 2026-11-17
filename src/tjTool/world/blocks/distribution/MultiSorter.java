@@ -20,6 +20,7 @@ import mindustry.ui.Styles;
 import mindustry.world.Tile;
 import mindustry.world.blocks.ItemSelection;
 import mindustry.world.meta.BlockGroup;
+import tjTool.content.TjSettings;
 import tjTool.world.blocks.TjBlock;
 
 import static mindustry.Vars.*;
@@ -116,6 +117,11 @@ public class MultiSorter extends TjBlock {
                 Draw.color(sortItem.color);
                 Draw.rect(configRegion, x, y);
                 Draw.color();
+                if (TjSettings.arcChoiceUiIcon.getBool()) {
+                    Draw.scl(0.5f);
+                    Draw.rect(sortItem.uiIcon, x, y);
+                    Draw.reset();
+                }
             }
         }
 

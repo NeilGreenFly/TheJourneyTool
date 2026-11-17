@@ -48,7 +48,6 @@ public class DirSource extends BaseSource {
         super(name);
         rotate = true;
         quickRotate = false;
-        regionRotated1 = 1;
         configurable = true;
         saveConfig = true;
     }
