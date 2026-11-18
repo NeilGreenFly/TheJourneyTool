@@ -22,7 +22,7 @@ public abstract class TjBlock extends Block implements Bundle {
 
     @Override
     public String namespace() {
-        return "block";
+        return getContentType().toString();
     }
 
     @Override

@@ -8,13 +8,13 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.scene.Group;
 import arc.scene.actions.Actions;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.Button;
 import arc.scene.ui.Image;
 import arc.scene.ui.layout.Table;
 import arc.struct.EnumSet;
-import arc.util.Nullable;
 import arc.util.Strings;
 import arc.util.Time;
 import arc.util.io.Reads;
@@ -44,6 +44,7 @@ import static mindustry.world.meta.StatValues.withTooltip;
 import static tjTool.core.TjStat.multiConsumersConfig;
 import static tjTool.dialogs.TjSettingTable.buttonDrop;
 import static tjTool.widgets.TjTable.*;
+import static tjTool.world.LazyGetter.*;
 import static tjTool.world.Range.*;
 
 public class MultiCrafter extends TjBlock {
@@ -58,7 +59,6 @@ public class MultiCrafter extends TjBlock {
     public float updateEffectChance = 0.04f;
     public float updateEffectSpread = 4f;
     public float warmupSpeed = 0.019f;
-    protected @Nullable Table consumption;
 
     public MultiCrafter(String name) {
         super(name);
@@ -90,6 +90,7 @@ public class MultiCrafter extends TjBlock {
         super.init();
         hasItems = multiConsumers.hasItems;
         hasLiquids = multiConsumers.hasLiquids;
+        outputsLiquid = multiConsumers.outputsLiquid;
         hasConsumers = multiConsumers.hasConsumers();
         configurable = multiConsumers.consumers.length > 1;
         itemFilter = multiConsumers.itemFilter;
@@ -134,6 +135,11 @@ public class MultiCrafter extends TjBlock {
                 () -> Pal.ammo,
                 building::progress
         ));
+    }
+
+    @Override
+    public boolean outputsItems() {
+        return multiConsumers.outputsItems;
     }
 
     public class BuildType extends TjBlock.BuildType implements HeatConsumer {
@@ -298,7 +304,6 @@ public class MultiCrafter extends TjBlock {
                     new Table(t -> forEach(multiConsumers.consumers, (i, consumer) -> t.add(new Button(style) {{
                         clicked(() -> {
                             if (currentConsumer != i) configure(i);
-                            if (consumption != null) displayConsumption(consumption);
                         });
                         update(() -> {
                             if (!(currentConsumer == i && image.c != i)) return;
@@ -329,8 +334,13 @@ public class MultiCrafter extends TjBlock {
 
         @Override
         public void displayConsumption(Table table) {
-            (consumption = table).clear();
-            currentConsumer().displayConsumption(table.left(), this);
+            multiConsumers.last = -1;
+            table.update(() -> {
+                if (multiConsumers.last != currentConsumer) {
+                    multiConsumers.last = currentConsumer;
+                    currentConsumer().displayConsumption(apply(table, Group::clear).left(), this);
+                }
+            });
         }
 
         @Override

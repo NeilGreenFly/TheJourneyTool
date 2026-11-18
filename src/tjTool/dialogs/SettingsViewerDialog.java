@@ -200,16 +200,18 @@ public class SettingsViewerDialog {
             var v = getValue();
             if (v instanceof Boolean o)
                 ui.showConfirm(key, "[gray]" + o + "[sky]  ->  " + cFmt(validColor(!o)) + !o, () -> setValue(table, !o));
-            else if (v instanceof Integer o)
-                showNumInput(false, key, "[gray]" + o + "[sky]  ->  ", o.toString(), str -> {
-                    if (Strings.canParsePositiveInt(str)) setValue(table, Strings.parseInt(str));
-                    else ui.showInfo("@invalid");
-                });
-            else if (v instanceof Float o) {
-                showNumInput(true, key, "[gray]" + o + "[sky]  ->  ", o.toString(), str -> {
-                    if (Strings.canParsePositiveFloat(str)) setValue(table, Strings.parseFloat(str));
-                    else ui.showInfo("@invalid");
-                });
+            else if (v instanceof Number number) {
+                String text = mobile ? (number + "  ->  ") : ("[gray]" + number + "[sky]  ->  ");
+                if (number instanceof Integer o)
+                    showNumInput(false, key, text, o.toString(), str -> {
+                        if (Strings.canParsePositiveInt(str)) setValue(table, Strings.parseInt(str));
+                        else ui.showInfo("@invalid");
+                    });
+                else if (number instanceof Float o)
+                    showNumInput(true, key, text, o.toString(), str -> {
+                        if (Strings.canParsePositiveFloat(str)) setValue(table, Strings.parseFloat(str));
+                        else ui.showInfo("@invalid");
+                    });
             }
         }
 

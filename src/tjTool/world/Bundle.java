@@ -4,6 +4,7 @@ import static arc.Core.bundle;
 
 /**
  * @author NeilGreenFly
+ * @see mindustry.ctype.ContentType
  */
 public interface Bundle {
     String dot = ".";

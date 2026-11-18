@@ -29,12 +29,20 @@ public class SingleConsumer extends BaseConsumer {
 
     @Override
     public boolean hasItems() {
-        return super.hasItems() || output.hasItems();
+        return super.hasItems() || outputsItems();
     }
 
     @Override
     public boolean hasLiquids() {
-        return super.hasLiquids() || output.hasLiquids();
+        return super.hasLiquids() || outputsLiquid();
+    }
+
+    public boolean outputsItems() {
+        return output.hasItems();
+    }
+
+    public boolean outputsLiquid() {
+        return output.hasLiquids();
     }
 
     public static SingleConsumer by(float sec) {
