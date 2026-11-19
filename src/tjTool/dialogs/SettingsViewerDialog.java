@@ -11,6 +11,7 @@ import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Strings;
+import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
@@ -28,6 +29,8 @@ public class SettingsViewerDialog {
 
     public static BaseDialog dialog;
     public static boolean showMods = true;
+
+    private static String tmp;
 
     private static Seq<ModEntry> modSeq;
     private static Seq<SettingEntry> planetsSeq;
@@ -83,7 +86,32 @@ public class SettingsViewerDialog {
         arcSeq = preArc.keys.map(SettingEntry::new);
         defaultSeq = preDef.keys.map(SettingEntry::new);
 
-        modSeq.add(apply(new ModEntry("< null >"), it -> {
+        modSeq.add(apply(new ModEntry("[accent]<[]MINDUSTRY[accent]>[]"), it -> {
+            Boolf2<KeyPreEntry, Boolf2<String, String>> has = (pre, findBy) -> {
+                if (findBy.get(pre.key, tmp)) return true;
+                UnlockableContent find = content.blocks().find(c -> findBy.get(pre.key, c.name));
+                if (find == null) find = content.units().find(c -> findBy.get(pre.key, c.name));
+                if (find == null) find = content.items().find(c -> findBy.get(pre.key, c.name));
+                if (find == null) find = content.liquids().find(c -> findBy.get(pre.key, c.name));
+                if (find == null) find = content.statusEffects().find(c -> findBy.get(pre.key, c.name));
+                if (find == null) find = content.weathers().find(c -> findBy.get(pre.key, c.name));
+                if (find == null) find = content.planets().find(c -> findBy.get(pre.key, c.name));
+                if (find == null) find = content.sectors().find(c -> findBy.get(pre.key, c.name));
+                if (find == null) return false;
+                tmp = find.name;
+                return true;
+            };
+            preReq.keys.each(pre -> !pre.ign, pre -> {
+                if (has.get(pre, (key, str) -> key.startsWith("req-" + str + "-")))
+                    it.req.add(new SettingEntry(pre));
+            });
+            preUnlocked.keys.each(pre -> !pre.ign, pre -> {
+                if (has.get(pre, (key, str) -> key.endsWith(str + "-unlocked")))
+                    it.unlocked.add(new SettingEntry(pre));
+            });
+        }));
+
+        modSeq.add(apply(new ModEntry("[coral]<[] null [coral]>[]"), it -> {
             preReq.keys.each(pre -> !pre.ign, pre -> it.req.add(new OtherEntry(pre)));
             preUnlocked.keys.each(pre -> !pre.ign, pre -> it.unlocked.add(new OtherEntry(pre)));
         }));
@@ -92,10 +120,7 @@ public class SettingsViewerDialog {
     private static void select(KeySeq from, Func<ModEntry, Seq<SettingEntry>> to, Boolf2<String, String> b) {
         from.keys.each(pre -> {
             var it = modSeq.find(mod -> b.get(mod.searchName, pre.key));
-            if (it != null) {
-                to.get(it).add(new SettingEntry(pre));
-                pre.ign = true;
-            }
+            if (it != null) to.get(it).add(new SettingEntry(pre));
         });
     }
 
@@ -173,6 +198,7 @@ public class SettingsViewerDialog {
 
         public SettingEntry(KeyPreEntry pre) {
             this(pre.key);
+            pre.ign = true;
         }
 
         public SettingEntry(String name) {
@@ -258,8 +284,14 @@ public class SettingsViewerDialog {
         public ModEntry(String name) {
             super(name);
             key = "mod-" + name + "-enabled";
-            if (name.equals("mindustryx")) displayName = TjDraw.gradient(name, Color.coral, Pal.accent);
-            else if (name.equals("kotlin")) displayName = TjDraw.gradient(name, TjColor.kotlin, Color.violet);
+            displayName = switch (name) {
+                case "mindustryx" -> TjDraw.gradient(name, Color.coral, Pal.accent);
+                case "kotlin" -> TjDraw.gradient(name, TjColor.kotlin, Color.violet);
+                case "mod-tools" -> TjDraw.gradient(name, Color.sky, Color.white);
+                case "he" -> TjDraw.gradient(name, Color.salmon, Color.white);
+                case "tmi" -> TjDraw.gradient(name, Color.teal, Color.green);
+                default -> displayName;
+            };
         }
 
         @Override
