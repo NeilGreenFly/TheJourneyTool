@@ -18,15 +18,17 @@ import static tjTool.world.LazyGetter.*;
 @SuppressWarnings("unused")
 public final class LazyButton {
 
+    public static Boolp neverChecked = () -> false;
+
     public static Cell<ImageButton> add(Table table, ImageButton button) {
         return table.add(button).size(uiSize);
     }
 
-    public static ImageButton button(TextureRegionDrawable icon, Boolp isChecked, @Nullable Boolc changed) {
-        return button(icon, null, isChecked, changed);
+    public static ImageButton lazyButton(TextureRegionDrawable icon, Boolp isChecked, @Nullable Boolc changed) {
+        return lazyButton(icon, null, isChecked, changed);
     }
 
-    public static ImageButton button(TextureRegionDrawable iconUp, TextureRegionDrawable iconChecked, Boolp isChecked, @Nullable Boolc changed) {
+    public static ImageButton lazyButton(TextureRegionDrawable iconUp, TextureRegionDrawable iconChecked, Boolp isChecked, @Nullable Boolc changed) {
         return apply(new ImageButton(iconUp, Styles.clearNoneTogglei), it -> {
             it.getStyle().imageChecked = iconChecked;
             it.resizeImage(iconSize);

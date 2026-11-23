@@ -25,6 +25,11 @@ public class UpdateDialog extends BaseDialog {
             panel.exited(() -> clearScrollFocus(panel));
         })).grow().row();
 
+        titleTable(frame, "v1.2.2 alpha", """
+                新增 >>
+                - 现在 任意源 和 定向源 均可批量配置
+                - 现在 定向源 可以设置炮台攻击位置
+                """, false);
         titleTable(frame, "v1.2.1 alpha", """
                 新增 & 修复 >>
                 - 完善 设置查看器 的相关功能
@@ -157,7 +162,7 @@ public class UpdateDialog extends BaseDialog {
             table.button("=", SettingsViewerDialog::show).row();
             table.button("-", DebugDialog::show).row();
         }).top().get().color.a(0.2f); // debug
-        cont.table(updateLog).growY().width(500);
+        cont.table(updateLog).growY().width(600);
         addCloseButton();
     }
 

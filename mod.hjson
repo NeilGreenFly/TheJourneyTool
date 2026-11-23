@@ -2,11 +2,11 @@ displayName: "The Journey Tool"
 subtitle: "旅途有你, 才叫旅途."
 description: "The Journey Tool"
 
-name: tj-tool
-author: NeilGreenFly
+name: "tj-tool"
+author: "NeilGreenFly"
 
-main: tjTool.TheJourney
-
-version: 1.2.1-alpha
-minGameVersion: 159.2
+main: "tjTool.TheJourney"
 java: true
+
+version: "1.2.2-alpha"
+minGameVersion: "159.2"

@@ -14,13 +14,16 @@ import mindustry.type.Liquid;
 import mindustry.type.LiquidStack;
 import mindustry.ui.Styles;
 import mindustry.world.Block;
-import mindustry.world.consumers.ConsumeItems;
-import mindustry.world.consumers.ConsumeLiquid;
-import mindustry.world.consumers.ConsumeLiquids;
+import mindustry.world.consumers.*;
 
 import static tjTool.widgets.TjTable.*;
 import static tjTool.world.Range.*;
 
+/**
+ * @deprecated 早期的冗余设计, 因错误地将用户面与逻辑相耦合而极难维护, 遂弃用.
+ * @since 1.0
+ */
+@Deprecated(forRemoval = true)
 @SuppressWarnings("unused")
 public final class TjConfigTable {
 

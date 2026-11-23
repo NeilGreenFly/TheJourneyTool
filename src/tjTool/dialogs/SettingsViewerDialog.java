@@ -22,6 +22,7 @@ import tjTool.world.graphics.TjDraw;
 
 import static mindustry.Vars.*;
 import static tjTool.widgets.TjTable.*;
+import static tjTool.world.Bundle.at;
 import static tjTool.world.LazyGetter.*;
 
 @SuppressWarnings("unused")
@@ -323,14 +324,14 @@ public class SettingsViewerDialog {
 
     public static void showNumInput(boolean isFloat, String title, String text, int textLength, String def, Cons<String> confirmed, Runnable closed) {
         if (mobile) Core.input.getTextInput(apply(new Input.TextInput(), it -> {
-            it.title = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title);
+            it.title = (title.startsWith(at) ? Core.bundle.get(title.substring(1)) : title);
             it.text = def;
             it.numeric = true;
             it.maxLength = textLength;
             it.accepted = confirmed;
             it.canceled = closed;
             it.allowEmpty = false;
-            it.message = text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
+            it.message = text.startsWith(at) ? Core.bundle.get(text.substring(1)) : text;
         }));
         else apply(new Dialog(title), it -> {
             it.cont.margin(30).add(text).padRight(6f);

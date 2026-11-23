@@ -31,10 +31,10 @@ import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.meta.*;
 import tjTool.func.FloatT;
 import tjTool.world.graphics.TjDraw;
-import tjTool.world.LazyButton;
 import tjTool.world.graphics.TjColor;
 
 import static mindustry.Vars.*;
+import static tjTool.world.LazyButton.*;
 import static tjTool.world.graphics.TjDraw.rainbow;
 import static tjTool.widgets.TjTable.*;
 import static tjTool.core.TjVars.halfSize;
@@ -207,7 +207,7 @@ public class OverdriveSource extends SandboxBlock {
 
             table.table(t -> {
                 t.defaults().size(uiSize);
-                t.add(LazyButton.button(Icon.eyeOffSmall, Icon.eyeSmall, () -> alwaysShowRange, v -> alwaysShowRange = v));
+                t.add(lazyButton(Icon.eyeOffSmall, Icon.eyeSmall, () -> alwaysShowRange, v -> alwaysShowRange = v));
                 configs.each(config -> {
                     if (!config.boost) t.button(Icon.info, Styles.clearNonei, iconSize, () -> {
                         ui.content.show(config.block);
@@ -217,7 +217,7 @@ public class OverdriveSource extends SandboxBlock {
                 });
                 t.row().image(Icon.effect);
                 configs.each(current -> {
-                    var button = new Table(b -> b.add(LazyButton.button(new TextureRegionDrawable(current.block.uiIcon), () -> false, ignore -> {
+                    var button = new Table(b -> b.add(lazyButton(new TextureRegionDrawable(current.block.uiIcon), neverChecked, ignore -> {
                         configure(current.serialize());
                         speedSlider.setValue(current.speed);
                         rangeSlider.setValue(current.range);
@@ -239,22 +239,22 @@ public class OverdriveSource extends SandboxBlock {
                     );
                 });
                 t.row().image(Icon.upOpen);
-                configs.each(current -> t.add(LazyButton.button(
+                configs.each(current -> t.add(lazyButton(
                         Icon.hammer, Icon.ok, () -> current.speed == overdriveConfig.speed,
                         ignore -> configure(overdriveConfig.setSpeed(current.speed).serialize())))
                         .tooltip(speedString(current.speed), true).get()
                         .changed(() -> speedSlider.setValue(current.speed)));
-                t.add(LazyButton.button(Icon.tag, Icon.tags, () -> sort == 1, v -> {
+                t.add(lazyButton(Icon.tag, Icon.tags, () -> sort == 1, v -> {
                     sort = v ? 1 : 0;
                     rebuild(table);
                 })).size(uiSize).tooltip(atKey("sort-by-speed"), true);
                 t.row().image(Icon.resize);
-                configs.each(current -> t.add(LazyButton.button(
+                configs.each(current -> t.add(lazyButton(
                         Icon.hammer, Icon.ok, () -> current.range == overdriveConfig.range,
                         ignore -> configure(overdriveConfig.setRange(current.range).serialize())))
                         .tooltip(rangeString(current.range), true).get()
                         .changed(() -> rangeSlider.setValue(current.range)));
-                t.add(LazyButton.button(Icon.tag, Icon.tags, () -> sort == 2, v -> {
+                t.add(lazyButton(Icon.tag, Icon.tags, () -> sort == 2, v -> {
                     sort = v ? 2 : 0;
                     rebuild(table);
                 })).size(uiSize).tooltip(atKey("sort-by-range"), true);

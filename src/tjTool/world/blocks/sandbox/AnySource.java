@@ -30,14 +30,14 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.BuildTurret;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.meta.BlockGroup;
-import tjTool.world.LazyButton;
 
 import java.util.Arrays;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.Layer.*;
 import static tjTool.widgets.TjTable.*;
-import static tjTool.core.TjVars.halfSize;
+import static tjTool.core.TjVars.*;
+import static tjTool.world.LazyButton.*;
 import static tjTool.world.LazyGetter.*;
 
 /**
@@ -59,8 +59,6 @@ public class AnySource extends BaseSource {
         hasLiquids = true;
         outputsLiquid = true;
         liquidCapacity = 1f;
-        configurable = true;
-        saveConfig = true;
         commandable = true;
     }
 
@@ -155,21 +153,18 @@ public class AnySource extends BaseSource {
                     table.button(Icon.logic, Styles.clearNonei, () -> {
                         boolean[] config = (boolean[]) config();
                         Arrays.fill(config, !getStatus());
-                        configure(config);
+                        configAll(config);
                     }).size(uiSize).tooltip("@addall", true);
                     table.row();
-                    table.button(Icon.trash, iconSize, () -> configure(2)).size(uiSize).tooltip("@stance.stop", true).padTop(100);
+                    table.button(Icon.trash, iconSize, () -> configAll(2)).size(uiSize).tooltip("@stance.stop", true).padTop(100);
                 })),
                 new Page(Icon.units).with(
                         new EmptyContent<>(table -> table.background(Styles.black6).label(() -> "Create a unit above").height(uiSize)),
                         Selection.unlockableContent(content.units().select(BaseSource::canProduce)::as, () -> null))
         );
 
-        private void addButton(Table table, TextureRegionDrawable icon, Boolp isChecked, Boolc setChecked, Block block) {
-            table.add(LazyButton.button(icon, isChecked, v -> {
-                setChecked.get(v);
-                configure(config());
-            })).size(uiSize).tooltip(tip -> {
+        private void addButton(Table table, TextureRegionDrawable icon, Boolp isChecked, Boolc changed, Block block) {
+            table.add(lazyButton(icon, isChecked, v -> configAll(() -> changed.get(v)))).size(uiSize).tooltip(tip -> {
                 tip.background(Tex.paneLeft).image(block.uiIcon).size(iconSize).padLeft(5).padRight(10);
                 tip.label(() -> block.localizedName + "    " + Core.bundle.get(isChecked.get() ? "mod.enabled" : "mod.disabled") + "[]\n" + block.description);
             });
@@ -290,6 +285,11 @@ public class AnySource extends BaseSource {
         @Override
         public void handleItem(Building source, Item item) {
             handle = false;
+        }
+
+        @Override
+        public boolean configureBy(Building building) {
+            return building instanceof BuildType;
         }
 
         @Override

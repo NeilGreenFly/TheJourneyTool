@@ -17,6 +17,7 @@ import tjTool.world.Range;
 import static arc.Core.settings;
 import static mindustry.Vars.ui;
 import static tjTool.TheJourney.theJourney;
+import static tjTool.world.Bundle.at;
 import static tjTool.world.LazyGetter.apply;
 
 /**
@@ -33,7 +34,7 @@ public class TjSettingTable {
         // 原本是可以直接调用 addCategory(...) 的, 但是我需要在后面追加一些不属于设置的部分,
         // 原本直接追加也是可以的因为 rebuild() 不再调用, 但是在 X 端这样是不行的, 我不得不重写 rebuild() 并手动调用一次, 原因不明.
         // 尽管这些也本不应该出现在设置中, 不过现阶段不做考虑.
-        ui.settings.getCategories().add(apply(new SettingsCategory("@" + theJourney.name + ".displayName", Icon.wrench, Setting::build) {{ builder.get(table = new SettingsTable() {
+        ui.settings.getCategories().add(apply(new SettingsCategory(at + theJourney.name + ".displayName", Icon.wrench, Setting::build) {{ builder.get(table = new SettingsTable() {
             @Override
             public void rebuild() {
                 super.rebuild();

@@ -34,7 +34,6 @@ import mindustry.world.blocks.heat.HeatConsumer;
 import mindustry.world.meta.BlockFlag;
 import mindustry.world.meta.Stat;
 import tjTool.widgets.TjBar;
-import tjTool.world.LazyButton;
 import tjTool.world.blocks.TjBlock;
 import tjTool.world.consumers.*;
 
@@ -44,6 +43,7 @@ import static mindustry.world.meta.StatValues.withTooltip;
 import static tjTool.core.TjStat.multiConsumersConfig;
 import static tjTool.dialogs.TjSettingTable.buttonDrop;
 import static tjTool.widgets.TjTable.*;
+import static tjTool.world.LazyButton.*;
 import static tjTool.world.LazyGetter.*;
 import static tjTool.world.Range.*;
 
@@ -256,7 +256,7 @@ public class MultiCrafter extends TjBlock {
         }
 
         protected void addButton(Table root, Table table, TextureRegionDrawable icon, Boolp isChecked, Boolc setChecked) {
-            table.add(LazyButton.button(icon, isChecked, v -> {
+            table.add(lazyButton(icon, isChecked, v -> {
                 setChecked.get(v);
                 rebuild(root);
             }));

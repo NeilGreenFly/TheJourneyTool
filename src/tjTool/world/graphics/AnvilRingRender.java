@@ -20,9 +20,9 @@ import mindustry.type.Planet;
 
 import static arc.Core.graphics;
 import static mindustry.graphics.Shaders.screenspace;
-import static tjTool.world.graphics.MultiModel.ring;
-import static tjTool.world.graphics.MultiModel.ringMesh;
-import static tjTool.world.graphics.Shaders.shader;
+import static tjTool.world.LazyGetter.*;
+import static tjTool.world.graphics.MultiModel.*;
+import static tjTool.world.graphics.Shaders.*;
 
 // TODO bloom
 
@@ -34,12 +34,12 @@ public class AnvilRingRender {
     public static final Camera3D camera = new Camera3D();
     public static final Camera3D planetCamera = new Camera3D();
     public static final PlanetParams params = new PlanetParams();
-    public static final FrameBuffer buffer = new FrameBuffer(graphics.getWidth(), graphics.getHeight(), true);
-    public static final Bloom bloom = new Bloom(graphics.getWidth() / 4, graphics.getHeight() / 4, true, true) {{
-        blurPasses = 4;
-        setThreshold(0.8f);
-        setBloomIntensity(0.2f);
-    }};
+    public static final FrameBuffer buffer = new FrameBuffer(0, 0, true);
+    public static final Bloom bloom = apply(new Bloom(0, 0, true, true), it -> {
+        it.blurPasses = 4;
+        it.setThreshold(0.8f);
+        it.setBloomIntensity(0.2f);
+    });
     protected static float actualZ;
     protected static float delta;
 

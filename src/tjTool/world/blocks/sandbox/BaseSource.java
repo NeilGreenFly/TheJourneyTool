@@ -27,6 +27,9 @@ public abstract class BaseSource extends SandboxBlock {
         outputsPower = true;
         consumesPower = false;
         conductivePower = true;
+        quickRotate = false;
+        configurable = true;
+        saveConfig = true;
         group = BlockGroup.transportation;
     }
 
@@ -99,5 +102,19 @@ public abstract class BaseSource extends SandboxBlock {
             return 1f;
         }
 
+        public boolean configureBy(Building building) {
+            return false;
+        }
+
+        public void configAll(Runnable pre) {
+            pre.run();
+            configAll(config());
+        }
+
+        public void configAll(Object value) {
+            var seq = control.input.commandBuildings;
+            if (!seq.contains(this::configureBy)) configure(value);
+            else seq.each(this::configureBy, it -> it.configure(value));
+        }
     }
 }

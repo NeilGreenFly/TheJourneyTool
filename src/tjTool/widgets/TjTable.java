@@ -39,6 +39,7 @@ import static tjTool.world.graphics.TjDraw.rainbow;
  * 由于旧的 {@code TjConfigTable} 将用户面和数据过度耦合导致极难扩展, 所以我们需要一种新的设计, 但是显然这需要一点时间...<p>
  * 但是后来我们发现这两个类的应用面并不能完全重合, 它们并不能完全替代对方, 因此我们完成了对 {@code TjConfigTable} 的优化并将其保留下来.<p>
  * 接下来我们将时间交给 {@code TjTable} 的优化和完善...<p>
+ * {@code TjConfigTable} 已弃用<p>
  * For example:
  * <blockquote><pre> {@code
  *     public Item myItem = null;
@@ -289,6 +290,17 @@ public final class TjTable {
                 });
             };
         }
+    }
+
+    /**
+     * 这个暂时没什么用
+     */
+    public static void tableWithTwoLines(Table table) {
+        table.table(Tex.whiteui, t -> {
+            t.image().height(3).growX().color(Pal.remove).row();
+            t.add("注意:\n这只是测试功能, 慎用!").pad(4).color(Pal.remove).row();
+            t.image().height(3).growX().color(Pal.remove).row();
+        }).color(Color.black).margin(10).padTop(10).row();
     }
 
     public static void init() {
